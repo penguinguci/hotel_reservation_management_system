@@ -1,2 +1,2 @@
-### Welcome to the course Distributed Programming with Java Language
+## Welcome to the course Distributed Programming with Java Language
 
