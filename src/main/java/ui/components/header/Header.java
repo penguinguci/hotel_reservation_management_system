@@ -5,6 +5,7 @@
 package ui.components.header;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -15,6 +16,7 @@ public class Header extends javax.swing.JPanel {
     public Header() {
         initComponents();
         setOpaque(false);
+        setFont(new Font("Arial", Font.BOLD, 16));
     }
 
     @Override
@@ -38,7 +40,6 @@ public class Header extends javax.swing.JPanel {
 
         lbImageLogo.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lbImageLogo.setForeground(new java.awt.Color(236, 236, 236));
-        lbImageLogo.setIcon(new javax.swing.ImageIcon("D:\\Distributed Programming\\workspace\\hotel_reservation_management_system\\src\\main\\java\\ui\\components\\header\\logo.png")); // NOI18N
         lbImageLogo.setText("Melody");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
