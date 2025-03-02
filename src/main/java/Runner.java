@@ -29,7 +29,7 @@ public class Runner {
 
         // test chức năng update
 //        Staff staff = new Staff();
-//        staff.setStaffId("06a06abb-c610-4688-bee6-3b58be6464e5");
+//        staff.setStaffId("06a06abb-c60-4688-bee6-3b58be6464e5");
 //        staff.setFirstName("Haywood");
 //        staff.setLastName("Minhan");
 //        staff.setGender(Gender.FEMALE);
