@@ -167,7 +167,6 @@ public class HomePageForm extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     private void initComponents() {
     }
-
     // Variables declaration
     private javax.swing.JLabel jLabel1;
 }
