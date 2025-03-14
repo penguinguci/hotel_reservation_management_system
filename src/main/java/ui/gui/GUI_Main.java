@@ -6,7 +6,7 @@ package ui.gui;
 
 import java.awt.Component;
 import ui.components.menu.MenuEvent;
-import ui.forms.DefaultForm;
+import ui.forms.HomePageForm;
 
 
 public class GUI_Main extends javax.swing.JFrame {
@@ -19,15 +19,17 @@ public class GUI_Main extends javax.swing.JFrame {
     public GUI_Main() {
         initComponents();
         setExtendedState(MAXIMIZED_BOTH);
+        HomePageForm homePageForm = new HomePageForm(" ");
+        showForm(homePageForm);
         menu3.setEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) {
-                showForm(new DefaultForm("Form : " + index + " " + subIndex));
+                showForm(new HomePageForm("Form : " + index + " " + subIndex));
             }
         });
     }
     
-    private void showForm(Component com) {
+    private void showForm(HomePageForm com) {
         body.removeAll();
         body.add(com);
         body.repaint();

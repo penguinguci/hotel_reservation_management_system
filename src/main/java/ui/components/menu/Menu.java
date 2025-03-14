@@ -24,11 +24,12 @@ public class Menu extends JComponent {
     private MenuEvent event;
     private MigLayout layout;
     private String[][] menuItems = new String[][] {
-        {"Dashboard"},
-        {"Email", "Inbox", "Read", "Compost"},
-        {"Chat"},
-        {"Calendar"},
-        {"UI Kit", "Accordion", "Alearts", "Badges", "Breadcrumbs", "Buttons", "Button group"}
+        {"Trang chủ"},
+        {"Dịch vụ", "Đặt phòng", "Trả phòng", "Hủy đặt phòng"},
+        {"Khách hàng"},
+        {"Nhân viên"},
+        {"Khuyến mãi"},
+        {"Đăng xuất"}
     };
     
     public Menu() {
@@ -71,6 +72,7 @@ public class Menu extends JComponent {
         if (icon != null) {
             item.setIcon(icon);
         }
+        //Chuyển form
         item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -91,8 +93,8 @@ public class Menu extends JComponent {
             }
         });
         add(item);
-        revalidate();
-        repaint();
+        //revalidate();
+        //repaint();
     }
      
     private void addSubMenu(MenuItem item, int index, int length, int indexZorder) {
