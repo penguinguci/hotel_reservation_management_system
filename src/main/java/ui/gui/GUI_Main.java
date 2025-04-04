@@ -4,9 +4,8 @@
  */
 package ui.gui;
 
-import java.awt.Component;
 import ui.components.menu.MenuEvent;
-import ui.forms.HomePageForm;
+import ui.forms.Form_HomePage;
 
 
 public class GUI_Main extends javax.swing.JFrame {
@@ -19,17 +18,17 @@ public class GUI_Main extends javax.swing.JFrame {
     public GUI_Main() {
         initComponents();
         setExtendedState(MAXIMIZED_BOTH);
-        HomePageForm homePageForm = new HomePageForm(" ");
+        Form_HomePage homePageForm = new Form_HomePage(" ");
         showForm(homePageForm);
         menu3.setEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) {
-                showForm(new HomePageForm("Form : " + index + " " + subIndex));
+                showForm(new Form_HomePage("Form : " + index + " " + subIndex));
             }
         });
     }
     
-    private void showForm(HomePageForm com) {
+    private void showForm(Form_HomePage com) {
         body.removeAll();
         body.add(com);
         body.repaint();

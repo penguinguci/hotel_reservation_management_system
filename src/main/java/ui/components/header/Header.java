@@ -34,13 +34,19 @@ public class Header extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lbImageLogo = new javax.swing.JLabel();
+        lblImageLogo = new javax.swing.JLabel();
+        lblTitleLogo = new javax.swing.JLabel();
 
         setName("lbImageLogo"); // NOI18N
 
-        lbImageLogo.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        lbImageLogo.setForeground(new java.awt.Color(236, 236, 236));
-        lbImageLogo.setText("Melody");
+        lblImageLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hotel.png"))); // NOI18N
+        lblImageLogo.setMaximumSize(new java.awt.Dimension(32, 32));
+        lblImageLogo.setMinimumSize(new java.awt.Dimension(32, 32));
+        lblImageLogo.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        lblTitleLogo.setFont(new java.awt.Font("Segoe UI", 2, 22)); // NOI18N
+        lblTitleLogo.setForeground(new java.awt.Color(236, 236, 236));
+        lblTitleLogo.setText("Hotel Melody");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -48,20 +54,27 @@ public class Header extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lbImageLogo)
-                .addContainerGap(542, Short.MAX_VALUE))
+                .addComponent(lblImageLogo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblTitleLogo)
+                .addContainerGap(504, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lbImageLogo, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblTitleLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblImageLogo, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
+
+        lblTitleLogo.getAccessibleContext().setAccessibleName("Hotel Melody");
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel lbImageLogo;
+    private javax.swing.JLabel lblImageLogo;
+    private javax.swing.JLabel lblTitleLogo;
     // End of variables declaration//GEN-END:variables
 }
