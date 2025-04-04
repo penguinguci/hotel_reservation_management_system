@@ -19,14 +19,14 @@ import java.util.Calendar;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 
-public class HomePageForm extends javax.swing.JPanel {
+public class Form_HomePage extends javax.swing.JPanel {
 
     private AnalogClock analogClock;
     private JLabel lblDigitalTime;
     private JLabel lblPhongTrong;
     private JLabel lblDoanhThu;
 
-    public HomePageForm(String name) {
+    public Form_HomePage(String name) {
         initComponents();
 
         initCustomComponents();
@@ -66,8 +66,8 @@ public class HomePageForm extends javax.swing.JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Gradient background
-        Color color1 = new Color(38, 120, 113);
-        Color color2 = new Color(69, 162, 158);
+        Color color1 = new Color(149, 145, 239);
+        Color color2 = new Color(113, 105, 246);
         GradientPaint gp = new GradientPaint(0, 0, color1, getWidth(), getHeight(), color2);
         g2d.setPaint(gp);
         g2d.fillRect(0, 0, getWidth(), getHeight());
