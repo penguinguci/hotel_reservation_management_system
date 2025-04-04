@@ -28,8 +28,8 @@ public class Header extends javax.swing.JPanel {
         super.paintComponent(g);
     }
 
-    
-    
+
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -68,8 +68,6 @@ public class Header extends javax.swing.JPanel {
                     .addComponent(lblImageLogo, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
-
-        lblTitleLogo.getAccessibleContext().setAccessibleName("Hotel Melody");
     }// </editor-fold>//GEN-END:initComponents
 
 
