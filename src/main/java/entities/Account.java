@@ -17,7 +17,8 @@ public class Account {
     @Column(columnDefinition = "varchar(50)", nullable = false)
     private String password;
 
-    @OneToOne
-    @JoinColumn(name = "staff_id", unique = true, nullable = false)
-    private Staff staff;
+    //@OneToOne
+   // @JoinColumn(name = "role", unique = true, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
 }

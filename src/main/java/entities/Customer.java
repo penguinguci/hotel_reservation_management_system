@@ -23,8 +23,8 @@ public class Customer {
     @Column(name = "last_name", columnDefinition = "nvarchar(50)", nullable = false)
     private String lastName;
 
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
+    @Column(name = "gender")
+    private boolean gender;
 
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
@@ -35,11 +35,11 @@ public class Customer {
     @Column(columnDefinition = "varchar(50)", nullable = true, unique = true)
     private String email;
 
-    @Embedded
-    private Address address;
+    @Column(name = "address")
+    private String address;
 
-    @OneToOne(mappedBy = "customer")
-    private BonusPoint bonusPoint;
+    @Column(name = "point")
+    private double bonusPoint;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "customer")

@@ -28,9 +28,9 @@ public class Service {
     @Column(columnDefinition = "bit", nullable = false)
     private boolean availability;
 
-    @OneToOne
-    @JoinColumn(name = "promotion_id")
-    private Promotion promotion;
+//    @OneToOne
+//    @JoinColumn(name = "promotion_id")
+//    private Promotion promotion;
 
     @OneToMany(mappedBy = "service")
     private Set<OrderDetails> orderDetails;
