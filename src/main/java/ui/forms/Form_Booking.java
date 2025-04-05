@@ -6,14 +6,14 @@ package ui.forms;
 
 /**
  *
- * @author Lenovo
+ * @author TRAN LONG VU
  */
-public class ReservationRoom extends javax.swing.JPanel {
+public class Form_Booking extends javax.swing.JPanel {
 
     /**
-     * Creates new form RoomForm
+     * Creates new form Form_Booking
      */
-    public ReservationRoom() {
+    public Form_Booking() {
         initComponents();
     }
 
