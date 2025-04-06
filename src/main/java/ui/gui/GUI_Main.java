@@ -7,6 +7,8 @@ package ui.gui;
 import ui.components.menu.MenuEvent;
 import ui.forms.Form_HomePage;
 
+import javax.swing.*;
+
 
 public class GUI_Main extends javax.swing.JFrame {
     private javax.swing.JPanel body;
@@ -23,7 +25,12 @@ public class GUI_Main extends javax.swing.JFrame {
         menu3.setEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) {
-                showForm(new Form_HomePage("Form : " + index + " " + subIndex));
+                if(index == -1){
+                    logout();
+                }
+                else{
+                    showForm(new Form_HomePage("Form : " + index + " " + subIndex));
+                }
             }
         });
     }
@@ -123,4 +130,13 @@ public class GUI_Main extends javax.swing.JFrame {
         });
     }
 
+    private void logout() {
+        int response = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn đăng xuất?", "Đăng xuất", JOptionPane.YES_NO_OPTION);
+
+        if (response == JOptionPane.YES_OPTION) {
+
+            new GUI_Login().setVisible(true);
+            this.dispose();
+        }
+    }
 }

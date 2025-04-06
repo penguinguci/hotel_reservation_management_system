@@ -14,15 +14,25 @@ import jakarta.persistence.TypedQuery;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 import java.rmi.RemoteException;
 
 public class GUI_Login extends javax.swing.JFrame {
 
     public GUI_Login() {
+        setUndecorated(true); // Ẩn các nút điều khiển
+        setShape(new RoundRectangle2D.Double(0, 0, 800, 500, 30, 30));
         initComponents();
         setLocationRelativeTo(null);
     }
-
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setColor(Color.black); // Màu đường viền
+        g2.setStroke(new BasicStroke(4)); // Độ dày của đường viền
+        g2.draw(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 30, 30)); // Vẽ đường viền
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
