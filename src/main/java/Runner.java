@@ -1,7 +1,5 @@
 import dao.StaffDAO;
-import data.DataGenerator;
-import entities.Address;
-import entities.Gender;
+
 import entities.Role;
 import entities.Staff;
 import jakarta.persistence.EntityManager;
@@ -36,6 +34,6 @@ public class Runner {
 //        staffDAO.update(staff);
 
         // test tìm kiếm danh sách nhân viên theo tên
-        staffDAO.listStaffByName("Michael");
+ //       staffDAO.listStaffByName("Michael");
     }
 }
