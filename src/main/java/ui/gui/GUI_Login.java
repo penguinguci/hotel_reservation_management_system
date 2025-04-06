@@ -5,8 +5,16 @@
 package ui.gui;
 
 
+import dao.AccountDAO;
+import dao.AccountDAOImpl;
+import entities.Account;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+
 import javax.swing.*;
 import java.awt.*;
+import java.rmi.RemoteException;
 
 public class GUI_Login extends javax.swing.JFrame {
 
@@ -108,7 +116,11 @@ public class GUI_Login extends javax.swing.JFrame {
         btn_Login.setText("Login");
         btn_Login.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_LoginActionPerformed(evt);
+                try {
+                    btn_LoginActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -122,6 +134,15 @@ public class GUI_Login extends javax.swing.JFrame {
         roundedTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 roundedTextField1ActionPerformed(evt);
+            }
+        });
+        roundedPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                try {
+                    roundedPasswordField1ActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -185,17 +206,40 @@ public class GUI_Login extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_LoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_LoginActionPerformed
+    private void btn_LoginActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_LoginActionPerformed
         // TODO add your handling code here:
+        String username = roundedTextField1.getText();
+        String password = new String(roundedPasswordField1.getPassword());
+
+        AccountDAO accountDAO = new AccountDAOImpl();
+        Account account = accountDAO.getAccount(username);
+        if(account != null && account.getPassword().equals(password)){
+            JOptionPane.showMessageDialog(this  , "Login Successful", "Notification", JOptionPane.INFORMATION_MESSAGE);
+            this.dispose();
+            GUI_Main guiMain = new GUI_Main();
+            guiMain.setVisible(true);
+        }
+        else{
+            JOptionPane.showMessageDialog(this, "Login Fail", "Warning", JOptionPane.INFORMATION_MESSAGE);
+
+        }
     }//GEN-LAST:event_btn_LoginActionPerformed
 
     private void btn_ExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ExitActionPerformed
-        // TODO add your handling code here:
+        System.exit(0);
     }//GEN-LAST:event_btn_ExitActionPerformed
 
     private void roundedTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roundedTextField1ActionPerformed
         // TODO add your handling code here:
+        if (evt.getSource() == roundedTextField1) {
+            roundedPasswordField1.requestFocus();
+        }
     }//GEN-LAST:event_roundedTextField1ActionPerformed
+    private void roundedPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
+        if (evt.getSource() == roundedPasswordField1) {
+            btn_LoginActionPerformed(evt);
+        }
+    }
 
     /**
      * @param args the command line arguments
