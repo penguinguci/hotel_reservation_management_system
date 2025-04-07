@@ -13,19 +13,19 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "rooms")
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Room {
+public class Room {
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "room_id")
     protected String roomId;
 
-    @Column(name = "price_per_night", columnDefinition = "float")
-    protected double pricePerNight;
+    @Column(name = "price", columnDefinition = "float")
+    protected double price;
 
     protected int capacity;
 
-    @Column(columnDefinition = "nvarchar(1024)")
-    protected String description;
+//    @Column(columnDefinition = "nvarchar(1024)")
+//    protected String description;
 
     protected int status;
 
@@ -37,10 +37,10 @@ public abstract class Room {
 
     @Column(name = "room_size")
     protected double roomSize;
-
-    @OneToOne
-    @JoinColumn(name = "promotion_id", unique = true, nullable = true)
-    protected Promotion promotion;
+//
+//    @OneToOne
+//    @JoinColumn(name = "promotion_id", unique = true, nullable = true)
+//    protected Promotion promotion;
 
     @Column(name = "room_image", columnDefinition = "varchar(1024)")
     protected String roomImage;

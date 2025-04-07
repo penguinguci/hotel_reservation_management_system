@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 @AllArgsConstructor
-public class StaffDAO {
+public class StaffDAOImpl {
     private EntityManager em;
 
     // create

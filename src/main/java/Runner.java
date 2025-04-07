@@ -1,24 +1,14 @@
-import dao.StaffDAO;
-import data.DataGenerator;
-import entities.Address;
-import entities.Gender;
-import entities.Role;
-import entities.Staff;
+import dao.StaffDAOImpl;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Persistence;
-
-import java.sql.Date;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class Runner {
     public static void main(String[] args) {
         EntityManager em = Persistence.createEntityManagerFactory("mariadb")
                 .createEntityManager();
 
-        StaffDAO staffDAO = new StaffDAO(em);
+        StaffDAOImpl staffDAO = new StaffDAOImpl(em);
 
         // test chức năng create
 //        DataGenerator dataGenerator = new DataGenerator();
@@ -36,6 +26,6 @@ public class Runner {
 //        staffDAO.update(staff);
 
         // test tìm kiếm danh sách nhân viên theo tên
-        staffDAO.listStaffByName("Michael");
+ //       staffDAO.listStaffByName("Michael");
     }
 }

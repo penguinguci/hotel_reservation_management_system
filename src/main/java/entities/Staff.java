@@ -27,8 +27,9 @@ public class Staff {
     @Column(name = "last_name", columnDefinition = "nvarchar(50)", nullable = false)
     private String lastName;
 
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
+    //@Enumerated(EnumType.STRING)
+    @Column(name = "gender")
+    private boolean gender;
 
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
@@ -39,8 +40,8 @@ public class Staff {
     @Column(name = "phones", nullable = false)
     private Set<String> phoneNumbers;
 
-    @Embedded
-    private Address address;
+    @Column(name = "address",  columnDefinition = "nvarchar(100)")
+    private String address;
 
     @Column(name = "email", columnDefinition = "varchar(50)", unique = true)
     private String email;
@@ -48,8 +49,8 @@ public class Staff {
     @Column(name = "staff_image", columnDefinition = "varchar(1024)")
     private String staffImage;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+//    @Enumerated(EnumType.STRING)
+//    private Role role;
 
     @Column(name = "date_of_join")
     private Date dateOfJoin;

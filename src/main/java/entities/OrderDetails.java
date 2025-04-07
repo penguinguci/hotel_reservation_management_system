@@ -36,7 +36,7 @@ public class OrderDetails {
     public double calculateLineTotalAmount() {
         double lineTotalAmount = 0;
         if (room != null && service == null) {
-            lineTotalAmount = quantity * room.getPricePerNight();
+            lineTotalAmount = quantity * room.getPrice();
         } else if (room == null && service != null) {
             lineTotalAmount = quantity * service.getPrice();
         }
