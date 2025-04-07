@@ -1,11 +1,12 @@
 package dao;
 
-import entities.Account;
-import interfaces.AccountDAO;
+import entities.Room;
+import interfaces.RoomDAO;
 import jakarta.persistence.*;
 
 import java.util.List;
-public class AccountDAOImpl implements AccountDAO {
+
+public class RoomDAOImpl implements RoomDAO {
 
     @PersistenceContext
     private EntityManagerFactory entityManagerFactory;
@@ -13,16 +14,17 @@ public class AccountDAOImpl implements AccountDAO {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public AccountDAOImpl() {
+    public RoomDAOImpl() {
         entityManagerFactory = Persistence.createEntityManagerFactory("mariadb");
         entityManager = entityManagerFactory.createEntityManager();
     }
 
-    public void createAccount(Account account) {
+    // Tạo phòng
+    public void createRoom(Room room) {
         EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
-            entityManager.persist(account);
+            entityManager.persist(room);
             transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) {
@@ -32,20 +34,23 @@ public class AccountDAOImpl implements AccountDAO {
         }
     }
 
-    public Account getAccount(String username) {
-        return entityManager.find(Account.class, username);
+    // Lấy phòng theo ID
+    public Room getRoom(int id) {
+        return entityManager.find(Room.class, id);
     }
 
-    public List<Account> getAllAccounts() {
-        TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a", Account.class);
+    // Lấy tất cả phòng
+    public List<Room> getAllRooms() {
+        TypedQuery<Room> query = entityManager.createQuery("SELECT r FROM Room r", Room.class);
         return query.getResultList();
     }
 
-    public void updateAccount(Account account) {
+    // Cập nhật thông tin phòng
+    public void updateRoom(Room room) {
         EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
-            entityManager.merge(account);
+            entityManager.merge(room);
             transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) {
@@ -55,13 +60,14 @@ public class AccountDAOImpl implements AccountDAO {
         }
     }
 
-    public void deleteAccount(String username) {
+    // Xóa phòng
+    public void deleteRoom(int id) {
         EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
-            Account account = entityManager.find(Account.class, username);
-            if (account != null) {
-                entityManager.remove(account);
+            Room room = entityManager.find(Room.class, id);
+            if (room != null) {
+                entityManager.remove(room);
             }
             transaction.commit();
         } catch (Exception e) {
@@ -72,6 +78,7 @@ public class AccountDAOImpl implements AccountDAO {
         }
     }
 
+    // Đóng kết nối
     public void close() {
         if (entityManager != null) {
             entityManager.close();

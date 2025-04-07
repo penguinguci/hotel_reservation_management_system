@@ -1,11 +1,12 @@
 package dao;
 
-import entities.Account;
-import interfaces.AccountDAO;
+import entities.Service;
+import interfaces.ServicesDAO;
 import jakarta.persistence.*;
 
 import java.util.List;
-public class AccountDAOImpl implements AccountDAO {
+
+public class ServicesDAOImpl implements ServicesDAO {
 
     @PersistenceContext
     private EntityManagerFactory entityManagerFactory;
@@ -13,16 +14,17 @@ public class AccountDAOImpl implements AccountDAO {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public AccountDAOImpl() {
+    public ServicesDAOImpl() {
         entityManagerFactory = Persistence.createEntityManagerFactory("mariadb");
         entityManager = entityManagerFactory.createEntityManager();
     }
 
-    public void createAccount(Account account) {
+    // Tạo dịch vụ
+    public void createService(Service service) {
         EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
-            entityManager.persist(account);
+            entityManager.persist(service);
             transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) {
@@ -32,20 +34,23 @@ public class AccountDAOImpl implements AccountDAO {
         }
     }
 
-    public Account getAccount(String username) {
-        return entityManager.find(Account.class, username);
+    // Lấy dịch vụ theo ID
+    public Service getService(int id) {
+        return entityManager.find(Service.class, id);
     }
 
-    public List<Account> getAllAccounts() {
-        TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a", Account.class);
+    // Lấy tất cả dịch vụ
+    public List<Service> getAllServices() {
+        TypedQuery<Service> query = entityManager.createQuery("SELECT s FROM Service s", Service.class);
         return query.getResultList();
     }
 
-    public void updateAccount(Account account) {
+    // Cập nhật thông tin dịch vụ
+    public void updateService(Service service) {
         EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
-            entityManager.merge(account);
+            entityManager.merge(service);
             transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) {
@@ -55,13 +60,14 @@ public class AccountDAOImpl implements AccountDAO {
         }
     }
 
-    public void deleteAccount(String username) {
+    // Xóa dịch vụ
+    public void deleteService(int id) {
         EntityTransaction transaction = entityManager.getTransaction();
         try {
             transaction.begin();
-            Account account = entityManager.find(Account.class, username);
-            if (account != null) {
-                entityManager.remove(account);
+            Service service = entityManager.find(Service.class, id);
+            if (service != null) {
+                entityManager.remove(service);
             }
             transaction.commit();
         } catch (Exception e) {
@@ -72,6 +78,7 @@ public class AccountDAOImpl implements AccountDAO {
         }
     }
 
+    // Đóng kết nối
     public void close() {
         if (entityManager != null) {
             entityManager.close();
