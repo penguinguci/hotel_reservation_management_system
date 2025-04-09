@@ -4,19 +4,71 @@
  */
 package ui.forms;
 
+import dao.CustomerDAOImpl;
+import entities.Customer;
+import interfaces.CustomerDAO;
 import ui.components.textfield.CustomRoundedTextField;
+
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.KeyEvent;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
  * @author Lenovo
  */
 public class Form_CustomerManagement extends javax.swing.JPanel {
-
+    private CustomerDAOImpl customerDAO;
     /**
      * Creates new form Form_StaffManagement
      */
     public Form_CustomerManagement() {
         initComponents();
+        customerDAO = new CustomerDAOImpl();
+        loadCustomerData();
+        customTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int row = customTable1.getSelectedRow();
+                if (row != -1) {
+                    loadCustomerDataTable(row);
+                }
+            }
+        });
+        txt_NameSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btn_SearchActionPerformed(null);
+                   txt_PhoneSearch.requestFocus();
+                }
+            }
+        });
+
+        txt_IDSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btn_SearchActionPerformed(null);
+                    txt_NameSearch.requestFocus();
+                }
+            }
+        });
+
+        txt_PhoneSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btn_SearchActionPerformed(null);
+                    cbx_GenderSearch.getSelectedItem();
+                }
+            }
+        });
+
+        cbx_GenderSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btn_SearchActionPerformed(null);
+                }
+            }
+        });
     }
 
     /**
@@ -50,7 +102,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         txt_Address = new ui.components.textfield.CustomRoundedTextField();
         pnl_Point = new javax.swing.JPanel();
         lbl_Point = new javax.swing.JLabel();
-        txt_Password = new ui.components.textfield.CustomRoundedTextField();
+        txt_Points = new ui.components.textfield.CustomRoundedTextField();
         pnl_Gender = new javax.swing.JPanel();
         lbl_Gender = new javax.swing.JLabel();
         cbx_Gender = new ui.components.combobox.StyledComboBox();
@@ -92,7 +144,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         lbl_Title.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         lbl_Title.setForeground(new java.awt.Color(127, 122, 239));
         lbl_Title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbl_Title.setText(" QUẢN LÝ NHÂN VIÊN");
+        lbl_Title.setText(" QUẢN LÝ KHÁCH HÀNG");
         pnl_North.add(lbl_Title, java.awt.BorderLayout.CENTER);
 
         add(pnl_North, java.awt.BorderLayout.PAGE_START);
@@ -106,7 +158,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         pnl_FisrtName.setBackground(new java.awt.Color(255, 255, 255));
 
         lbl_FirstName.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_FirstName.setText("Họ:");
+        lbl_FirstName.setText("Mã khách hàng:");
 
         txt_FisrtName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -120,9 +172,10 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
             pnl_FisrtNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_FisrtNameLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lbl_FirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-                .addComponent(txt_FisrtName, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(lbl_FirstName)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txt_FisrtName, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         pnl_FisrtNameLayout.setVerticalGroup(
             pnl_FisrtNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,7 +188,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         );
 
         pnl_Left.add(pnl_FisrtName);
-        pnl_FisrtName.setBounds(30, 30, 350, 41);
+        pnl_FisrtName.setBounds(30, 30, 360, 41);
 
         pnl_LastName.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -154,8 +207,8 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
             pnl_LastNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_LastNameLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lbl_LastName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 51, Short.MAX_VALUE)
+                .addComponent(lbl_LastName, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
                 .addComponent(txt_LastName, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnl_LastNameLayout.setVerticalGroup(
@@ -279,10 +332,10 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         lbl_Point.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         lbl_Point.setText("Điểm:");
 
-        txt_Password.setEditable(false);
-        txt_Password.addActionListener(new java.awt.event.ActionListener() {
+        txt_Points.setEditable(false);
+        txt_Points.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_PasswordActionPerformed(evt);
+                txt_PointsActionPerformed(evt);
             }
         });
 
@@ -294,7 +347,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(lbl_Point)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
-                .addComponent(txt_Password, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(txt_Points, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnl_PointLayout.setVerticalGroup(
             pnl_PointLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -302,7 +355,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(pnl_PointLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lbl_Point)
-                    .addComponent(txt_Password, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txt_Points, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -315,6 +368,9 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         lbl_Gender.setText("Giới tính:");
 
         cbx_Gender.setPreferredSize(new java.awt.Dimension(72, 34));
+        cbx_Gender.addItem("");
+        cbx_Gender.addItem("Nam");
+        cbx_Gender.addItem("Nữ");
         cbx_Gender.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbx_GenderActionPerformed(evt);
@@ -328,8 +384,8 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
             .addGroup(pnl_GenderLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lbl_Gender)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-                .addComponent(cbx_Gender, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
+                .addComponent(cbx_Gender, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(19, 19, 19))
         );
         pnl_GenderLayout.setVerticalGroup(
@@ -574,10 +630,10 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         pButton.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 140, 50));
 
         btnImport.setText("Import");
-        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 140, 50));
+        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 140, 50));
 
         btnExport.setText("Export");
-        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 260, 140, 50));
+        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 140, 50));
 
         javax.swing.GroupLayout pnl_SouthLayout = new javax.swing.GroupLayout(pnl_South);
         pnl_South.setLayout(pnl_SouthLayout);
@@ -602,7 +658,64 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
 
         add(pnl_Center, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+    private void loadCustomerData(){
+        List<Customer> customers = customerDAO.getAllCustomers(); // Lấy danh sách khách hàng
+        DefaultTableModel model = (DefaultTableModel) customTable1.getModel();
+        model.setRowCount(0); // Xóa dữ liệu cũ trong bảng
 
+        for (Customer customer : customers) {
+           // String name = customer.getFirstName()+" "+customer.getLastName();
+            model.addRow(new Object[]{
+                    customer.getCustomerId(),
+                    customer.getFirstName()+" "+customer.getLastName(),
+                    customer.isGender() ? "Nam":"Nữ",
+                    customer.getDateOfBirth(),
+                    customer.getPhoneNumber(),
+                    customer.getEmail(),
+                    customer.getAddress(),
+                    customer.getBonusPoint()
+            });
+        }
+    }
+    private void loadCustomerDataTable(int row){
+        DefaultTableModel model = (DefaultTableModel) customTable1.getModel();
+
+        String id = (String) model.getValueAt(row, 0);
+        String name = (String) model.getValueAt(row, 1); // Họ
+        String gender = (String) model.getValueAt(row, 2); // Giới tính
+        Date birthDate = (Date) model.getValueAt(row, 3); // Ngày sinh
+        String phone = (String) model.getValueAt(row, 4); // Số điện thoại
+        String email = (String) model.getValueAt(row, 5); // Email
+        String address = (String) model.getValueAt(row, 6); // Địa chỉ
+        double points = (Double) model.getValueAt(row, 7); // Điểm
+
+
+        txt_FisrtName.setText(id);
+        txt_LastName.setText(name); // Nếu bạn có trường họ
+        cbx_Gender.setSelectedItem(gender);
+        txt_Phone.setText(phone);
+        txt_Email.setText(email);
+        txt_Address.setText(address);
+        txt_Points.setText(String.valueOf(points));
+        calendar_BirthDate.setSelectedDate(birthDate);
+    }
+    private void updateCustomerTable(List<Customer> customers) {
+        DefaultTableModel model = (DefaultTableModel) customTable1.getModel();
+        model.setRowCount(0); // Clear previous data
+
+        for (Customer customer : customers) {
+            model.addRow(new Object[]{
+                    customer.getCustomerId(),
+                    customer.getFirstName() + " " + customer.getLastName(),
+                    customer.isGender() ? "Nam" : "Nữ",
+                    customer.getDateOfBirth(),
+                    customer.getPhoneNumber(),
+                    customer.getEmail(),
+                    customer.getAddress(),
+                    customer.getBonusPoint()
+            });
+        }
+    }
     private void txt_FisrtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_FisrtNameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_FisrtNameActionPerformed
@@ -623,9 +736,9 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_AddressActionPerformed
 
-    private void txt_PasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_PasswordActionPerformed
+    private void txt_PointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_PointsActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txt_PasswordActionPerformed
+    }//GEN-LAST:event_txt_PointsActionPerformed
 
     private void cbx_GenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbx_GenderActionPerformed
         // TODO add your handling code here:
@@ -649,6 +762,18 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
 
     private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
         // TODO add your handling code here:
+        String name = txt_NameSearch.getText().trim();
+        String id = txt_IDSearch.getText().trim();
+        String phone = txt_PhoneSearch.getText().trim();
+        String gender = (String) cbx_GenderSearch.getSelectedItem();
+
+        if (name.isEmpty() && id.isEmpty() && phone.isEmpty() && (gender == null || gender.isEmpty())) {
+            loadCustomerData(); // Hiện toàn bộ bảng
+        } else {
+            // Nếu không trống, thực hiện tìm kiếm
+      //      List<Customer> customers = customerDAO.searchCustomers();
+      //      updateCustomerTable(customers);
+        }
     }//GEN-LAST:event_btn_SearchActionPerformed
 
 
@@ -701,8 +826,8 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
     private ui.components.textfield.CustomRoundedTextField txt_IDSearch;
     private ui.components.textfield.CustomRoundedTextField txt_LastName;
     private ui.components.textfield.CustomRoundedTextField txt_NameSearch;
-    private ui.components.textfield.CustomRoundedTextField txt_Password;
     private ui.components.textfield.CustomRoundedTextField txt_Phone;
     private ui.components.textfield.CustomRoundedTextField txt_PhoneSearch;
+    private ui.components.textfield.CustomRoundedTextField txt_Points;
     // End of variables declaration//GEN-END:variables
 }

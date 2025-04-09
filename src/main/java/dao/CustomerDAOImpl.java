@@ -34,7 +34,7 @@ public class CustomerDAOImpl implements CustomerDAO {
     }
 
     // Lấy khách hàng theo ID
-    public Customer getCustomer(int id) {
+    public Customer getCustomer(String id) {
         return entityManager.find(Customer.class, id);
     }
 

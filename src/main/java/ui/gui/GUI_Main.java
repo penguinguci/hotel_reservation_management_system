@@ -24,6 +24,8 @@ public class GUI_Main extends javax.swing.JFrame {
         initComponents();
         setExtendedState(MAXIMIZED_BOTH);
         Form_HomePage homePageForm = new Form_HomePage();
+        Form_CustomerManagement customerManagementForm = new Form_CustomerManagement();
+        Form_StaffManagement staffManagementForm = new Form_StaffManagement();
         showForm(homePageForm);
         menu3.setEvent(new MenuEvent() {
             @Override
@@ -33,10 +35,10 @@ public class GUI_Main extends javax.swing.JFrame {
                 } else if (index == 1) {
                     showForm(new Form_Booking());
                 } else if(index == 4){
-                    showForm(new Form_CustomerManagement());
+                    showForm(customerManagementForm);
                 }
                 else if (index == 5) {
-                    showForm(new Form_StaffManagement());
+                    showForm(staffManagementForm);
                 }
                 else{
                     showForm(new Form_HomePage());

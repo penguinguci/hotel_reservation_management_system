@@ -480,6 +480,8 @@ public class CustomCalendar extends JPanel {
         updateCalendarDisplay();
     }
 
+
+
     /**
      * Custom JButton with rounded corners
      */

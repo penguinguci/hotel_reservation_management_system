@@ -28,8 +28,8 @@ public class CustomTable extends JTable {
                 setBackground(headerBackground);
                 setForeground(headerForeground);
                 setFont(headerFont);
-                setHorizontalAlignment(SwingConstants.CENTER);
-                setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+                setHorizontalAlignment(SwingConstants.LEFT);
+                setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
                 return this;
             }
         });
