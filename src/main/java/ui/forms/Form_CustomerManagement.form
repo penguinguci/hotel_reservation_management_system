@@ -839,6 +839,9 @@
                         <Column editable="true" title="&#x110;i&#x1ec3;m" type="java.lang.Object"/>
                       </Table>
                     </Property>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Segoe UI" size="14" style="0"/>
+                    </Property>
                   </Properties>
                 </Component>
               </SubComponents>
