@@ -67,7 +67,7 @@ public class GUI_Login extends javax.swing.JFrame {
         lb_Welcome.setText("Welcome to Melody Hotel");
 
 
-        String imagePath = "D:\\Distributed Programming\\workspace\\hotel_reservation_management_system\\src\\main\\java\\images\\logo.png";
+        String imagePath = "src/main/java/images/logo.png";
         ImageIcon originalIcon = new ImageIcon(imagePath);
 
         lb_Logo.setBounds(0, 0, 350, 230);
