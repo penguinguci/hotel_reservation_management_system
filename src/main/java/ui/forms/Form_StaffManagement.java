@@ -28,7 +28,6 @@ public class Form_StaffManagement extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
         pnl_North = new javax.swing.JPanel();
         lbl_Title = new javax.swing.JLabel();
         pnl_Center = new javax.swing.JPanel();
@@ -87,8 +86,6 @@ public class Form_StaffManagement extends javax.swing.JPanel {
         btnUpdate = new ui.components.button.ButtonCustom();
         btnImport = new ui.components.button.ButtonCustom();
         btnExport = new ui.components.button.ButtonCustom();
-
-        jLabel1.setText("jLabel1");
 
         setBackground(new java.awt.Color(255, 255, 255));
         setLayout(new java.awt.BorderLayout());
