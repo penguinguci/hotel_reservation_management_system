@@ -9,6 +9,7 @@ import entities.Customer;
 import interfaces.CustomerDAO;
 import ui.components.textfield.CustomRoundedTextField;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.KeyEvent;
 import java.util.Date;
@@ -57,7 +58,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
                     btn_SearchActionPerformed(null);
-                    cbx_GenderSearch.getSelectedItem();
+                    cbx_GenderSearch.requestFocus();
                 }
             }
         });
@@ -368,9 +369,10 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         lbl_Gender.setText("Giới tính:");
 
         cbx_Gender.setPreferredSize(new java.awt.Dimension(72, 34));
-        cbx_Gender.addItem("");
+        cbx_Gender.addItem(" ");
         cbx_Gender.addItem("Nam");
         cbx_Gender.addItem("Nữ");
+
         cbx_Gender.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbx_GenderActionPerformed(evt);
@@ -618,6 +620,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
                 "Mã khách hàng", "Tên khách hàng", "Giới tính", "Ngày sinh", "Số điện thoại", "Email", "Địa chỉ", "Điểm"
             }
         ));
+        customTable1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jScrollPane1.setViewportView(customTable1);
 
         pButton.setBackground(new java.awt.Color(255, 255, 255));
@@ -630,10 +633,10 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         pButton.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 140, 50));
 
         btnImport.setText("Import");
-        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 140, 50));
+        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 140, 50));
 
         btnExport.setText("Export");
-        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 140, 50));
+        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 260, 140, 50));
 
         javax.swing.GroupLayout pnl_SouthLayout = new javax.swing.GroupLayout(pnl_South);
         pnl_South.setLayout(pnl_SouthLayout);
@@ -699,11 +702,11 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         txt_Points.setText(String.valueOf(points));
         calendar_BirthDate.setSelectedDate(birthDate);
     }
-    private void updateCustomerTable(List<Customer> customers) {
+    private void updateCustomerTable(Customer customer) {
         DefaultTableModel model = (DefaultTableModel) customTable1.getModel();
         model.setRowCount(0); // Clear previous data
 
-        for (Customer customer : customers) {
+
             model.addRow(new Object[]{
                     customer.getCustomerId(),
                     customer.getFirstName() + " " + customer.getLastName(),
@@ -714,7 +717,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
                     customer.getAddress(),
                     customer.getBonusPoint()
             });
-        }
+
     }
     private void txt_FisrtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_FisrtNameActionPerformed
         // TODO add your handling code here:
@@ -750,6 +753,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
 
     private void txt_IDSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_IDSearchActionPerformed
         // TODO add your handling code here:
+
     }//GEN-LAST:event_txt_IDSearchActionPerformed
 
     private void txt_PhoneSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_PhoneSearchActionPerformed
@@ -768,11 +772,18 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         String gender = (String) cbx_GenderSearch.getSelectedItem();
 
         if (name.isEmpty() && id.isEmpty() && phone.isEmpty() && (gender == null || gender.isEmpty())) {
-            loadCustomerData(); // Hiện toàn bộ bảng
+            loadCustomerData();
         } else {
-            // Nếu không trống, thực hiện tìm kiếm
-      //      List<Customer> customers = customerDAO.searchCustomers();
-      //      updateCustomerTable(customers);
+            if(!id.isEmpty()){
+                Customer customer = customerDAO.getCustomer(id);
+                if(customer == null){
+                    JOptionPane.showMessageDialog(this, "Không tìm thấy người dùng với mã: " + id);
+                }else{
+                    updateCustomerTable(customer);
+                }
+            }
+            //List<Customer> customers = customerDAO.searchCustomers();
+           // updateCustomerTable(customers);
         }
     }//GEN-LAST:event_btn_SearchActionPerformed
 
