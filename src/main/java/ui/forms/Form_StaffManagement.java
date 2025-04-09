@@ -4,7 +4,15 @@
  */
 package ui.forms;
 
+import com.twelvemonkeys.image.ResampleOp;
+import net.coobird.thumbnailator.Thumbnails;
 import ui.components.textfield.CustomRoundedTextField;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 /**
  *
@@ -447,9 +455,9 @@ public class Form_StaffManagement extends javax.swing.JPanel {
             }
         });
         pnl_Left.add(btn_UploadAvatar);
-        btn_UploadAvatar.setBounds(739, 200, 70, 30);
+        btn_UploadAvatar.setBounds(760, 200, 70, 30);
         pnl_Left.add(lbl_UploadAvatar);
-        lbl_UploadAvatar.setBounds(730, 40, 150, 150);
+        lbl_UploadAvatar.setBounds(730, 50, 140, 140);
 
         pnl_Center.add(pnl_Left, java.awt.BorderLayout.CENTER);
 
@@ -582,6 +590,7 @@ public class Form_StaffManagement extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
+        btn_Search.setIcon(new javax.swing.ImageIcon(getClass().getResource("/search.png"))); // NOI18N
         btn_Search.setText("Tìm kiếm");
         btn_Search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -593,10 +602,6 @@ public class Form_StaffManagement extends javax.swing.JPanel {
         pnl_Right.setLayout(pnl_RightLayout);
         pnl_RightLayout.setHorizontalGroup(
             pnl_RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_RightLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26))
             .addGroup(pnl_RightLayout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addGroup(pnl_RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -605,6 +610,10 @@ public class Form_StaffManagement extends javax.swing.JPanel {
                     .addComponent(pnl_PhoneSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnl_NameSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_RightLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26))
         );
         pnl_RightLayout.setVerticalGroup(
             pnl_RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -622,6 +631,8 @@ public class Form_StaffManagement extends javax.swing.JPanel {
         );
 
         pnl_Center.add(pnl_Right, java.awt.BorderLayout.EAST);
+
+        add(pnl_Center, java.awt.BorderLayout.CENTER);
 
         pnl_South.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -644,17 +655,32 @@ public class Form_StaffManagement extends javax.swing.JPanel {
         pButton.setBackground(new java.awt.Color(255, 255, 255));
         pButton.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        btnAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/plus.png"))); // NOI18N
         btnAdd.setText("Thêm");
-        pButton.add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 140, 50));
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
+        pButton.add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 140, 50));
 
+        btnUpdate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/update.png"))); // NOI18N
         btnUpdate.setText("Cập nhật");
         pButton.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 140, 50));
 
+        btnImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/import.png"))); // NOI18N
         btnImport.setText("Import");
         pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 140, 50));
 
+        btnExport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/export.png"))); // NOI18N
         btnExport.setText("Export");
-        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 140, 50));
+
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 260, 140, 50));
 
         javax.swing.GroupLayout pnl_SouthLayout = new javax.swing.GroupLayout(pnl_South);
         pnl_South.setLayout(pnl_SouthLayout);
@@ -675,9 +701,7 @@ public class Form_StaffManagement extends javax.swing.JPanel {
 
         pButton.getAccessibleContext().setAccessibleDescription("");
 
-        pnl_Center.add(pnl_South, java.awt.BorderLayout.PAGE_END);
-
-        add(pnl_Center, java.awt.BorderLayout.CENTER);
+        add(pnl_South, java.awt.BorderLayout.SOUTH);
     }// </editor-fold>//GEN-END:initComponents
 
     private void txt_FisrtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_FisrtNameActionPerformed
@@ -735,6 +759,14 @@ public class Form_StaffManagement extends javax.swing.JPanel {
     private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btn_SearchActionPerformed
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnAddActionPerformed
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnExportActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
