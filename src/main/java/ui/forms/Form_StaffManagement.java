@@ -651,10 +651,10 @@ public class Form_StaffManagement extends javax.swing.JPanel {
         pButton.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 140, 50));
 
         btnImport.setText("Import");
-        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 140, 50));
+        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 140, 50));
 
         btnExport.setText("Export");
-        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 260, 140, 50));
+        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 140, 50));
 
         javax.swing.GroupLayout pnl_SouthLayout = new javax.swing.GroupLayout(pnl_South);
         pnl_South.setLayout(pnl_SouthLayout);
