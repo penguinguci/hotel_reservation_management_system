@@ -6,6 +6,8 @@ package ui.gui;
 
 import ui.components.menu.MenuEvent;
 import ui.forms.*;
+import ui.forms.Form_HomePage;
+import ui.forms.Form_StaffManagement;
 
 import javax.swing.*;
 import java.rmi.RemoteException;
@@ -33,12 +35,16 @@ public class GUI_Main extends javax.swing.JFrame {
                 } else if(index == 4){
                     showForm(new Form_CustomerManagement());
                 }
+                if (index == 5) {
+                    showForm(new Form_StaffManagement());
+                }
                 else{
                     showForm(new Form_HomePage());
                 }
             }
         });
     }
+
 
     private void showForm(JComponent com) {
         body.removeAll();
@@ -60,7 +66,7 @@ public class GUI_Main extends javax.swing.JFrame {
 
         pnlConstrain.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(164, 164, 164)));
         pnlConstrain.setPreferredSize(new java.awt.Dimension(1920, 720));
-
+    
         scrollPaneWin111.setBorder(null);
         scrollPaneWin111.setViewportView(menu3);
 
