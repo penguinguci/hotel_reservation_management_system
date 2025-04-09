@@ -39,7 +39,7 @@ public class GUI_Main extends javax.swing.JFrame {
         });
     }
 
-    private void showForm(JPanel com) {
+    private void showForm(JComponent com) {
         body.removeAll();
         body.add(com);
         body.repaint();
