@@ -440,14 +440,14 @@ public class Form_StaffManagement extends javax.swing.JPanel {
         pnl_Left.add(pnl_BirthDate);
         pnl_BirthDate.setBounds(30, 190, 350, 40);
 
-        btn_UploadAvatar.setText("Thêm ảnh");
+        btn_UploadAvatar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/upload_image.png"))); // NOI18N
         btn_UploadAvatar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_UploadAvatarActionPerformed(evt);
             }
         });
         pnl_Left.add(btn_UploadAvatar);
-        btn_UploadAvatar.setBounds(750, 200, 110, 30);
+        btn_UploadAvatar.setBounds(739, 200, 70, 30);
         pnl_Left.add(lbl_UploadAvatar);
         lbl_UploadAvatar.setBounds(730, 40, 150, 150);
 
@@ -651,10 +651,10 @@ public class Form_StaffManagement extends javax.swing.JPanel {
         pButton.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 140, 50));
 
         btnImport.setText("Import");
-        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 140, 50));
+        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 140, 50));
 
         btnExport.setText("Export");
-        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 140, 50));
+        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 260, 140, 50));
 
         javax.swing.GroupLayout pnl_SouthLayout = new javax.swing.GroupLayout(pnl_South);
         pnl_South.setLayout(pnl_SouthLayout);
@@ -749,7 +749,6 @@ public class Form_StaffManagement extends javax.swing.JPanel {
     private ui.components.combobox.StyledComboBox cbx_Gender;
     private ui.components.combobox.StyledComboBox cbx_GenderSearch;
     private ui.components.table.CustomTable customTable1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_Address;
     private javax.swing.JLabel lbl_BirthDate;

@@ -614,14 +614,16 @@
             </Container>
             <Component class="ui.components.button.ButtonCustom" name="btn_UploadAvatar">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Th&#xea;m &#x1ea3;nh"/>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/upload_image.png"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_UploadAvatarActionPerformed"/>
               </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="750" y="200" width="110" height="30"/>
+                  <AbsoluteConstraints x="739" y="200" width="70" height="30"/>
                 </Constraint>
               </Constraints>
             </Component>

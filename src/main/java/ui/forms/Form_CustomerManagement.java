@@ -106,7 +106,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         txt_Points = new ui.components.textfield.CustomRoundedTextField();
         pnl_Gender = new javax.swing.JPanel();
         lbl_Gender = new javax.swing.JLabel();
-        cbx_Gender = new ui.components.combobox.StyledComboBox();
+        cbx_Gender = new ui.components.combobox.StyledComboBox(genderItems);
         pnl_BirthDate = new javax.swing.JPanel();
         lbl_BirthDate = new javax.swing.JLabel();
         calendar_BirthDate = new ui.components.calendar.CustomCalendar();
@@ -122,7 +122,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         txt_PhoneSearch = new ui.components.textfield.CustomRoundedTextField();
         pnl_GenderSearch = new javax.swing.JPanel();
         lbl_GenderSearch = new javax.swing.JLabel();
-        cbx_GenderSearch = new ui.components.combobox.StyledComboBox();
+        cbx_GenderSearch = new ui.components.combobox.StyledComboBox(genderItems);
         btn_Search = new ui.components.button.ButtonCustom();
         pnl_South = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -369,9 +369,6 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         lbl_Gender.setText("Giới tính:");
 
         cbx_Gender.setPreferredSize(new java.awt.Dimension(72, 34));
-        cbx_Gender.addItem(" ");
-        cbx_Gender.addItem("Nam");
-        cbx_Gender.addItem("Nữ");
 
         cbx_Gender.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -795,8 +792,9 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
     private ui.components.button.ButtonCustom btnUpdate;
     private ui.components.button.ButtonCustom btn_Search;
     private ui.components.calendar.CustomCalendar calendar_BirthDate;
-    private ui.components.combobox.StyledComboBox cbx_Gender;
-    private ui.components.combobox.StyledComboBox cbx_GenderSearch;
+    private String[] genderItems = {"Nam", "Nữ"};
+    private ui.components.combobox.StyledComboBox<String> cbx_Gender;
+    private ui.components.combobox.StyledComboBox<String> cbx_GenderSearch;
     private ui.components.table.CustomTable customTable1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
