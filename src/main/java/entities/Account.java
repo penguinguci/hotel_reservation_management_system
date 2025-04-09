@@ -20,7 +20,7 @@
         //@OneToOne
        // @JoinColumn(name = "role", unique = true, nullable = false)
         @OneToOne
-        @JoinColumn(name = "staff_id")
+        @JoinColumn(name = "staff_id", unique = true)
         private Staff staff;
 
         @Enumerated(EnumType.STRING)
