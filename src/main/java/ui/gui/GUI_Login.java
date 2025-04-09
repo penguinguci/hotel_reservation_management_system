@@ -5,12 +5,9 @@
 package ui.gui;
 
 
-import dao.AccountDAO;
+import interfaces.AccountDAO;
 import dao.AccountDAOImpl;
 import entities.Account;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 
 import javax.swing.*;
 import java.awt.*;

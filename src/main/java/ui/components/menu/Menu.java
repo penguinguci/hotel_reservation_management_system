@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
+import java.rmi.RemoteException;
 import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
@@ -18,8 +19,8 @@ public class Menu extends JComponent {
     private MigLayout layout;
     private String[][] menuItems = new String[][] {
             {"Trang chủ"},
-            {"Đặt phòng", "Hello"}, {"Phòng"}, {"Dịch vụ"},
-            {"Khách hàng", "Hello", "Hello"},
+            {"Đặt phòng"}, {"Phòng"}, {"Dịch vụ"},
+            {"Khách hàng"},
             {"Nhân viên"}, {"Thống kê"}
     };
     private LogoutButton logoutButton;
@@ -59,8 +60,11 @@ public class Menu extends JComponent {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (event != null) {
-                    event.selected(-1, -1);
-
+                    try {
+                        event.selected(-1, -1);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         });
@@ -112,7 +116,6 @@ public class Menu extends JComponent {
             public void actionPerformed(ActionEvent e) {
                 if (length > 1) {
                     closeOtherSubMenus(item);
-
                     if (!item.isSelected()) {
                         item.setSelected(true);
                         addSubMenu(item, index, length);
@@ -123,7 +126,11 @@ public class Menu extends JComponent {
                 } else {
                     closeAllSubMenus();
                     if (event != null) {
-                        event.selected(index, 0);
+                        try {
+                            event.selected(index, 0);
+                        } catch (RemoteException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
 
@@ -153,7 +160,11 @@ public class Menu extends JComponent {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (event != null) {
-                        event.selected(index, subItem.getIndex());
+                        try {
+                            event.selected(index, subItem.getIndex());
+                        } catch (RemoteException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             });

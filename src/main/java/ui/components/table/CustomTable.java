@@ -6,7 +6,7 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 
 public class CustomTable extends JTable {
-    private Color headerBackground = new Color(70, 130, 180); // Màu mặc định cho header
+    private Color headerBackground = new Color(149, 145, 239); // Màu mặc định cho header
     private Color headerForeground = Color.WHITE;
     private Font headerFont = new Font("Segoe UI", Font.BOLD, 14);
 
