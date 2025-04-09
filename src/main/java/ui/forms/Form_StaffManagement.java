@@ -28,7 +28,6 @@ public class Form_StaffManagement extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
         pnl_North = new javax.swing.JPanel();
         lbl_Title = new javax.swing.JLabel();
         pnl_Center = new javax.swing.JPanel();
@@ -80,8 +79,6 @@ public class Form_StaffManagement extends javax.swing.JPanel {
         cbx_GenderSearch = new ui.components.combobox.StyledComboBox();
         btn_Search = new ui.components.button.ButtonCustom();
         pnl_South = new javax.swing.JPanel();
-
-        jLabel1.setText("jLabel1");
 
         setBackground(new java.awt.Color(255, 255, 255));
         setLayout(new java.awt.BorderLayout());
@@ -621,17 +618,7 @@ public class Form_StaffManagement extends javax.swing.JPanel {
 
         add(pnl_Center, java.awt.BorderLayout.CENTER);
 
-        javax.swing.GroupLayout pnl_SouthLayout = new javax.swing.GroupLayout(pnl_South);
-        pnl_South.setLayout(pnl_SouthLayout);
-        pnl_SouthLayout.setHorizontalGroup(
-            pnl_SouthLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 4687, Short.MAX_VALUE)
-        );
-        pnl_SouthLayout.setVerticalGroup(
-            pnl_SouthLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 295, Short.MAX_VALUE)
-        );
-
+        pnl_South.setLayout(new java.awt.BorderLayout());
         add(pnl_South, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
 
@@ -699,7 +686,6 @@ public class Form_StaffManagement extends javax.swing.JPanel {
     private ui.components.calendar.CustomCalendar calender_DateJoin;
     private ui.components.combobox.StyledComboBox cbx_Gender;
     private ui.components.combobox.StyledComboBox cbx_GenderSearch;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lbl_Address;
     private javax.swing.JLabel lbl_BirthDate;
     private javax.swing.JLabel lbl_DateJoin;
