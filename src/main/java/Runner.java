@@ -8,6 +8,9 @@ public class Runner {
         EntityManager em = Persistence.createEntityManagerFactory("mariadb")
                 .createEntityManager();
 
+        em.getTransaction().begin();
+        em.getTransaction().commit();
+
         StaffDAOImpl staffDAO = new StaffDAOImpl(em);
 
         // test chức năng create
