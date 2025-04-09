@@ -631,10 +631,10 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         pButton.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 140, 50));
 
         btnImport.setText("Import");
-        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 140, 50));
+        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 140, 50));
 
         btnExport.setText("Export");
-        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 260, 140, 50));
+        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 140, 50));
 
         javax.swing.GroupLayout pnl_SouthLayout = new javax.swing.GroupLayout(pnl_South);
         pnl_South.setLayout(pnl_SouthLayout);
@@ -657,7 +657,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
 
         add(pnl_South, java.awt.BorderLayout.SOUTH);
     }// </editor-fold>//GEN-END:initComponents
-    private void loadCustomerData(){
+    public void loadCustomerData(){
         List<Customer> customers = customerDAO.getAllCustomers(); // Lấy danh sách khách hàng
         DefaultTableModel model = (DefaultTableModel) customTable1.getModel();
         model.setRowCount(0); // Xóa dữ liệu cũ trong bảng
@@ -698,11 +698,11 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         txt_Points.setText(String.valueOf(points));
         calendar_BirthDate.setSelectedDate(birthDate);
     }
-    private void updateCustomerTable(Customer customer) {
+    private void updateCustomerTable(List<Customer> customers) {
         DefaultTableModel model = (DefaultTableModel) customTable1.getModel();
         model.setRowCount(0); // Clear previous data
 
-
+        for (Customer customer : customers) {
             model.addRow(new Object[]{
                     customer.getCustomerId(),
                     customer.getFirstName() + " " + customer.getLastName(),
@@ -713,7 +713,15 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
                     customer.getAddress(),
                     customer.getBonusPoint()
             });
+        }
 
+
+    }
+    public void clearSearchFields() {
+        txt_NameSearch.setText("");  // Xóa trường tên
+        txt_IDSearch.setText("");    // Xóa trường ID
+        txt_PhoneSearch.setText("");  // Xóa trường điện thoại
+        cbx_GenderSearch.setSelectedIndex(-1); // Đặt lại combobox giới tính
     }
     private void txt_FisrtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_FisrtNameActionPerformed
         // TODO add your handling code here:
@@ -766,20 +774,26 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         String id = txt_IDSearch.getText().trim();
         String phone = txt_PhoneSearch.getText().trim();
         String gender = (String) cbx_GenderSearch.getSelectedItem();
-
         if (name.isEmpty() && id.isEmpty() && phone.isEmpty() && (gender == null || gender.isEmpty())) {
             loadCustomerData();
         } else {
             if(!id.isEmpty()){
-                Customer customer = customerDAO.getCustomer(id);
-                if(customer == null){
+                List<Customer> customers = customerDAO.searchCustomerById(id);
+                if(customers == null){
                     JOptionPane.showMessageDialog(this, "Không tìm thấy người dùng với mã: " + id);
                 }else{
-                    updateCustomerTable(customer);
+                    updateCustomerTable(customers);
                 }
             }
-            //List<Customer> customers = customerDAO.searchCustomers();
-           // updateCustomerTable(customers);
+            if(!phone.isEmpty()){
+                List<Customer> customers = customerDAO.searchCustomersByPhone(phone);
+                if(customers == null){
+                    JOptionPane.showMessageDialog(this,"Không tìm thấy khách hàng với số: "+ phone);
+                }else {
+                    updateCustomerTable( customers );
+                }
+            }
+
         }
     }//GEN-LAST:event_btn_SearchActionPerformed
 
