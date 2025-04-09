@@ -80,6 +80,13 @@ public class Form_StaffManagement extends javax.swing.JPanel {
         cbx_GenderSearch = new ui.components.combobox.StyledComboBox();
         btn_Search = new ui.components.button.ButtonCustom();
         pnl_South = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        customTable1 = new ui.components.table.CustomTable();
+        pButton = new javax.swing.JPanel();
+        btnAdd = new ui.components.button.ButtonCustom();
+        btnUpdate = new ui.components.button.ButtonCustom();
+        btnImport = new ui.components.button.ButtonCustom();
+        btnExport = new ui.components.button.ButtonCustom();
 
         jLabel1.setText("jLabel1");
 
@@ -100,7 +107,7 @@ public class Form_StaffManagement extends javax.swing.JPanel {
 
         pnl_Center.setLayout(new java.awt.BorderLayout());
 
-        pnl_Left.setBackground(new java.awt.Color(239, 239, 239));
+        pnl_Left.setBackground(new java.awt.Color(255, 255, 255));
         pnl_Left.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin nhân viên", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 16), new java.awt.Color(102, 102, 255))); // NOI18N
         pnl_Left.setLayout(null);
 
@@ -614,25 +621,66 @@ public class Form_StaffManagement extends javax.swing.JPanel {
                 .addComponent(pnl_GenderSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(376, Short.MAX_VALUE))
         );
 
         pnl_Center.add(pnl_Right, java.awt.BorderLayout.EAST);
 
-        add(pnl_Center, java.awt.BorderLayout.CENTER);
+        pnl_South.setBackground(new java.awt.Color(255, 255, 255));
+
+        customTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Mã nhân viên", "Tên nhân viên", "Giới tính", "Ngày sinh", "Số điện thoại", "Email", "Địa chỉ", "Chức vụ", "Ngày vào làm", "Trạng thái"
+            }
+        ));
+        jScrollPane1.setViewportView(customTable1);
+
+        pButton.setBackground(new java.awt.Color(255, 255, 255));
+        pButton.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btnAdd.setText("Thêm");
+        pButton.add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 140, 50));
+
+        btnUpdate.setText("Cập nhật");
+        pButton.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 140, 50));
+
+        btnImport.setText("Import");
+        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 140, 50));
+
+        btnExport.setText("Export");
+        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 140, 50));
 
         javax.swing.GroupLayout pnl_SouthLayout = new javax.swing.GroupLayout(pnl_South);
         pnl_South.setLayout(pnl_SouthLayout);
         pnl_SouthLayout.setHorizontalGroup(
             pnl_SouthLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 4687, Short.MAX_VALUE)
+            .addGroup(pnl_SouthLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1097, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pButton, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(3451, Short.MAX_VALUE))
         );
         pnl_SouthLayout.setVerticalGroup(
             pnl_SouthLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 295, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(pButton, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
-        add(pnl_South, java.awt.BorderLayout.PAGE_END);
+        pButton.getAccessibleContext().setAccessibleDescription("");
+
+        pnl_Center.add(pnl_South, java.awt.BorderLayout.PAGE_END);
+
+        add(pnl_Center, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void txt_FisrtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_FisrtNameActionPerformed
@@ -693,13 +741,19 @@ public class Form_StaffManagement extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private ui.components.button.ButtonCustom btnAdd;
+    private ui.components.button.ButtonCustom btnExport;
+    private ui.components.button.ButtonCustom btnImport;
+    private ui.components.button.ButtonCustom btnUpdate;
     private ui.components.button.ButtonCustom btn_Search;
     private ui.components.button.ButtonCustom btn_UploadAvatar;
     private ui.components.calendar.CustomCalendar calendar_BirthDate;
     private ui.components.calendar.CustomCalendar calender_DateJoin;
     private ui.components.combobox.StyledComboBox cbx_Gender;
     private ui.components.combobox.StyledComboBox cbx_GenderSearch;
+    private ui.components.table.CustomTable customTable1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_Address;
     private javax.swing.JLabel lbl_BirthDate;
     private javax.swing.JLabel lbl_DateJoin;
@@ -716,6 +770,7 @@ public class Form_StaffManagement extends javax.swing.JPanel {
     private javax.swing.JLabel lbl_Title;
     private ui.components.label.LabelImage lbl_UploadAvatar;
     private javax.swing.JLabel lbl_UserName;
+    private javax.swing.JPanel pButton;
     private javax.swing.JPanel pnl_Address;
     private javax.swing.JPanel pnl_BirthDate;
     private javax.swing.JPanel pnl_Center;

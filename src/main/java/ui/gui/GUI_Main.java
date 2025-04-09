@@ -35,7 +35,7 @@ public class GUI_Main extends javax.swing.JFrame {
                 } else if(index == 4){
                     showForm(new Form_CustomerManagement());
                 }
-                if (index == 5) {
+                else if (index == 5) {
                     showForm(new Form_StaffManagement());
                 }
                 else{
