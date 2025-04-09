@@ -4,21 +4,39 @@
  */
 package ui.forms;
 
-import com.twelvemonkeys.image.ResampleOp;
+import dao.GenericDAOImpl;
+import dao.StaffDAOImpl;
+import entities.Account;
+import entities.Role;
+import entities.Staff;
+import interfaces.GenericDAO;
+import interfaces.StaffDAO;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import net.coobird.thumbnailator.Thumbnails;
-import ui.components.textfield.CustomRoundedTextField;
+import ultilities.ImageConverter;
+import ultilities.RegexPattern;
+import utils.AppUtil;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.time.LocalDate;
+import java.util.Set;
 
 /**
  *
  * @author TRAN LONG VU
  */
-public class Form_StaffManagement extends javax.swing.JPanel {
+public class Form_StaffManagement extends javax.swing.JPanel implements ActionListener {
 
     /**
      * Creates new form Form_StaffManagement
@@ -702,6 +720,16 @@ public class Form_StaffManagement extends javax.swing.JPanel {
         pButton.getAccessibleContext().setAccessibleDescription("");
 
         add(pnl_South, java.awt.BorderLayout.SOUTH);
+
+        // Add event
+        btn_UploadAvatar.addActionListener(this);
+        btnAdd.addActionListener(this);
+        btnUpdate.addActionListener(this);
+        btnImport.addActionListener(this);
+        btnExport.addActionListener(this);
+        btn_Search.addActionListener(this);
+
+        loadStaffData();
     }// </editor-fold>//GEN-END:initComponents
 
     private void txt_FisrtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_FisrtNameActionPerformed
@@ -829,5 +857,202 @@ public class Form_StaffManagement extends javax.swing.JPanel {
     private ui.components.textfield.CustomRoundedTextField txt_Phone;
     private ui.components.textfield.CustomRoundedTextField txt_PhoneSearch;
     private ui.components.textfield.CustomRoundedTextField txt_UserName;
-    // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object o = e.getSource();
+        if (o == btn_UploadAvatar) {
+            uploadImage();
+        } else if (o == btnAdd) {
+            add();
+        }
+    }
+
+
+    // Hàm upload ảnh
+    private void uploadImage() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Image files", ImageIO.getReaderFileSuffixes()));
+
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            try {
+                File selectedFile = fileChooser.getSelectedFile();
+                BufferedImage originalImage = ImageIO.read(selectedFile);
+
+                // Resize ảnh để phù hợp với kích thước hiển thị
+                BufferedImage resizedImage = Thumbnails.of(originalImage)
+                        .size(140, 140)
+                        .asBufferedImage();
+
+                // Hiển thị ảnh lên label
+                lbl_UploadAvatar.setIcon(new ImageIcon(resizedImage));
+
+                String imageBase64 = ImageConverter.imageToBase64String(resizedImage, "png");
+
+                byte[] imageBytes = Files.readAllBytes(selectedFile.toPath());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Lỗi khi tải ảnh!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void displayStaffImage(String base64Image) {
+        if (base64Image != null && !base64Image.isEmpty()) {
+            BufferedImage image = ImageConverter.base64StringToImage(base64Image);
+            if (image != null) {
+                lbl_UploadAvatar.setIcon(new ImageIcon(image));
+            }
+        }
+    }
+
+    // Hàm Validate dữ liệu
+    private boolean validateInput() {
+        if (txt_FisrtName.getText().trim().isEmpty() || txt_LastName.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Họ và tên không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            txt_FisrtName.requestFocus();
+            return false;
+        }
+
+        String phone = txt_Phone.getText().trim();
+        if (phone.isEmpty() || !phone.matches(RegexPattern.PHONE_VN)) {
+            JOptionPane.showMessageDialog(this, "Số điện thoại không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            txt_Phone.requestFocus();
+            return false;
+        }
+
+        String email = txt_Email.getText().trim();
+        if (!email.isEmpty() && !email.matches(RegexPattern.EMAIL)) {
+            JOptionPane.showMessageDialog(this, "Email không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            txt_Email.requestFocus();
+            return false;
+        }
+
+
+        if (calendar_BirthDate.getSelectedDate() == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày sinh!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            calendar_BirthDate.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void clearForm() {
+        txt_FisrtName.setText("");
+        txt_LastName.setText("");
+        txt_Phone.setText("");
+        txt_Email.setText("");
+        txt_Address.setText("");
+        cbx_Gender.setSelectedIndex(0);
+        calendar_BirthDate.setSelectedDate(null);
+        calender_DateJoin.setSelectedDate(null);
+        lbl_UploadAvatar.setIcon(null);
+    }
+
+    private void loadStaffData() {
+        try {
+            GenericDAO<Staff, String> staffDAO = new GenericDAOImpl<>(Staff.class);
+
+            DefaultTableModel model = (DefaultTableModel) customTable1.getModel();
+            model.setRowCount(0); // Xóa dữ liệu cũ
+
+            for (Staff staff : staffDAO.findAll()) {
+                model.addRow(new Object[]{
+                        staff.getStaffId(),
+                        staff.getLastName() + " " + staff.getFirstName(),
+                        staff.isGender() ? "Nam" : "Nữ",
+                        staff.getDateOfBirth(),
+                        String.join(", ", staff.getPhoneNumbers()),
+                        staff.getEmail(),
+                        staff.getAddress(),
+                        staff.getAccount().getRole() != null ? staff.getAccount().getRole() : "",
+                        staff.getDateOfJoin(),
+                        staff.isStatus() ? "Đang làm" : "Đã nghỉ"
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu nhân viên", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private String generateStaffId() {
+        String prefix = "NV" + LocalDate.now().getYear() +
+                String.format("%02d", LocalDate.now().getMonthValue());
+
+        StaffDAO staffDao = new StaffDAOImpl();
+        long count = staffDao.countByPrefix(prefix);
+
+        return prefix + String.format("%03d", count + 1);
+    }
+
+    private void add() {
+        if (!validateInput()) {
+            return; // Nếu dữ liệu đầu vào không hợp lệ, thoát khỏi hàm.
+        }
+
+        EntityTransaction transaction = null;
+        try {
+            StaffDAO staffDAO = new StaffDAOImpl();
+            GenericDAO<Staff, String> staffDAOGeneric = new GenericDAOImpl<>(Staff.class);
+            GenericDAO<Account, String> accountDAO = new GenericDAOImpl<>(Account.class);
+
+            // Kiểm tra tên đăng nhập
+            String username = txt_UserName.getText().trim();
+            if (staffDAO.isUsernameExists(username)) {
+                JOptionPane.showMessageDialog(this, "Tên đăng nhập đã tồn tại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Tạo đối tượng Staff
+            Staff newStaff = new Staff();
+            newStaff.setStaffId(generateStaffId());
+            newStaff.setFirstName(txt_FisrtName.getText().trim());
+            newStaff.setLastName(txt_LastName.getText().trim());
+            newStaff.setGender(cbx_Gender.getSelectedIndex() == 1); // 1 là Nam, 2 là Nữ
+            newStaff.setDateOfBirth(calendar_BirthDate.getSelectedDate());
+            newStaff.setPhoneNumbers(Set.of(txt_Phone.getText().trim()));
+            newStaff.setAddress(txt_Address.getText().trim());
+            newStaff.setEmail(txt_Email.getText().trim());
+            newStaff.setDateOfJoin(calender_DateJoin.getSelectedDate());
+            newStaff.setStatus(true); // Mặc định active
+
+            // Xử lý ảnh đại diện nếu có
+            if (lbl_UploadAvatar.getIcon() != null) {
+                String imageBase64 = ImageConverter.convertImageToBase64((ImageIcon) lbl_UploadAvatar.getIcon());
+                newStaff.setStaffImage(imageBase64);
+            }
+
+            // Tạo đối tượng Account
+            Account newAccount = new Account();
+            newAccount.setUsername(username);
+            newAccount.setPassword(txt_Password.getText().trim());
+            newAccount.setRole(Role.STAFF); // Mặc định là nhân viên lễ tân
+            newAccount.setStaff(newStaff);
+
+            // Xử lý transaction
+            transaction = AppUtil.getEntityManager().getTransaction();
+            transaction.begin();
+            if (staffDAOGeneric.create(newStaff) && accountDAO.create(newAccount)) {
+                transaction.commit();
+                JOptionPane.showMessageDialog(this, "Thêm nhân viên thành công!");
+                clearForm();
+                loadStaffData();
+            } else {
+                transaction.rollback();
+                JOptionPane.showMessageDialog(this, "Thêm nhân viên thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi thêm nhân viên!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+
 }

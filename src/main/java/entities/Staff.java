@@ -46,7 +46,7 @@ public class Staff {
     @Column(name = "email", columnDefinition = "varchar(50)", unique = true)
     private String email;
 
-    @Column(name = "staff_image", columnDefinition = "varchar(1024)")
+    @Column(name = "staff_image", columnDefinition = "LONGTEXT")
     private String staffImage;
 
 //    @Enumerated(EnumType.STRING)
