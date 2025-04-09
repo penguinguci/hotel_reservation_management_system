@@ -775,7 +775,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         String id = txt_IDSearch.getText().trim();
         String phone = txt_PhoneSearch.getText().trim();
         String gender = (String) cbx_GenderSearch.getSelectedItem();
-        if (name.isEmpty() && id.isEmpty() && phone.isEmpty() && (gender == null || gender.isEmpty())) {
+        if (name.isEmpty() && id.isEmpty() && phone.isEmpty()) {
             loadCustomerData();
         } else {
             if(!id.isEmpty()){

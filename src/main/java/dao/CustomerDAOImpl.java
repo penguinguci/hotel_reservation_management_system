@@ -46,10 +46,10 @@ public class CustomerDAOImpl implements CustomerDAO {
         query.setParameter("phone", phone);
         return query.getResultList();
     }
-    public List<Customer> searchCustomersByGender(String phone) {
-        String queryString = "SELECT c FROM Customer c WHERE c.phoneNumber = :phone";
+    public List<Customer> searchCustomersByName(String name) {
+        String queryString = "SELECT c FROM Customer c WHERE c.firstName LIKE :name or c.lastName LIKE :name";
         TypedQuery<Customer> query = entityManager.createQuery(queryString, Customer.class);
-        query.setParameter("phone", phone);
+        query.setParameter("firstName" + "lastName", "%" + name + "%");
         return query.getResultList();
     }
 
