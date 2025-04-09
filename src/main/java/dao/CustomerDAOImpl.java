@@ -34,8 +34,23 @@ public class CustomerDAOImpl implements CustomerDAO {
     }
 
     // Lấy khách hàng theo ID
-    public Customer getCustomer(String id) {
-        return entityManager.find(Customer.class, id);
+    public List<Customer> searchCustomerById(String id) {
+        String queryString = "SELECT c FROM Customer c WHERE c.customerId = :id";
+        TypedQuery<Customer> query = entityManager.createQuery(queryString, Customer.class);
+        query.setParameter("id", id);
+        return query.getResultList();
+    }
+    public List<Customer> searchCustomersByPhone(String phone) {
+        String queryString = "SELECT c FROM Customer c WHERE c.phoneNumber = :phone";
+        TypedQuery<Customer> query = entityManager.createQuery(queryString, Customer.class);
+        query.setParameter("phone", phone);
+        return query.getResultList();
+    }
+    public List<Customer> searchCustomersByGender(String phone) {
+        String queryString = "SELECT c FROM Customer c WHERE c.phoneNumber = :phone";
+        TypedQuery<Customer> query = entityManager.createQuery(queryString, Customer.class);
+        query.setParameter("phone", phone);
+        return query.getResultList();
     }
 
     // Lấy tất cả khách hàng

@@ -10,6 +10,6 @@ public interface CustomerDAO extends Remote {
     void addCustomer(Customer customer) throws RemoteException;
     void updateCustomer(Customer customer) throws RemoteException;
   //  void deleteCustomer(Customer customer) throws RemoteException;
-    Customer getCustomer(String id)  throws RemoteException;
+    List<Customer> searchCustomerById(String id)  throws RemoteException;
     List<Customer> getAllCustomers()  throws RemoteException;
 }

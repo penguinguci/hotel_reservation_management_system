@@ -19,14 +19,14 @@ public class GUI_Main extends javax.swing.JFrame {
     private ui.components.menu.Menu menu3;
     private javax.swing.JPanel pnlConstrain;
     private ui.components.scroll.win11.ScrollPaneWin11 scrollPaneWin111;
-
+    private Form_CustomerManagement formCustomerManagement;
     public GUI_Main() {
         initComponents();
         setExtendedState(MAXIMIZED_BOTH);
         Form_HomePage homePageForm = new Form_HomePage();
-        Form_CustomerManagement customerManagementForm = new Form_CustomerManagement();
         Form_StaffManagement staffManagementForm = new Form_StaffManagement();
         showForm(homePageForm);
+        formCustomerManagement = new Form_CustomerManagement();
         menu3.setEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) throws RemoteException {
@@ -35,7 +35,9 @@ public class GUI_Main extends javax.swing.JFrame {
                 } else if (index == 1) {
                     showForm(new Form_Booking());
                 } else if(index == 4){
-                    showForm(customerManagementForm);
+                    showForm(formCustomerManagement);
+                    formCustomerManagement.loadCustomerData();
+                    formCustomerManagement.clearSearchFields();
                 }
                 else if (index == 5) {
                     showForm(staffManagementForm);
@@ -47,7 +49,7 @@ public class GUI_Main extends javax.swing.JFrame {
         });
     }
 
-    private void showForm(JComponent com) {
+    private void showForm(JPanel com) {
         body.removeAll();
         body.add(com);
         body.repaint();
