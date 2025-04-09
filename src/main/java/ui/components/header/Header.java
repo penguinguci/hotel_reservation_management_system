@@ -4,6 +4,11 @@
  */
 package ui.components.header;
 
+import dao.AccountDAOImpl;
+import interfaces.AccountDAO;
+import ui.gui.GUI_Login;
+import utils.CurrentAccount;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GradientPaint;
@@ -16,7 +21,7 @@ public class Header extends javax.swing.JPanel {
     public Header() {
         initComponents();
         setOpaque(false);
-        setFont(new Font("Arial", Font.BOLD, 16));
+        setFont(new Font("Segoe UI", Font.BOLD, 16));
     }
 
     @Override
@@ -36,17 +41,20 @@ public class Header extends javax.swing.JPanel {
 
         lblImageLogo = new javax.swing.JLabel();
         lblTitleLogo = new javax.swing.JLabel();
+        btnUser = new ui.components.button.ButtonCustom();
 
         setName("lbImageLogo"); // NOI18N
 
         lblImageLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hotel.png"))); // NOI18N
-        lblImageLogo.setMaximumSize(new java.awt.Dimension(32, 32));
-        lblImageLogo.setMinimumSize(new java.awt.Dimension(32, 32));
-        lblImageLogo.setPreferredSize(new java.awt.Dimension(32, 32));
 
         lblTitleLogo.setFont(new java.awt.Font("Segoe UI", 2, 22)); // NOI18N
         lblTitleLogo.setForeground(new java.awt.Color(236, 236, 236));
         lblTitleLogo.setText("Hotel Melody");
+        //AccountDAO accountDAO = new AccountDAOImpl();
+        GUI_Login GUI_Login = new GUI_Login();
+        String user;
+//Hiện tên nhân viên
+        //btnUser.setText("Nhân viên: "+ CurrentAccount.getCurrentAccount().getStaff().getFirstName()+" "+CurrentAccount.getCurrentAccount().getStaff().getLastName());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -54,24 +62,29 @@ public class Header extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblImageLogo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblImageLogo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblTitleLogo)
-                .addContainerGap(504, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 258, Short.MAX_VALUE)
+                .addComponent(btnUser, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblTitleLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblImageLogo, javax.swing.GroupLayout.DEFAULT_SIZE, 49, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblTitleLogo)
+                        .addComponent(btnUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lblImageLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private ui.components.button.ButtonCustom btnUser;
     private javax.swing.JLabel lblImageLogo;
     private javax.swing.JLabel lblTitleLogo;
     // End of variables declaration//GEN-END:variables

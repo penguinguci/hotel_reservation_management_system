@@ -11,6 +11,7 @@ import interfaces.AccountDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import utils.CurrentAccount;
 
 
 import javax.swing.*;
@@ -225,6 +226,7 @@ public class GUI_Login extends javax.swing.JFrame {
         AccountDAO accountDAO = new AccountDAOImpl();
         Account account = accountDAO.getAccount(username);
         if(account != null && account.getPassword().equals(password)){
+            CurrentAccount.setCurrentAccount(account);
             JOptionPane.showMessageDialog(this  , "Login Successful", "Notification", JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             GUI_Main guiMain = new GUI_Main();
