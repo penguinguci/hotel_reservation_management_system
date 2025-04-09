@@ -26,7 +26,7 @@ public class Form_HomePage extends javax.swing.JPanel {
     private JLabel lblPhongTrong;
     private JLabel lblDoanhThu;
 
-    public Form_HomePage(String name) {
+    public Form_HomePage() {
         initComponents();
 
         initCustomComponents();
