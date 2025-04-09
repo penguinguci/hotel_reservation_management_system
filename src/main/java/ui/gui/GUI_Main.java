@@ -5,10 +5,12 @@
 package ui.gui;
 
 import ui.components.menu.MenuEvent;
+import ui.forms.*;
 import ui.forms.Form_HomePage;
 import ui.forms.Form_StaffManagement;
 
 import javax.swing.*;
+import java.rmi.RemoteException;
 
 
 public class GUI_Main extends javax.swing.JFrame {
@@ -21,19 +23,23 @@ public class GUI_Main extends javax.swing.JFrame {
     public GUI_Main() {
         initComponents();
         setExtendedState(MAXIMIZED_BOTH);
-        Form_HomePage homePageForm = new Form_HomePage(" ");
+        Form_HomePage homePageForm = new Form_HomePage();
         showForm(homePageForm);
         menu3.setEvent(new MenuEvent() {
             @Override
-            public void selected(int index, int subIndex) {
+            public void selected(int index, int subIndex) throws RemoteException {
                 if(index == -1){
                     logout();
+                } else if (index == 1) {
+                    showForm(new Form_Booking());
+                } else if(index == 4){
+                    showForm(new Form_CustomerManagement());
                 }
                 if (index == 5) {
                     showForm(new Form_StaffManagement());
                 }
                 else{
-                    showForm(new Form_HomePage("Form : " + index + " " + subIndex));
+                    showForm(new Form_HomePage());
                 }
             }
         });
