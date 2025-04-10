@@ -4,11 +4,13 @@
  */
 package ui.forms;
 
+import dao.AccountDAOImpl;
 import dao.GenericDAOImpl;
 import dao.StaffDAOImpl;
 import entities.Account;
 import entities.Role;
 import entities.Staff;
+import interfaces.AccountDAO;
 import interfaces.GenericDAO;
 import interfaces.StaffDAO;
 import jakarta.persistence.EntityManager;
@@ -20,6 +22,8 @@ import utils.AppUtil;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -29,14 +33,16 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.rmi.RemoteException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 /**
  *
  * @author TRAN LONG VU
  */
-public class Form_StaffManagement extends javax.swing.JPanel implements ActionListener {
+public class Form_StaffManagement extends javax.swing.JPanel implements ActionListener, ListSelectionListener {
 
     /**
      * Creates new form Form_StaffManagement
@@ -106,7 +112,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
         btn_Search = new ui.components.button.ButtonCustom();
         pnl_South = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        customTable1 = new ui.components.table.CustomTable();
+        table = new ui.components.table.CustomTable();
         pButton = new javax.swing.JPanel();
         btnAdd = new ui.components.button.ButtonCustom();
         btnUpdate = new ui.components.button.ButtonCustom();
@@ -473,7 +479,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
             }
         });
         pnl_Left.add(btn_UploadAvatar);
-        btn_UploadAvatar.setBounds(760, 200, 70, 30);
+        btn_UploadAvatar.setBounds(765, 200, 70, 30);
         pnl_Left.add(lbl_UploadAvatar);
         lbl_UploadAvatar.setBounds(730, 50, 140, 140);
 
@@ -654,7 +660,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
 
         pnl_South.setBackground(new java.awt.Color(255, 255, 255));
 
-        customTable1.setModel(new javax.swing.table.DefaultTableModel(
+        table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null, null, null},
@@ -668,7 +674,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
                 "Mã nhân viên", "Tên nhân viên", "Giới tính", "Ngày sinh", "Số điện thoại", "Email", "Địa chỉ", "Chức vụ", "Ngày vào làm", "Trạng thái"
             }
         ));
-        jScrollPane1.setViewportView(customTable1);
+        jScrollPane1.setViewportView(table);
 
         pButton.setBackground(new java.awt.Color(255, 255, 255));
         pButton.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -728,6 +734,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
         btnImport.addActionListener(this);
         btnExport.addActionListener(this);
         btn_Search.addActionListener(this);
+        table.getSelectionModel().addListSelectionListener(this);
 
         loadStaffData();
     }// </editor-fold>//GEN-END:initComponents
@@ -809,7 +816,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
     private String[] itemsGender = {"Chọn giới tính", "Nam", "Nữ"};
     private ui.components.combobox.StyledComboBox<String> cbx_Gender;
     private ui.components.combobox.StyledComboBox<String> cbx_GenderSearch;
-    private ui.components.table.CustomTable customTable1;
+    private ui.components.table.CustomTable table;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_Address;
     private javax.swing.JLabel lbl_BirthDate;
@@ -865,6 +872,10 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
             uploadImage();
         } else if (o == btnAdd) {
             add();
+        } else if (o == btnUpdate) {
+            update();
+        } else  if (o == btn_Search) {
+            search();
         }
     }
 
@@ -898,14 +909,6 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
         }
     }
 
-    private void displayStaffImage(String base64Image) {
-        if (base64Image != null && !base64Image.isEmpty()) {
-            BufferedImage image = ImageConverter.base64StringToImage(base64Image);
-            if (image != null) {
-                lbl_UploadAvatar.setIcon(new ImageIcon(image));
-            }
-        }
-    }
 
     // Hàm Validate dữ liệu
     private boolean validateInput() {
@@ -946,6 +949,8 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
         txt_Email.setText("");
         txt_Address.setText("");
         cbx_Gender.setSelectedIndex(0);
+        txt_UserName.setText("");
+        txt_Password.setText("");
         calendar_BirthDate.setSelectedDate(null);
         calender_DateJoin.setSelectedDate(null);
         lbl_UploadAvatar.setIcon(null);
@@ -955,7 +960,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
         try {
             GenericDAO<Staff, String> staffDAO = new GenericDAOImpl<>(Staff.class);
 
-            DefaultTableModel model = (DefaultTableModel) customTable1.getModel();
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
             model.setRowCount(0); // Xóa dữ liệu cũ
 
             for (Staff staff : staffDAO.findAll()) {
@@ -978,7 +983,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
         }
     }
 
-    private String generateStaffId() {
+    private String generateId() {
         String prefix = "NV" + LocalDate.now().getYear() +
                 String.format("%02d", LocalDate.now().getMonthValue());
 
@@ -988,27 +993,41 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
         return prefix + String.format("%03d", count + 1);
     }
 
+    // Add staff
     private void add() {
         if (!validateInput()) {
-            return; // Nếu dữ liệu đầu vào không hợp lệ, thoát khỏi hàm.
+            return;
         }
 
         EntityTransaction transaction = null;
         try {
             StaffDAO staffDAO = new StaffDAOImpl();
+            AccountDAO accountDAO = new AccountDAOImpl();
             GenericDAO<Staff, String> staffDAOGeneric = new GenericDAOImpl<>(Staff.class);
-            GenericDAO<Account, String> accountDAO = new GenericDAOImpl<>(Account.class);
+            GenericDAO<Account, String> accountDAOGeneric= new GenericDAOImpl<>(Account.class);
+
+            String phone = txt_Phone.getText().trim();
+            if (staffDAO.isPhoneExists(phone)) {
+                JOptionPane.showMessageDialog(this, "Số điện thoại đã tồn tại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String email = txt_Email.getText().trim();
+            if (staffDAO.isEmailExists(email)) {
+                JOptionPane.showMessageDialog(this, "Email đã tồn tại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
             // Kiểm tra tên đăng nhập
             String username = txt_UserName.getText().trim();
-            if (staffDAO.isUsernameExists(username)) {
+            if (accountDAO.isUsernameExists(username)) {
                 JOptionPane.showMessageDialog(this, "Tên đăng nhập đã tồn tại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // Tạo đối tượng Staff
             Staff newStaff = new Staff();
-            newStaff.setStaffId(generateStaffId());
+            newStaff.setStaffId(generateId());
             newStaff.setFirstName(txt_FisrtName.getText().trim());
             newStaff.setLastName(txt_LastName.getText().trim());
             newStaff.setGender(cbx_Gender.getSelectedIndex() == 1); // 1 là Nam, 2 là Nữ
@@ -1035,7 +1054,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
             // Xử lý transaction
             transaction = AppUtil.getEntityManager().getTransaction();
             transaction.begin();
-            if (staffDAOGeneric.create(newStaff) && accountDAO.create(newAccount)) {
+            if (staffDAOGeneric.create(newStaff) && accountDAOGeneric.create(newAccount)) {
                 transaction.commit();
                 JOptionPane.showMessageDialog(this, "Thêm nhân viên thành công!");
                 clearForm();
@@ -1053,6 +1072,165 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
         }
     }
 
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        if (!e.getValueIsAdjusting()) {
+            int row = table.getSelectedRow();
+            if (row >= 0) {
+                try {
+                    fillRow(row);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+    }
 
+    private void fillRow(int row) throws RemoteException {
+        String id = table.getValueAt(row, 0).toString();
+        GenericDAO<Staff, String> staffDAO = new GenericDAOImpl<>(Staff.class);
+        AccountDAO accountDAO = new AccountDAOImpl();
+        Staff staff = staffDAO.findById(id);
+        Account account = accountDAO.findAccoutByStaffID(staff.getStaffId());
+        txt_FisrtName.setText(staff.getFirstName());
+        txt_LastName.setText(staff.getLastName());
+        txt_Phone.setText(staff.getPhoneNumbers().iterator().next());
+        txt_Email.setText(staff.getEmail());
+        txt_Address.setText(staff.getAddress());
+        txt_UserName.setText(account.getUsername());
+        txt_UserName.setEnabled(false);
+        txt_Password.setText(account.getPassword());
+        calendar_BirthDate.setSelectedDate(staff.getDateOfBirth());
+        calender_DateJoin.setSelectedDate(staff.getDateOfJoin());
+        cbx_Gender.setSelectedItem(staff.isGender() == true ? "Nam" : "Nữ");
+
+        try {
+            String base64Image = staff.getStaffImage();
+            if (base64Image != null && !base64Image.isEmpty()) {
+                BufferedImage originalImage = ImageConverter.base64StringToImage(base64Image);
+
+                if (originalImage != null) {
+                    BufferedImage resizedImage = Thumbnails.of(originalImage)
+                            .size(140, 140)
+                            .asBufferedImage();
+
+                    lbl_UploadAvatar.setIcon(new ImageIcon(resizedImage));
+                } else {
+                    lbl_UploadAvatar.setIcon(null);
+                }
+            } else {
+                lbl_UploadAvatar.setIcon(null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            lbl_UploadAvatar.setIcon(null);
+        }
+
+    }
+
+
+
+    // Update staff
+    private void update() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn nhân viên cần cập nhật!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (!validateInput()) {
+            return;
+        }
+
+        try {
+            AccountDAO accountDAO = new AccountDAOImpl();
+            GenericDAO<Staff, String> staffGenericDAO = new GenericDAOImpl<>(Staff.class);
+            GenericDAO<Account, String> accountGenericDAO = new GenericDAOImpl<>(Account.class);
+
+            String staffID = table.getValueAt(selectedRow, 0).toString();
+            Staff staff = staffGenericDAO.findById(staffID);
+            if (staff == null) {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy nhân viên!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // cập nhật thông tin Staff
+            staff.setFirstName(txt_FisrtName.getText().trim());
+            staff.setLastName(txt_LastName.getText().trim());
+            staff.setGender(cbx_Gender.getSelectedIndex() == 1); // 1 là Nam, 2 là Nữ
+            staff.setDateOfBirth(calendar_BirthDate.getSelectedDate());
+            staff.setPhoneNumbers(Set.of(txt_Phone.getText().trim()));
+            staff.setAddress(txt_Address.getText().trim());
+            staff.setEmail(txt_Email.getText().trim());
+            staff.setDateOfJoin(calender_DateJoin.getSelectedDate());
+
+            // xử lý ảnh đại diện nếu có
+            if (lbl_UploadAvatar.getIcon() != null) {
+                String imageBase64 = ImageConverter.convertImageToBase64((ImageIcon) lbl_UploadAvatar.getIcon());
+                staff.setStaffImage(imageBase64);
+            }
+
+            Account account = accountDAO.findAccoutByStaffID(staffID);
+            if (account == null) {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy tài khoản liên quan!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            String newPassword = txt_Password.getText().trim();
+            if (!newPassword.isEmpty()) {
+                account.setPassword(newPassword);
+            }
+            account.setStaff(staff);
+
+
+            boolean staffUpdated = staffGenericDAO.update(staff);
+            boolean accountUpdated = accountGenericDAO.update(account);
+
+            if (staffUpdated && accountUpdated) {
+                JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thành công!");
+                loadStaffData();
+                clearForm();
+            } else {
+                JOptionPane.showMessageDialog(this, "Cập nhật nhân viên thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật nhân viên: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            txt_UserName.setEnabled(true);
+        }
+    }
+
+    // Search staff
+    private void search() {
+        String id = txt_IDSearch.getText().trim();
+        String name = txt_NameSearch.getText().trim();
+        String phone = txt_PhoneSearch.getText().trim();
+        Boolean gender = null;
+
+        if (cbx_GenderSearch.getSelectedIndex() > 0) {
+            gender = cbx_GenderSearch.getSelectedIndex() == 1;
+        }
+
+        StaffDAO staffDAO = new StaffDAOImpl();
+        List<Staff> staffList = staffDAO.searchStaffAdvanced(id, name, phone, gender);
+
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+
+        for (Staff staff : staffList) {
+            model.addRow(new Object[]{
+                    staff.getStaffId(),
+                    staff.getLastName() + " " + staff.getFirstName(),
+                    staff.isGender() ? "Nam" : "Nữ",
+                    staff.getDateOfBirth(),
+                    String.join(", ", staff.getPhoneNumbers()),
+                    staff.getEmail(),
+                    staff.getAddress(),
+                    staff.getAccount().getRole() != null ? staff.getAccount().getRole() : "",
+                    staff.getDateOfJoin(),
+                    staff.isStatus() ? "Đang làm" : "Đã nghỉ"
+            });
+        }
+    }
 
 }
