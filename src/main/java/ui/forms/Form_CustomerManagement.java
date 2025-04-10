@@ -58,18 +58,12 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
                     btn_SearchActionPerformed(null);
-                    cbx_GenderSearch.requestFocus();
+
                 }
             }
         });
 
-        cbx_GenderSearch.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-                    btn_SearchActionPerformed(null);
-                }
-            }
-        });
+
     }
 
     /**
@@ -106,10 +100,11 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         txt_Points = new ui.components.textfield.CustomRoundedTextField();
         pnl_Gender = new javax.swing.JPanel();
         lbl_Gender = new javax.swing.JLabel();
-        cbx_Gender = new ui.components.combobox.StyledComboBox(itemsGender);
+        cbx_Gender = new ui.components.combobox.StyledComboBox();
         pnl_BirthDate = new javax.swing.JPanel();
         lbl_BirthDate = new javax.swing.JLabel();
         calendar_BirthDate = new ui.components.calendar.CustomCalendar();
+        btnReset = new ui.components.button.ButtonCustom();
         pnl_Right = new javax.swing.JPanel();
         pnl_NameSearch = new javax.swing.JPanel();
         lbl_NameSearch = new javax.swing.JLabel();
@@ -120,9 +115,6 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         pnl_PhoneSearch = new javax.swing.JPanel();
         lbl_PhoneSearch = new javax.swing.JLabel();
         txt_PhoneSearch = new ui.components.textfield.CustomRoundedTextField();
-        pnl_GenderSearch = new javax.swing.JPanel();
-        lbl_GenderSearch = new javax.swing.JLabel();
-        cbx_GenderSearch = new ui.components.combobox.StyledComboBox(itemsGender);
         btn_Search = new ui.components.button.ButtonCustom();
         pnl_South = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -428,6 +420,10 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         pnl_Left.add(pnl_BirthDate);
         pnl_BirthDate.setBounds(30, 150, 350, 40);
 
+        btnReset.setText("Làm mới");
+        pnl_Left.add(btnReset);
+        btnReset.setBounds(30, 210, 110, 30);
+
         pnl_Center.add(pnl_Left, java.awt.BorderLayout.CENTER);
 
         pnl_Right.setBackground(new java.awt.Color(255, 255, 255));
@@ -526,39 +522,6 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pnl_GenderSearch.setBackground(new java.awt.Color(255, 255, 255));
-
-        lbl_GenderSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_GenderSearch.setText("Giới tính:");
-
-        cbx_GenderSearch.setPreferredSize(new java.awt.Dimension(72, 34));
-        cbx_GenderSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbx_GenderSearchActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnl_GenderSearchLayout = new javax.swing.GroupLayout(pnl_GenderSearch);
-        pnl_GenderSearch.setLayout(pnl_GenderSearchLayout);
-        pnl_GenderSearchLayout.setHorizontalGroup(
-            pnl_GenderSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_GenderSearchLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_GenderSearch)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-                .addComponent(cbx_GenderSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19))
-        );
-        pnl_GenderSearchLayout.setVerticalGroup(
-            pnl_GenderSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_GenderSearchLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_GenderSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbx_GenderSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(lbl_GenderSearch))
-                .addContainerGap())
-        );
-
         btn_Search.setText("Tìm kiếm");
         btn_Search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -578,10 +541,9 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
                 .addGap(16, 16, 16)
                 .addGroup(pnl_RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnl_IDSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnl_GenderSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnl_PhoneSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnl_NameSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         pnl_RightLayout.setVerticalGroup(
             pnl_RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -591,11 +553,9 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
                 .addComponent(pnl_NameSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnl_PhoneSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnl_GenderSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(60, 60, 60)
                 .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(376, Short.MAX_VALUE))
+                .addContainerGap(368, Short.MAX_VALUE))
         );
 
         pnl_Center.add(pnl_Right, java.awt.BorderLayout.EAST);
@@ -631,10 +591,10 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         pButton.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 140, 50));
 
         btnImport.setText("Import");
-        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 140, 50));
+        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 140, 50));
 
         btnExport.setText("Export");
-        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 140, 50));
+        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 260, 140, 50));
 
         javax.swing.GroupLayout pnl_SouthLayout = new javax.swing.GroupLayout(pnl_South);
         pnl_South.setLayout(pnl_SouthLayout);
@@ -721,7 +681,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         txt_NameSearch.setText("");  // Xóa trường tên
         txt_IDSearch.setText("");    // Xóa trường ID
         txt_PhoneSearch.setText("");  // Xóa trường điện thoại
-        cbx_GenderSearch.setSelectedIndex(-1); // Đặt lại combobox giới tính
+
     }
     private void txt_FisrtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_FisrtNameActionPerformed
         // TODO add your handling code here:
@@ -773,7 +733,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         String name = txt_NameSearch.getText().trim();
         String id = txt_IDSearch.getText().trim();
         String phone = txt_PhoneSearch.getText().trim();
-        String gender = (String) cbx_GenderSearch.getSelectedItem();
+
         if (name.isEmpty() && id.isEmpty() && phone.isEmpty()) {
             loadCustomerData();
         } else {
@@ -802,12 +762,11 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
     private ui.components.button.ButtonCustom btnAdd;
     private ui.components.button.ButtonCustom btnExport;
     private ui.components.button.ButtonCustom btnImport;
+    private ui.components.button.ButtonCustom btnReset;
     private ui.components.button.ButtonCustom btnUpdate;
     private ui.components.button.ButtonCustom btn_Search;
     private ui.components.calendar.CustomCalendar calendar_BirthDate;
-    private String[] itemsGender = {"Chọn giới tính", "Nam", "Nữ"};
-    private ui.components.combobox.StyledComboBox<String> cbx_Gender;
-    private ui.components.combobox.StyledComboBox<String> cbx_GenderSearch;
+    private ui.components.combobox.StyledComboBox cbx_Gender;
     private ui.components.table.CustomTable customTable1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -816,7 +775,6 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
     private javax.swing.JLabel lbl_Email;
     private javax.swing.JLabel lbl_FirstName;
     private javax.swing.JLabel lbl_Gender;
-    private javax.swing.JLabel lbl_GenderSearch;
     private javax.swing.JLabel lbl_IDSearch;
     private javax.swing.JLabel lbl_LastName;
     private javax.swing.JLabel lbl_NameSearch;
@@ -831,7 +789,6 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
     private javax.swing.JPanel pnl_Email;
     private javax.swing.JPanel pnl_FisrtName;
     private javax.swing.JPanel pnl_Gender;
-    private javax.swing.JPanel pnl_GenderSearch;
     private javax.swing.JPanel pnl_IDSearch;
     private javax.swing.JPanel pnl_LastName;
     private javax.swing.JPanel pnl_Left;

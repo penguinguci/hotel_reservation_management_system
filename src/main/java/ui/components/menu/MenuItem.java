@@ -33,7 +33,7 @@ public class MenuItem extends JButton {
         setForeground(new Color(230, 230, 230));
         setHorizontalAlignment(SwingConstants.LEFT);
         setBorder(new EmptyBorder(9, 10, 9, 10));
-        setFont(new Font("Tomato", Font.PLAIN, 18));
+        setFont(new Font("Segoe UI", Font.PLAIN, 18));
         setIconTextGap(10);
         setCursor(new Cursor(Cursor.HAND_CURSOR));
         rippleEffect = new RippleEffect(this);
