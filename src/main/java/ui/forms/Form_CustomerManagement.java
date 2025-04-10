@@ -201,8 +201,8 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
             .addGroup(pnl_LastNameLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lbl_LastName, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
-                .addComponent(txt_LastName, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                .addComponent(txt_LastName, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnl_LastNameLayout.setVerticalGroup(
             pnl_LastNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -270,8 +270,8 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
             .addGroup(pnl_EmailLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lbl_Email)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
-                .addComponent(txt_Email, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                .addComponent(txt_Email, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnl_EmailLayout.setVerticalGroup(
             pnl_EmailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -304,8 +304,9 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
             .addGroup(pnl_AddressLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lbl_Address)
-                .addGap(32, 32, 32)
-                .addComponent(txt_Address, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
+                .addGap(26, 26, 26)
+                .addComponent(txt_Address, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+                .addContainerGap())
         );
         pnl_AddressLayout.setVerticalGroup(
             pnl_AddressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -326,6 +327,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         lbl_Point.setText("Điểm:");
 
         txt_Points.setEditable(false);
+        txt_Points.setPreferredSize(new java.awt.Dimension(64, 30));
         txt_Points.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_PointsActionPerformed(evt);
@@ -339,8 +341,9 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
             .addGroup(pnl_PointLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lbl_Point)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
-                .addComponent(txt_Points, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
+                .addComponent(txt_Points, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         pnl_PointLayout.setVerticalGroup(
             pnl_PointLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -353,7 +356,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         );
 
         pnl_Left.add(pnl_Point);
-        pnl_Point.setBounds(390, 110, 330, 41);
+        pnl_Point.setBounds(390, 110, 330, 42);
 
         pnl_Gender.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -522,6 +525,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        btn_Search.setIcon(new javax.swing.ImageIcon(getClass().getResource("/search.png"))); // NOI18N
         btn_Search.setText("Tìm kiếm");
         btn_Search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -535,7 +539,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
             pnl_RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_RightLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(26, 26, 26))
             .addGroup(pnl_RightLayout.createSequentialGroup()
                 .addGap(16, 16, 16)
@@ -584,15 +588,19 @@ public class Form_CustomerManagement extends javax.swing.JPanel {
         pButton.setBackground(new java.awt.Color(255, 255, 255));
         pButton.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        btnAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/plus.png"))); // NOI18N
         btnAdd.setText("Thêm");
-        pButton.add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 140, 50));
+        pButton.add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 140, 50));
 
+        btnUpdate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/update.png"))); // NOI18N
         btnUpdate.setText("Cập nhật");
         pButton.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 140, 50));
 
+        btnImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/import.png"))); // NOI18N
         btnImport.setText("Import");
         pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 140, 50));
 
+        btnExport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/export.png"))); // NOI18N
         btnExport.setText("Export");
         pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 260, 140, 50));
 
