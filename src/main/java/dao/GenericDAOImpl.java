@@ -1,15 +1,10 @@
 package dao;
 
-import entities.Staff;
 import interfaces.GenericDAO;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Id;
 import jakarta.persistence.TypedQuery;
-import net.datafaker.providers.base.App;
 import utils.AppUtil;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 public class GenericDAOImpl<T, ID> implements GenericDAO<T, ID> {
