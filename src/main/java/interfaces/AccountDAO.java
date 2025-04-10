@@ -12,4 +12,6 @@ public interface AccountDAO extends Remote {
     public List<Account> getAllAccounts() throws RemoteException;
     public Account getAccount(String username) throws RemoteException;
     public void createAccount(Account account) throws RemoteException;
+    public Account findAccoutByStaffID(String staffID) throws RemoteException;
+    boolean isUsernameExists(String username);
 }

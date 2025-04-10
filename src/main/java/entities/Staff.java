@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.NamedQueries;
-import org.hibernate.annotations.NamedQuery;
 
-import javax.xml.namespace.QName;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -24,10 +21,10 @@ public class Staff {
 
     @Column(name = "first_name", columnDefinition = "nvarchar(50)", nullable = false)
     private String firstName;
+
     @Column(name = "last_name", columnDefinition = "nvarchar(50)", nullable = false)
     private String lastName;
 
-    //@Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private boolean gender;
 
@@ -40,17 +37,14 @@ public class Staff {
     @Column(name = "phones", nullable = false)
     private Set<String> phoneNumbers;
 
-    @Column(name = "address",  columnDefinition = "nvarchar(100)")
+    @Column(name = "address", columnDefinition = "nvarchar(100)")
     private String address;
 
     @Column(name = "email", columnDefinition = "varchar(50)", unique = true)
     private String email;
 
-    @Column(name = "staff_image", columnDefinition = "varchar(1024)")
+    @Column(name = "staff_image", columnDefinition = "LONGTEXT")
     private String staffImage;
-
-//    @Enumerated(EnumType.STRING)
-//    private Role role;
 
     @Column(name = "date_of_join")
     private Date dateOfJoin;
@@ -58,7 +52,7 @@ public class Staff {
     @Column(columnDefinition = "bit", nullable = false)
     private boolean status;
 
-    @OneToOne(mappedBy = "staff")
+    @OneToOne(mappedBy = "staff", cascade = CascadeType.ALL)
     private Account account;
 
     @ToString.Exclude

@@ -19,7 +19,7 @@ import javax.swing.JLabel;
  */
 public class LabelImage extends JLabel {
     private BufferedImage image;
-    private int borderWidth = 5; // Độ rộng viền
+    private int borderWidth = 2; // Độ rộng viền
 
     // Constructor mặc định
     public LabelImage() {
@@ -54,7 +54,7 @@ public class LabelImage extends JLabel {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             // Vẽ viền tím
-            g2d.setColor(new Color(128, 0, 128)); // Màu tím
+            g2d.setColor(new Color(196, 75, 248)); // Màu tím
             g2d.fill(new Ellipse2D.Double(0, 0, diameter, diameter));
 
             // Vẽ ảnh bên trong viền

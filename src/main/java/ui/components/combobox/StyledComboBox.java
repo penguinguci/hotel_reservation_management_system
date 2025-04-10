@@ -12,7 +12,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 public class StyledComboBox<E> extends JComboBox<E> {
-    private Color borderColor = new Color(204, 204, 204);
+    private Color borderColor = new Color(255, 255, 255);
 
     public StyledComboBox() {
         setRenderer(new CustomComboBoxRenderer());
@@ -57,7 +57,7 @@ public class StyledComboBox<E> extends JComboBox<E> {
             setBorder(new EmptyBorder(5, 10, 5, 10));
 
             if (isSelected) {
-                setBackground(new Color(103, 58, 183));
+                setBackground(new Color(126, 77, 213));
                 setForeground(Color.WHITE);
             } else {
                 setBackground(Color.WHITE);
