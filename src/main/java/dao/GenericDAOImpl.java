@@ -5,6 +5,7 @@ import interfaces.GenericDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Id;
+import jakarta.persistence.TypedQuery;
 import net.datafaker.providers.base.App;
 import utils.AppUtil;
 
@@ -84,6 +85,21 @@ public class GenericDAOImpl<T, ID> implements GenericDAO<T, ID> {
     public List<T> findAll() {
         String query = "SELECT e FROM " + entityClass.getSimpleName() + " e";
         return em.createQuery(query, entityClass).getResultList();
+    }
+
+    // Find with pagination
+    public List<T> findAll(int page, int pageSize) {
+        String queryStr = "SELECT e FROM " + entityClass.getSimpleName() + " e";
+        TypedQuery<T> query = em.createQuery(queryStr, entityClass)
+                .setFirstResult((page - 1) * pageSize)
+                .setMaxResults(pageSize);
+        return query.getResultList();
+    }
+
+    // Count all records
+    public long countAll() {
+        String queryStr = "SELECT COUNT(e) FROM " + entityClass.getSimpleName() + " e";
+        return em.createQuery(queryStr, Long.class).getSingleResult();
     }
 
 }
