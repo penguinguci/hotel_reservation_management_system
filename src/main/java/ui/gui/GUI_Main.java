@@ -25,6 +25,7 @@ public class GUI_Main extends javax.swing.JFrame {
         setExtendedState(MAXIMIZED_BOTH);
         Form_HomePage homePageForm = new Form_HomePage();
         Form_StaffManagement staffManagementForm = new Form_StaffManagement();
+        Form_RoomManagement roomManagement = new Form_RoomManagement();
         showForm(homePageForm);
         formCustomerManagement = new Form_CustomerManagement();
         menu3.setEvent(new MenuEvent() {
@@ -34,7 +35,10 @@ public class GUI_Main extends javax.swing.JFrame {
                     logout();
                 } else if (index == 1) {
                     showForm(new Form_Booking());
-                } else if(index == 4){
+                }
+                else if(index == 2){
+                    showForm(roomManagement);
+                }else if(index == 4){
                     showForm(formCustomerManagement);
                     formCustomerManagement.loadCustomerData();
                     formCustomerManagement.clearSearchFields();
