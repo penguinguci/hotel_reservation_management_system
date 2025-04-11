@@ -23,8 +23,8 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lblImageLogo" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblTitleLogo" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="258" max="32767" attributes="0"/>
+              <Component id="lblTitleLogo" min="-2" pref="188" max="-2" attributes="0"/>
+              <EmptySpace pref="199" max="32767" attributes="0"/>
               <Component id="btnUser" min="-2" pref="248" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>

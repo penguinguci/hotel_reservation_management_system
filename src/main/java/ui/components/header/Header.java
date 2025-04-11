@@ -50,11 +50,8 @@ public class Header extends javax.swing.JPanel {
         lblTitleLogo.setFont(new java.awt.Font("Segoe UI", 2, 22)); // NOI18N
         lblTitleLogo.setForeground(new java.awt.Color(236, 236, 236));
         lblTitleLogo.setText("Hotel Melody");
-        //AccountDAO accountDAO = new AccountDAOImpl();
-        GUI_Login GUI_Login = new GUI_Login();
-        String user;
-//Hiện tên nhân viên
-        //btnUser.setText("Nhân viên: "+ CurrentAccount.getCurrentAccount().getStaff().getFirstName()+" "+CurrentAccount.getCurrentAccount().getStaff().getLastName());
+
+        btnUser.setText("Nhân viên: ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -64,8 +61,8 @@ public class Header extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(lblImageLogo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblTitleLogo)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 258, Short.MAX_VALUE)
+                .addComponent(lblTitleLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
                 .addComponent(btnUser, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
