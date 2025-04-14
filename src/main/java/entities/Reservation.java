@@ -46,11 +46,40 @@ public class Reservation {
     @Column(name = "total_price")
     private double totalPrice;
 
+    @Transient
+    private double subTotal;
+
+    @Transient
+    private double taxAmount;
+
+    @Transient
+    private double finalTotal;
+
+//    public void calculatePrices() {
+//        this.subTotal = getTotalPrice();
+//        this.taxAmount = subTotal * taxRate;
+//        this.finalTotal = subTotal + taxAmount - discountAmount;
+//    }
+
     private double getTotalPrice() {
-        double line_total_amount = 0;
+        double total = 0;
         for (ReservationDetails reservationDetail : reservationDetails) {
-            line_total_amount += reservationDetail.getLineTotalAmount();
+            total += reservationDetail.getLineTotalAmount();
         }
-        return line_total_amount;
+        this.totalPrice = total;
+        return total;
+    }
+
+    // Getters for transient fields
+    public double getSubTotal() {
+        return subTotal;
+    }
+
+    public double getTaxAmount() {
+        return taxAmount;
+    }
+
+    public double getFinalTotal() {
+        return finalTotal;
     }
 }

@@ -3,10 +3,12 @@ package dao;
 import entities.Room;
 import interfaces.RoomDAO;
 import jakarta.persistence.*;
+import utils.AppUtil;
 
+import java.util.Date;
 import java.util.List;
 
-public class RoomDAOImpl implements RoomDAO {
+public class RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDAO {
 
     @PersistenceContext
     private EntityManagerFactory entityManagerFactory;
@@ -15,6 +17,7 @@ public class RoomDAOImpl implements RoomDAO {
     private EntityManager entityManager;
 
     public RoomDAOImpl() {
+        super(Room.class);
         entityManagerFactory = Persistence.createEntityManagerFactory("mariadb");
         entityManager = entityManagerFactory.createEntityManager();
     }
@@ -85,6 +88,98 @@ public class RoomDAOImpl implements RoomDAO {
         }
         if (entityManagerFactory != null) {
             entityManagerFactory.close();
+        }
+    }
+
+    @Override
+    public List<Room> searchAvailableRooms(Date checkInDate, Date checkOutDate, int capacity, String roomType, double minPrice, double maxPrice) {
+        EntityManager em = AppUtil.getEntityManager();
+        try {
+            String jpql = "SELECT r FROM Room r WHERE r.status = 0 " + // 0 means available
+                    "AND r.capacity >= :capacity " +
+                    "AND r.price BETWEEN :minPrice AND :maxPrice " +
+                    "AND NOT EXISTS (SELECT rd FROM ReservationDetails rd " +
+                    "JOIN rd.reservation res " +
+                    "WHERE rd.room = r " +
+                    "AND ((res.CheckInDate < :checkOutDate) AND (res.CheckOutDate > :checkInDate)))";
+
+            if (roomType != null && !roomType.isEmpty()) {
+                jpql += " AND r.roomType.typeID = :roomType";
+            }
+
+            TypedQuery<Room> query = em.createQuery(jpql, Room.class)
+                    .setParameter("capacity", capacity)
+                    .setParameter("minPrice", minPrice)
+                    .setParameter("maxPrice", maxPrice)
+                    .setParameter("checkInDate", checkInDate)
+                    .setParameter("checkOutDate", checkOutDate);
+
+            if (roomType != null && !roomType.isEmpty()) {
+                query.setParameter("roomType", roomType);
+            }
+
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public boolean isRoomAvailable(String roomId, Date checkInDate, Date checkOutDate) {
+        EntityManager em = AppUtil.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(rd) FROM ReservationDetails rd " +
+                    "JOIN rd.reservation res " +
+                    "WHERE rd.room.roomId = :roomId " +
+                    "AND ((res.CheckInDate < :checkOutDate) AND (res.CheckOutDate > :checkInDate))";
+
+            Long count = em.createQuery(jpql, Long.class)
+                    .setParameter("roomId", roomId)
+                    .setParameter("checkInDate", checkInDate)
+                    .setParameter("checkOutDate", checkOutDate)
+                    .getSingleResult();
+
+            return count == 0;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public double calculateRoomPrice(String roomId, Date checkInDate, Date checkOutDate) {
+        Room room = findById(roomId);
+        if (room == null) {
+            throw new IllegalArgumentException("Room not found");
+        }
+
+        long diffInMillis = checkOutDate.getTime() - checkInDate.getTime();
+        long days = diffInMillis / (1000 * 60 * 60 * 24);
+        days = days == 0 ? 1 : days; // minimum 1 day
+
+        return room.getPrice() * days;
+    }
+
+    @Override
+    public List<Room> getAllRoomTypes() {
+        EntityManager em = AppUtil.getEntityManager();
+        try {
+            String jpql = "SELECT DISTINCT r FROM Room r";
+            return em.createQuery(jpql, Room.class).getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Room> getRoomsByStatus(int status) {
+        EntityManager em = AppUtil.getEntityManager();
+        try {
+            String jpql = "SELECT r FROM Room r WHERE r.status = :status";
+            return em.createQuery(jpql, Room.class)
+                    .setParameter("status", status)
+                    .getResultList();
+        } finally {
+            em.close();
         }
     }
 }

@@ -35,6 +35,9 @@ public class Customer {
     @Column(columnDefinition = "varchar(50)", nullable = true, unique = true)
     private String email;
 
+    @Column(name = "cccd", columnDefinition = "varchar(20)", nullable = true, unique = true)
+    private String CCCD;
+
     @Column(name = "address")
     private String address;
 
