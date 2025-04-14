@@ -77,7 +77,7 @@ public class GUI_Main extends javax.swing.JFrame {
         scrollPaneWin111.setBorder(null);
         scrollPaneWin111.setViewportView(menu3);
 
-        body.setBackground(new java.awt.Color(245, 245, 245));
+        body.setBackground(new java.awt.Color(255, 255, 255));
         body.setLayout(new java.awt.BorderLayout());
 
         javax.swing.GroupLayout pnlConstrainLayout = new javax.swing.GroupLayout(pnlConstrain);

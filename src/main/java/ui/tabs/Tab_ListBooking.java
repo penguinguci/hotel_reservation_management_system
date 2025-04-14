@@ -2,18 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package ui.forms;
+package ui.tabs;
 
 /**
  *
  * @author TRAN LONG VU
  */
-public class Form_Booking extends javax.swing.JPanel {
+public class Tab_ListBooking extends javax.swing.JPanel {
 
     /**
-     * Creates new form Form_Booking
+     * Creates new form Tab_ListBooking
      */
-    public Form_Booking() {
+    public Tab_ListBooking() {
         initComponents();
     }
 
@@ -26,33 +26,19 @@ public class Form_Booking extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        customTab = new ui.components.tab.CustomTab();
-
-        tabBooking = new ui.tabs.Tab_Booking();
-        tabListBooking = new ui.tabs.Tab_ListBooking();
-
-        customTab.addTabPanel("Đặt phòng", tabBooking);
-        customTab.addTabPanel("Danh sách đặt phòng", tabListBooking);
-
-        setBackground(new java.awt.Color(255, 255, 255));
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(customTab, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
+            .addGap(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(customTab, javax.swing.GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE)
+            .addGap(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private ui.components.tab.CustomTab customTab;
-    private ui.tabs.Tab_Booking tabBooking;
-    private ui.tabs.Tab_ListBooking tabListBooking;
-
     // End of variables declaration//GEN-END:variables
 }

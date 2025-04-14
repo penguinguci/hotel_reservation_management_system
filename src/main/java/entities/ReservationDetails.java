@@ -35,12 +35,16 @@ public class ReservationDetails {
     @Column(name = "line_total_amount")
     private double lineTotalAmount;
 
+    @Column(name = "number_of_nights")
+    private int numberOfNights = 1;
+
     public double getLineTotalAmount() {
         double lineTotalAmount = 0;
-        if (room != null && service == null) {
-            lineTotalAmount = quantity * room.price;
-        } else if (room == null && service != null) {
-            lineTotalAmount = quantity * service.getPrice();
+        if (room != null) {
+            lineTotalAmount = numberOfNights * room.getPrice();
+        }
+        if (service != null) {
+            lineTotalAmount += quantity * service.getPrice();
         }
         return lineTotalAmount;
     }

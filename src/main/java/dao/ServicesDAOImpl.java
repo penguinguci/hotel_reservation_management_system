@@ -3,10 +3,11 @@ package dao;
 import entities.Service;
 import interfaces.ServicesDAO;
 import jakarta.persistence.*;
+import utils.AppUtil;
 
 import java.util.List;
 
-public class ServicesDAOImpl implements ServicesDAO {
+public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements ServicesDAO {
 
     @PersistenceContext
     private EntityManagerFactory entityManagerFactory;
@@ -15,6 +16,7 @@ public class ServicesDAOImpl implements ServicesDAO {
     private EntityManager entityManager;
 
     public ServicesDAOImpl() {
+        super(Service.class);
         entityManagerFactory = Persistence.createEntityManagerFactory("mariadb");
         entityManager = entityManagerFactory.createEntityManager();
     }
@@ -85,6 +87,26 @@ public class ServicesDAOImpl implements ServicesDAO {
         }
         if (entityManagerFactory != null) {
             entityManagerFactory.close();
+        }
+    }
+
+    @Override
+    public List<Service> searchServices(String keyword, boolean availableOnly) {
+        EntityManager em = AppUtil.getEntityManager();
+        try {
+            String jpql = "SELECT s FROM Service s WHERE " +
+                    "(LOWER(s.name) LIKE LOWER(:keyword) OR " +
+                    "(LOWER(s.description) LIKE LOWER(:keyword)) ";
+
+            if (availableOnly) {
+                jpql += "AND s.availability = true";
+            }
+
+            return em.createQuery(jpql, Service.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .getResultList();
+        } finally {
+            em.close();
         }
     }
 }
