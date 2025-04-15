@@ -19,12 +19,6 @@ public class OrderDetails {
     @Id
     @EqualsAndHashCode.Include
     @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
-
-    @Id
-    @EqualsAndHashCode.Include
-    @ManyToOne
     @JoinColumn(name = "service_id")
     private Service service;
 
@@ -33,13 +27,12 @@ public class OrderDetails {
     @Column(name = "line_total_amount")
     private double lineTotalAmount;
 
-    public double calculateLineTotalAmount() {
-        double lineTotalAmount = 0;
-        if (room != null && service == null) {
-            lineTotalAmount = quantity * room.getPrice();
-        } else if (room == null && service != null) {
-            lineTotalAmount = quantity * service.getPrice();
+    public double calculateLineTotal() {
+        double total = 0;
+        if (service != null) {
+            total += quantity * service.getPrice();
         }
-        return lineTotalAmount;
+        this.lineTotalAmount = total;
+        return total;
     }
 }

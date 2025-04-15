@@ -54,13 +54,21 @@ public class Reservation {
     @Column(name = "remaining_amount")
     private double remainingAmount;
 
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
+
+    @Column(name = "number_of_nights")
+    private int numberOfNights = 1;
+
     // Tính toán tổng tiền từ chi tiết đặt phòng
     public double calculateTotalPrice() {
         if (reservationDetails == null || reservationDetails.isEmpty()) {
-            return 0.0;
+            this.totalPrice = room.getPrice() * numberOfNights;
+            return room.getPrice() * numberOfNights;
         }
 
-        double total = reservationDetails.stream()
+        double total = room.getPrice() * numberOfNights + reservationDetails.stream()
                 .mapToDouble(ReservationDetails::calculateLineTotal)
                 .sum();
 
