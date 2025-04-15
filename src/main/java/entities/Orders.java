@@ -38,8 +38,15 @@ public class Orders {
     private PaymentMethod paymentMethod;
 
     @ToString.Exclude
-    @OneToMany(mappedBy = "orders")
+    @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderDetails> orderDetails;
+
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
+
+    @Column(name = "number_of_nights")
+    private int numberOfNights = 1;
 
 //    @ManyToOne
 //    @JoinColumn(name = "tax_id")
@@ -75,10 +82,15 @@ public class Orders {
 //    }
 
     public double calculateTotalPrice() {
-        double line_total_amount = 0;
-        for (OrderDetails orderDetail : orderDetails) {
-            line_total_amount += orderDetail.getLineTotalAmount();
+        if (orderDetails == null || orderDetails.isEmpty()) {
+            return room.getPrice() * numberOfNights;
         }
-        return line_total_amount;
+
+        double total = room.getPrice() * numberOfNights + orderDetails.stream()
+                .mapToDouble(OrderDetails::calculateLineTotal)
+                .sum();
+
+        this.totalPrice = total;
+        return total;
     }
 }

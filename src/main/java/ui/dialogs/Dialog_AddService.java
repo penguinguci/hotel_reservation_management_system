@@ -71,7 +71,6 @@ public class Dialog_AddService extends javax.swing.JPanel {
 
         for (Service service : services) {
             Object[] rowData = {
-                    model.getRowCount() + 1,
                     service.getServiceId(),
                     service.getName(),
                     String.format("%,.0f VND", service.getPrice()),
@@ -154,7 +153,7 @@ public class Dialog_AddService extends javax.swing.JPanel {
 
         txt_SearchServices.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txt_SearchServices.setPlaceholder("Nhập tên dịch vụ...");
-        txt_SearchServices.setPlaceholderColor(new java.awt.Color(51, 51, 51));
+        txt_SearchServices.setPlaceholderColor(new java.awt.Color(102, 102, 102));
 
         javax.swing.GroupLayout pnl_SearchLayout = new javax.swing.GroupLayout(pnl_Search);
         pnl_Search.setLayout(pnl_SearchLayout);
@@ -200,7 +199,7 @@ public class Dialog_AddService extends javax.swing.JPanel {
         pnl_ListService.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         pnl_ListService.setLayout(new java.awt.BorderLayout());
 
-        table_ListService.setColumnNames(new String[] {"STT", "Mã dịch vụ", "Tên dịch vụ", "Giá", "Mô tả", "Trạng thái"});
+        table_ListService.setColumnNames(new String[] {"Mã dịch vụ", "Tên dịch vụ", "Giá", "Mô tả", "Trạng thái"});
         table_ListService.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
         pnl_ListService.add(table_ListService, java.awt.BorderLayout.CENTER);
 
@@ -264,8 +263,8 @@ public class Dialog_AddService extends javax.swing.JPanel {
             .addGroup(pnl_InforAddServiceLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnl_InforAddServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(pnl_TotalPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE)
-                    .addComponent(pnl_Title_TotalPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(pnl_TotalPrice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnl_Title_TotalPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnl_InforAddServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btn_Complete, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)

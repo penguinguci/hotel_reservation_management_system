@@ -100,18 +100,16 @@ public class Tab_Booking extends javax.swing.JPanel {
         table_Cart.getTable().getColumnModel().getColumn(3).setCellRenderer(new SpinnerRenderer());
         table_Cart.getTable().getColumnModel().getColumn(3).setCellEditor(new CustomTableButton.SpinnerEditor());
 
-
         table_Cart.setButtonClickListener((buttonType, row, column) -> {
-            System.out.println("Button clicked at row: " + row + ", column: " + column);
             if (column == 4) {
                 showServicesDialog(row);
             }
         });
 
-
         table_Cart.getTable().getModel().addTableModelListener(e -> {
             if (e.getColumn() == 3) {
                 updateRowTotal(e.getFirstRow());
+                updateSummaryTotals();
             }
         });
     }
@@ -123,9 +121,9 @@ public class Tab_Booking extends javax.swing.JPanel {
         model.addElement("Trực tuyến");
         cbx_BookingMethod.setModel(model);
 
-        cbx_BookingMethod.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                updateTotalPrices();
+        cbx_BookingMethod.addActionListener(e -> {
+            if (table_Cart.getTableModel().getRowCount() > 0) {
+                updateSummaryTotals();
             }
         });
     }
@@ -1143,61 +1141,56 @@ public class Tab_Booking extends javax.swing.JPanel {
 
     private void updateTotalPrices() {
         try {
-            // Tạo đối tượng Reservation
-            Reservation reservation = new Reservation();
-
-            // Thiết lập hình thức đặt phòng
-            String bookingMethodStr = (String) cbx_BookingMethod.getSelectedItem();
-            BookingMethod bookingMethod = "Tại quầy".equals(bookingMethodStr)
-                    ? BookingMethod.AT_THE_COUNTER
-                    : BookingMethod.CONTACT;
-            reservation.setBookingMethod(bookingMethod);
-
-            // Tạo danh sách chi tiết đặt phòng từ giỏ hàng
-            Set<ReservationDetails> details = new HashSet<>();
             CustomTableButton.CustomTableModel cartModel = table_Cart.getTableModel();
-
             for (int i = 0; i < cartModel.getRowCount(); i++) {
                 Object[] rowData = cartModel.getRowData(i);
 
-                // Tạo ReservationDetails cho mỗi phòng trong giỏ hàng
-                ReservationDetails detail = new ReservationDetails();
-                detail.setReservation(reservation);
-
-                // Lấy thông tin phòng (giả sử có phương thức getRoomById)
+                Reservation reservation = new Reservation();
                 String roomId = (String) rowData[1];
                 Room room = roomDAO.findById(roomId);
-                detail.setRoom(room);
+                reservation.setRoom(room);
+
+                // Thiết lập hình thức đặt phòng
+                String bookingMethodStr = (String) cbx_BookingMethod.getSelectedItem();
+                BookingMethod bookingMethod = "Tại quầy".equals(bookingMethodStr)
+                        ? BookingMethod.AT_THE_COUNTER
+                        : BookingMethod.CONTACT;
+                reservation.setBookingMethod(bookingMethod);
 
                 // Số đêm
                 int numberOfNights = (int) rowData[3];
-                detail.setNumberOfNights(numberOfNights);
+                reservation.setNumberOfNights(numberOfNights);
 
-                // Dịch vụ (nếu có)
-                // Giả sử rowData[4] chứa danh sách dịch vụ đã chọn
-                String servicesStr = (String) rowData[4];
-                if (!servicesStr.isEmpty()) {
-                    // Xử lý thêm dịch vụ vào detail nếu cần
+
+//                Set<ReservationDetails> details = new HashSet<>();
+//
+//                ReservationDetails detail = new ReservationDetails();
+//                detail.setReservation(reservation);
+//
+//                // Dịch vụ (nếu có)
+//                // Giả sử rowData[4] chứa danh sách dịch vụ đã chọn
+//                String servicesStr = (String) rowData[4];
+//                if (!servicesStr.isEmpty()) {
+//                    // Xử lý thêm dịch vụ vào detail nếu cần
+//                }
+//
+//                details.add(detail);
+//
+//                // Thiết lập chi tiết đặt phòng
+//                reservation.setReservationDetails(details);
+
+                // Tính toán các giá trị
+                reservation.calculateTotalPrice();
+                reservation.calculateDepositAmount();
+                reservation.calculateRemainingAmount();
+
+                // Cập nhật giao diện
+                lbl_LastTotalPrice_Value.setText(String.format("%,.0f VND", reservation.getTotalPrice()));
+                if (!cbx_BookingMethod.getSelectedItem().equals("Chọn hình thức đặt phòng")) {
+                    lbl_Deposit_Value.setText(String.format("%,.0f VND", reservation.getDepositAmount()));
                 }
-
-                details.add(detail);
+                lbl_RemainingAmount_Value.setText(String.format("%,.0f VND", reservation.getRemainingAmount()));
             }
-
-            // Thiết lập chi tiết đặt phòng
-            reservation.setReservationDetails(details);
-
-            // Tính toán các giá trị
-            reservation.calculateTotalPrice();
-            reservation.calculateDepositAmount();
-            reservation.calculateRemainingAmount();
-
-            // Cập nhật giao diện
-            lbl_LastTotalPrice_Value.setText(String.format("%,.0f VND", reservation.getTotalPrice()));
-            if (!cbx_BookingMethod.getSelectedItem().equals("Chọn hình thức đặt phòng")) {
-                lbl_Deposit_Value.setText(String.format("%,.0f VND", reservation.getDepositAmount()));
-            }
-            lbl_RemainingAmount_Value.setText(String.format("%,.0f VND", reservation.getRemainingAmount()));
-
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi tính toán giá: " + e.getMessage(),
@@ -1205,60 +1198,82 @@ public class Tab_Booking extends javax.swing.JPanel {
         }
     }
 
+    private int calculateNumberOfNights() {
+        Date checkInDate = calendar_Checkin.getSelectedDate();
+        Date checkOutDate = calendar_Checout.getSelectedDate();
+        if (checkInDate != null && checkOutDate != null) {
+            long diffInMillis = checkOutDate.getTime() - checkInDate.getTime();
+            return (int) Math.max(1, diffInMillis / (1000 * 60 * 60 * 24));
+        }
+        return 1; // Mặc định 1 đêm nếu chưa chọn ngày
+    }
+
+
+    private boolean isRoomAlreadyInCart(String roomId) {
+        CustomTableButton.CustomTableModel cartModel = table_Cart.getTableModel();
+        for (int i = 0; i < cartModel.getRowCount(); i++) {
+            Object[] cartRow = cartModel.getRowData(i);
+            if (roomId.equals(cartRow[1])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void addToCart(String roomId, double price, int numberOfNights) {
+        CustomTableButton.CustomTableModel cartModel = table_Cart.getTableModel();
+
+        Object[] cartRow = {
+                cartModel.getRowCount() + 1,
+                roomId,
+                String.format("%,.0f VND", price),
+                numberOfNights,
+                "Thêm dịch vụ",
+                String.format("%,.0f VND", numberOfNights * price)
+        };
+
+        CustomTableButton.ButtonType[] buttonTypes = new CustomTableButton.ButtonType[cartModel.getColumnCount()];
+        buttonTypes[4] = CustomTableButton.ButtonType.SERVICE;
+
+        cartModel.addRow(cartRow, buttonTypes);
+    }
+
     private void addEntityRoomToCart() {
         try {
             int selectedRow = table_EntityRoom.getTable().getSelectedRow();
             if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn phòng cần thêm", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn phòng cần thêm",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             int modelRow = table_EntityRoom.getTable().convertRowIndexToModel(selectedRow);
             Object[] rowData = table_EntityRoom.getTableModel().getRowData(modelRow);
 
+            // Kiểm tra trạng thái phòng
             String status = (String) rowData[5];
             if (!"Trống".equals(status)) {
-                JOptionPane.showMessageDialog(this, "Chỉ có thể thêm phòng có trạng thái Trống", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Chỉ có thể thêm phòng có trạng thái Trống",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
             String roomId = (String) rowData[1];
             double price = Double.parseDouble(((String) rowData[3]).replaceAll("[^\\d.]", ""));
 
-            Date checkInDate = calendar_Checkin.getSelectedDate();
-            Date checkOutDate = calendar_Checout.getSelectedDate();
-            int numberOfNights = 1;
+            // Tính số đêm
+            int numberOfNights = calculateNumberOfNights();
 
-            if (checkInDate != null && checkOutDate != null) {
-                long diffInMillis = checkOutDate.getTime() - checkInDate.getTime();
-                numberOfNights = (int) (diffInMillis / (1000 * 60 * 60 * 24));
-                numberOfNights = numberOfNights == 0 ? 1 : numberOfNights;
+            // Kiểm tra phòng đã có trong giỏ chưa
+            if (isRoomAlreadyInCart(roomId)) {
+                JOptionPane.showMessageDialog(this, "Phòng này đã có trong giỏ hàng",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
             }
 
-            CustomTableButton.CustomTableModel cartModel = table_Cart.getTableModel();
-            for (int i = 0; i < cartModel.getRowCount(); i++) {
-                Object[] cartRow = cartModel.getRowData(i);
-                if (roomId.equals(cartRow[1])) {
-                    JOptionPane.showMessageDialog(this, "Phòng này đã có trong giỏ hàng", "Thông báo", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-            }
-
-            Object[] cartRow = {
-                    cartModel.getRowCount() + 1,
-                    roomId,
-                    String.format("%,.0f VND", price),
-                    numberOfNights,
-                    "Thêm dịch vụ", // Text cho button
-                    String.format("%,.0f VND", numberOfNights * price)
-            };
-
-            CustomTableButton.ButtonType[] buttonTypes = new CustomTableButton.ButtonType[cartModel.getColumnCount()];
-            buttonTypes[4] = CustomTableButton.ButtonType.SERVICE;
-
-            cartModel.addRow(cartRow, buttonTypes);
-
-            updateTotalPrices();
+            // Thêm vào giỏ hàng
+            addToCart(roomId, price, numberOfNights);
+            updateSummaryTotals();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1266,6 +1281,80 @@ public class Tab_Booking extends javax.swing.JPanel {
                     "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    // Cập nhật tổng tiền khi số đêm thay đổi
+    private void updateRowTotal(int row) {
+        try {
+            CustomTableButton.CustomTableModel model = table_Cart.getTableModel();
+            Object[] rowData = model.getRowData(row);
+
+            // Lấy thông tin từ hàng
+            String roomId = (String) rowData[1];
+            int numberOfNights = (int) rowData[3];
+            double pricePerNight = Double.parseDouble(((String) rowData[2]).replaceAll("[^\\d.]", ""));
+
+            // Tính toán tổng tiền cho hàng
+            double rowTotal = pricePerNight * numberOfNights;
+
+            // Cập nhật dữ liệu hàng
+            rowData[5] = String.format("%,.0f VND", rowTotal);
+            model.fireTableRowsUpdated(row, row);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi cập nhật giá trị hàng: " + ex.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void updateSummaryTotals() {
+        try {
+            double totalPrice = 0;
+            CustomTableButton.CustomTableModel cartModel = table_Cart.getTableModel();
+
+            // Tính tổng giá trị từ tất cả các hàng
+            for (int i = 0; i < cartModel.getRowCount(); i++) {
+                Object[] rowData = cartModel.getRowData(i);
+                double rowTotal = Double.parseDouble(((String) rowData[5]).replaceAll("[^\\d.]", ""));
+                totalPrice += rowTotal;
+            }
+
+            // Tính toán các giá trị tổng hợp
+            double depositAmount = 0;
+            double remainingAmount = 0;
+            String bookingMethodStr = (String) cbx_BookingMethod.getSelectedItem();
+            if (!"Chọn hình thức đặt phòng".equals(bookingMethodStr)) {
+                BookingMethod bookingMethod = "Tại quầy".equals(bookingMethodStr)
+                        ? BookingMethod.AT_THE_COUNTER
+                        : BookingMethod.CONTACT;
+
+                depositAmount = calculateDeposit(totalPrice, bookingMethod);
+                remainingAmount = totalPrice - depositAmount;
+
+            }
+            lbl_Deposit_Value.setText(String.format("%,.0f VND", depositAmount));
+            lbl_RemainingAmount_Value.setText(String.format("%,.0f VND", remainingAmount));
+            lbl_LastTotalPrice_Value.setText(String.format("%,.0f VND", totalPrice));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi tính toán tổng giá: " + e.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private double calculateDeposit(double totalPrice, BookingMethod bookingMethod) {
+        // Logic tính tiền đặt cọc dựa trên hình thức đặt phòng
+        switch (bookingMethod) {
+            case AT_THE_COUNTER:
+                return Math.min(1000000, totalPrice * 0.3); // Tối đa 1 triệu hoặc 30%
+            case CONTACT:
+                return totalPrice * 0.5; // 50% cho đặt qua liên hệ
+            default:
+                return 0;
+        }
+    }
+
 
     private void clear() {
         calendar_Checkin.setSelectedDate(null);
@@ -1363,22 +1452,5 @@ public class Tab_Booking extends javax.swing.JPanel {
         updateTotalPrices();
     }
 
-    // Cập nhật tổng tiền khi số đêm thay đổi
-    private void updateRowTotal(int row) {
-        CustomTableButton.CustomTableModel model = table_Cart.getTableModel();
-        Object[] rowData = model.getRowData(row);
 
-        try {
-            int numberOfNights = (int) rowData[3];
-            double pricePerNight = Double.parseDouble(((String) rowData[2]).replaceAll("[^\\d.]", ""));
-            double total = numberOfNights * pricePerNight;
-
-            rowData[5] = String.format("%,.0f VND", total);
-            model.fireTableRowsUpdated(row, row);
-
-            updateTotalPrices();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
 }
