@@ -1,11 +1,10 @@
 package entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -20,4 +19,7 @@ public class RoomType {
     private String typeName;
     @Column(name ="description",columnDefinition = "nvarchar(1024)")
     private String description;
+
+    @OneToMany(mappedBy = "roomType")
+    private List<Room> room;
 }

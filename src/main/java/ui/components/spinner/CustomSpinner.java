@@ -6,9 +6,10 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.basic.BasicSpinnerUI;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 
 /**
- * CustomSpinner - A modern, elegant JSpinner with enhanced visual appearance
+ * CustomSpinner - A modern, elegant JSpinner with enhanced numeric value support
  */
 public class CustomSpinner extends JSpinner {
 
@@ -22,6 +23,9 @@ public class CustomSpinner extends JSpinner {
     private Color textColor = new Color(43, 43, 43);
     private int arcSize = 6;
 
+    // Default step size for numeric spinner
+    private double stepSize = 1.0;
+
     public CustomSpinner() {
         initialize();
     }
@@ -29,6 +33,55 @@ public class CustomSpinner extends JSpinner {
     public CustomSpinner(SpinnerModel model) {
         super(model);
         initialize();
+
+        // If using a number model, extract the step size
+        if (model instanceof SpinnerNumberModel) {
+            Object step = ((SpinnerNumberModel)model).getStepSize();
+            if (step instanceof Number) {
+                stepSize = ((Number)step).doubleValue();
+            }
+        }
+    }
+
+    /**
+     * Create a spinner specifically for numbers with custom format
+     *
+     * @param min Minimum value
+     * @param max Maximum value
+     * @param initialValue Starting value
+     * @param step Step increment/decrement size
+     * @param format Number format pattern (e.g., "#,##0.##")
+     * @return A configured CustomSpinner
+     */
+    public static CustomSpinner createNumberSpinner(double min, double max, double initialValue, double step, String format) {
+        SpinnerNumberModel model = new SpinnerNumberModel(initialValue, min, max, step);
+        CustomSpinner spinner = new CustomSpinner(model);
+
+        // Set up custom number editor with the specified format
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(spinner, format);
+        spinner.setEditor(editor);
+
+        // Customize text field
+        JFormattedTextField textField = editor.getTextField();
+        textField.setForeground(spinner.getTextColor());
+        textField.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
+        textField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+        return spinner;
+    }
+
+    /**
+     * Convenience method to create an integer spinner
+     */
+    public static CustomSpinner createIntegerSpinner(int min, int max, int initialValue, int step) {
+        return createNumberSpinner(min, max, initialValue, step, "#,##0");
+    }
+
+    /**
+     * Convenience method to create a decimal spinner with 2 decimal places
+     */
+    public static CustomSpinner createDecimalSpinner(double min, double max, double initialValue, double step) {
+        return createNumberSpinner(min, max, initialValue, step, "#,##0.00");
     }
 
     private void initialize() {
@@ -47,6 +100,163 @@ public class CustomSpinner extends JSpinner {
             textField.setForeground(textColor);
             textField.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
             textField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+            // Add keyboard shortcuts for increment/decrement
+            addKeyboardShortcuts(textField);
+        }
+    }
+
+    /**
+     * Get the next value from the spinner model
+     * @return The next value, or null if not available
+     */
+    public Object getNext() {
+        return getModel().getNextValue();
+    }
+
+    /**
+     * Get the previous value from the spinner model
+     * @return The previous value, or null if not available
+     */
+    public Object getPrevious() {
+        return getModel().getPreviousValue();
+    }
+
+    /**
+     * Add keyboard shortcut support for incrementing/decrementing
+     */
+    private void addKeyboardShortcuts(JFormattedTextField textField) {
+        // Using Key Bindings for better component-focused behavior
+        InputMap inputMap = textField.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap actionMap = textField.getActionMap();
+
+        // Up arrow to increment
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "increment");
+        actionMap.put("increment", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // Force commit of any edited text before incrementing
+                    textField.commitEdit();
+                    Object next = getNext();
+                    if (next != null) {
+                        setValue(next);
+                    }
+                } catch (ParseException ex) {
+                    // If parsing fails, revert to the previous value
+                    JFormattedTextField field = (JFormattedTextField)e.getSource();
+                    field.setValue(CustomSpinner.this.getValue()); // Fixed: use CustomSpinner's getValue
+                    Toolkit.getDefaultToolkit().beep();
+                }
+            }
+        });
+
+        // Down arrow to decrement
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "decrement");
+        actionMap.put("decrement", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // Force commit of any edited text before decrementing
+                    textField.commitEdit();
+                    Object previous = getPrevious();
+                    if (previous != null) {
+                        setValue(previous);
+                    }
+                } catch (ParseException ex) {
+                    // If parsing fails, revert to the previous value
+                    JFormattedTextField field = (JFormattedTextField)e.getSource();
+                    field.setValue(CustomSpinner.this.getValue()); // Fixed: use CustomSpinner's getValue
+                    Toolkit.getDefaultToolkit().beep();
+                }
+            }
+        });
+    }
+
+    /**
+     * Get the current value as a double
+     * @return The current value as a double, or 0 if not a number
+     */
+    public double getDoubleValue() {
+        Object value = getValue();
+        if (value instanceof Number) {
+            return ((Number)value).doubleValue();
+        }
+        return 0.0;
+    }
+
+    /**
+     * Get the current value as an integer
+     * @return The current value as an integer, or 0 if not a number
+     */
+    public int getIntValue() {
+        Object value = getValue();
+        if (value instanceof Number) {
+            return ((Number)value).intValue();
+        }
+        return 0;
+    }
+
+    /**
+     * Set the step size for manual incrementing/decrementing
+     * @param step The step size
+     */
+    public void setStepSize(double step) {
+        this.stepSize = step;
+        if (getModel() instanceof SpinnerNumberModel) {
+            ((SpinnerNumberModel)getModel()).setStepSize(step);
+        }
+    }
+
+    /**
+     * Get the current step size
+     * @return The step size
+     */
+    public double getStepSize() {
+        return this.stepSize;
+    }
+
+    /**
+     * Manually increment the spinner value by the step size
+     */
+    public void increment() {
+        try {
+            // Ensure any pending edits are committed
+            JComponent editor = getEditor();
+            if (editor instanceof JSpinner.DefaultEditor) {
+                JFormattedTextField textField = ((JSpinner.DefaultEditor)editor).getTextField();
+                textField.commitEdit();
+            }
+
+            // Use the model's next value
+            Object next = getNext();
+            if (next != null) {
+                setValue(next);
+            }
+        } catch (ParseException e) {
+            Toolkit.getDefaultToolkit().beep();
+        }
+    }
+
+    /**
+     * Manually decrement the spinner value by the step size
+     */
+    public void decrement() {
+        try {
+            // Ensure any pending edits are committed
+            JComponent editor = getEditor();
+            if (editor instanceof JSpinner.DefaultEditor) {
+                JFormattedTextField textField = ((JSpinner.DefaultEditor)editor).getTextField();
+                textField.commitEdit();
+            }
+
+            // Use the model's previous value
+            Object previous = getPrevious();
+            if (previous != null) {
+                setValue(previous);
+            }
+        } catch (ParseException e) {
+            Toolkit.getDefaultToolkit().beep();
         }
     }
 
@@ -120,7 +330,7 @@ public class CustomSpinner extends JSpinner {
         private boolean upButtonPressed = false;
         private boolean downButtonPressed = false;
 
-        // Explicitly declare these protected fields from BasicSpinnerUI
+        // Explicitly declare these fields to reference the ones from BasicSpinnerUI
         protected JComponent editor;
         protected JButton nextButton;
         protected JButton previousButton;
@@ -189,6 +399,11 @@ public class CustomSpinner extends JSpinner {
             previousButton.setFocusPainted(false);
             previousButton.setBorderPainted(false);
             previousButton.setContentAreaFilled(false);
+
+            // Fix: Add a proper action listener to handle decrement
+            previousButton.addActionListener(e -> {
+                CustomSpinner.this.decrement();
+            });
 
             previousButton.addMouseListener(new MouseAdapter() {
                 @Override
@@ -262,6 +477,11 @@ public class CustomSpinner extends JSpinner {
             nextButton.setFocusPainted(false);
             nextButton.setBorderPainted(false);
             nextButton.setContentAreaFilled(false);
+
+            // Fix: Add a proper action listener to handle increment
+            nextButton.addActionListener(e -> {
+                CustomSpinner.this.increment();
+            });
 
             nextButton.addMouseListener(new MouseAdapter() {
                 @Override
@@ -365,7 +585,7 @@ public class CustomSpinner extends JSpinner {
         }
     }
 
-    // Demo method with multiple theme options
+    // Demo method with multiple theme options and enhanced number handling
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
@@ -374,33 +594,39 @@ public class CustomSpinner extends JSpinner {
                 e.printStackTrace();
             }
 
-            JFrame frame = new JFrame("Custom Spinner Demo");
+            JFrame frame = new JFrame("Enhanced Custom Spinner Demo");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.getContentPane().setBackground(new Color(245, 245, 245));
-            frame.setLayout(new GridLayout(6, 2, 15, 15));
+            frame.setLayout(new GridLayout(8, 2, 15, 15));
             ((GridLayout)frame.getLayout()).setHgap(20);
             ((GridLayout)frame.getLayout()).setVgap(20);
             frame.getRootPane().setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            // Default style
-            CustomSpinner defaultSpinner = new CustomSpinner(
-                    new SpinnerNumberModel(42, 0, 100, 1));
+            // Default integer spinner
+            CustomSpinner intSpinner = createIntegerSpinner(0, 100, 42, 1);
 
-            // Light blue theme
-            CustomSpinner blueSpinner = new CustomSpinner(
-                    new SpinnerNumberModel(75, 0, 100, 5));
+            // Decimal spinner
+            CustomSpinner decimalSpinner = createDecimalSpinner(0.0, 100.0, 42.5, 0.5);
+
+            // Large step spinner
+            CustomSpinner largeStepSpinner = createIntegerSpinner(0, 1000, 50, 10);
+
+            // Percentage spinner with custom format
+            CustomSpinner percentSpinner = createNumberSpinner(0, 100, 75, 5, "#0'%'");
+
+            // Blue theme spinner
+            CustomSpinner blueSpinner = createDecimalSpinner(0.0, 100.0, 75.0, 0.25);
             blueSpinner.setBackgroundColor(new Color(240, 248, 255));
             blueSpinner.setBorderColor(new Color(176, 196, 222));
             blueSpinner.setButtonColor(new Color(230, 240, 250));
             blueSpinner.setForegroundColor(new Color(70, 130, 180));
 
-            // Light green theme
-            CustomSpinner greenSpinner = new CustomSpinner(
-                    new SpinnerNumberModel(50, 0, 100, 5));
-            greenSpinner.setBackgroundColor(new Color(240, 255, 240));
-            greenSpinner.setBorderColor(new Color(144, 238, 144));
-            greenSpinner.setButtonColor(new Color(230, 250, 230));
-            greenSpinner.setForegroundColor(new Color(60, 179, 113));
+            // Currency spinner
+            CustomSpinner currencySpinner = createNumberSpinner(0, 10000, 1299.99, 100, "$#,##0.00");
+            currencySpinner.setBackgroundColor(new Color(240, 255, 240));
+            currencySpinner.setBorderColor(new Color(144, 238, 144));
+            currencySpinner.setButtonColor(new Color(230, 250, 230));
+            currencySpinner.setForegroundColor(new Color(60, 179, 113));
 
             // Date spinner
             CustomSpinner dateSpinner = new CustomSpinner(new SpinnerDateModel());
@@ -421,25 +647,24 @@ public class CustomSpinner extends JSpinner {
             listSpinner.setButtonColor(new Color(240, 240, 245));
             listSpinner.setForegroundColor(new Color(106, 90, 205));
 
-            // Month spinner
-            String[] months = {"January", "February", "March", "April", "May", "June",
-                    "July", "August", "September", "October", "November", "December"};
-            CustomSpinner monthSpinner = new CustomSpinner(
-                    new SpinnerListModel(months));
-            monthSpinner.setBackgroundColor(new Color(255, 245, 250));
-            monthSpinner.setBorderColor(new Color(219, 112, 147, 100));
-            monthSpinner.setButtonColor(new Color(255, 240, 245));
-            monthSpinner.setForegroundColor(new Color(199, 21, 133));
-
             // Add components with labels
-            JLabel defaultLabel = new JLabel("Default Style:");
-            defaultLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            JLabel intLabel = new JLabel("Integer Spinner:");
+            intLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
-            JLabel blueLabel = new JLabel("Blue Theme:");
+            JLabel decimalLabel = new JLabel("Decimal Spinner (0.5 steps):");
+            decimalLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+            JLabel largeStepLabel = new JLabel("Large Step Spinner (10):");
+            largeStepLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+            JLabel percentLabel = new JLabel("Percentage Spinner:");
+            percentLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+
+            JLabel blueLabel = new JLabel("Blue Theme (0.25 steps):");
             blueLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
-            JLabel greenLabel = new JLabel("Green Theme:");
-            greenLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            JLabel currencyLabel = new JLabel("Currency Spinner:");
+            currencyLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
             JLabel dateLabel = new JLabel("Date Spinner:");
             dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -447,23 +672,40 @@ public class CustomSpinner extends JSpinner {
             JLabel listLabel = new JLabel("List Spinner:");
             listLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
-            JLabel monthLabel = new JLabel("Month Spinner:");
-            monthLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-
-            frame.add(defaultLabel);
-            frame.add(defaultSpinner);
+            frame.add(intLabel);
+            frame.add(intSpinner);
+            frame.add(decimalLabel);
+            frame.add(decimalSpinner);
+            frame.add(largeStepLabel);
+            frame.add(largeStepSpinner);
+            frame.add(percentLabel);
+            frame.add(percentSpinner);
             frame.add(blueLabel);
             frame.add(blueSpinner);
-            frame.add(greenLabel);
-            frame.add(greenSpinner);
+            frame.add(currencyLabel);
+            frame.add(currencySpinner);
             frame.add(dateLabel);
             frame.add(dateSpinner);
             frame.add(listLabel);
             frame.add(listSpinner);
-            frame.add(monthLabel);
-            frame.add(monthSpinner);
 
-            frame.setSize(450, 350);
+            // Add a panel with control buttons for demonstration
+            JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            JButton getValueBtn = new JButton("Get Current Value");
+            getValueBtn.addActionListener(e ->
+                    JOptionPane.showMessageDialog(frame,
+                            "Current Integer Value: " + intSpinner.getIntValue() +
+                                    "\nCurrent Decimal Value: " + decimalSpinner.getDoubleValue(),
+                            "Spinner Values", JOptionPane.INFORMATION_MESSAGE));
+
+            controlPanel.add(getValueBtn);
+
+            // Add control panel spanning both columns
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridwidth = 2;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+
+            frame.setSize(550, 500);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });

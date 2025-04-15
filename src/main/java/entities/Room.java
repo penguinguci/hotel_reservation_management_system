@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
 import java.util.Set;
@@ -33,6 +35,7 @@ public class Room {
     @ElementCollection
     @CollectionTable(name = "amentities", joinColumns = @JoinColumn(name = "room_id"))
     @Column(name = "amentities", nullable = false)
+    @Fetch(FetchMode.JOIN)
     protected List<String> amenities;
 
     @Column(name = "room_size")
@@ -50,4 +53,18 @@ public class Room {
 
     @OneToMany(mappedBy = "room")
     protected Set<ReservationDetails> reservationDetailsDetails;
+
+    @ManyToOne
+    @JoinColumn(name = "type_id")
+    protected RoomType roomType;
+
+    // Status constants
+    public static final int STATUS_AVAILABLE = 0;
+    public static final int STATUS_OCCUPIED = 1;
+    public static final int STATUS_MAINTENANCE = 2;
+    public static final int STATUS_RESERVED = 3;
+
+    public boolean isAvailable() {
+        return status == STATUS_AVAILABLE;
+    }
 }

@@ -38,14 +38,18 @@ public class ReservationDetails {
     @Column(name = "number_of_nights")
     private int numberOfNights = 1;
 
-    public double getLineTotalAmount() {
-        double lineTotalAmount = 0;
+    @Column(name = "note")
+    private String note;
+
+    public double calculateLineTotal() {
+        double total = 0;
         if (room != null) {
-            lineTotalAmount = numberOfNights * room.getPrice();
+            total += numberOfNights * room.getPrice();
         }
         if (service != null) {
-            lineTotalAmount += quantity * service.getPrice();
+            total += quantity * service.getPrice();
         }
-        return lineTotalAmount;
+        this.lineTotalAmount = total;
+        return total;
     }
 }

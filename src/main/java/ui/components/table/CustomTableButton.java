@@ -6,19 +6,11 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * CustomTableButton - bảng tùy chỉnh với các tính năng:
- * - Tùy chỉnh màu header
- * - Tùy chỉnh JScrollPane
- * - Hỗ trợ thêm nút trong các hàng
- * - JavaBean hỗ trợ kéo thả trong NetBeans
- */
 public class CustomTableButton extends JPanel implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,73 +22,56 @@ public class CustomTableButton extends JPanel implements Serializable {
     private Color headerForegroundColor = Color.WHITE;
     private int headerHeight = 35;
     private String[] columnNames = {"Column 1", "Column 2", "Column 3"};
+    private ColumnEditorType[] columnEditorTypes;
 
-    /**
-     * Constructor mặc định không tham số (cần thiết cho JavaBean)
-     */
     public CustomTableButton() {
         initialize(columnNames);
     }
 
-    /**
-     * Khởi tạo CustomTable với các cột
-     * @param columnNames Tên các cột
-     */
     public CustomTableButton(String[] columnNames) {
         initialize(columnNames);
     }
 
-    /**
-     * Khởi tạo component
-     */
     private void initialize(String[] columns) {
         setLayout(new BorderLayout());
 
-        // Tạo Table Model
         tableModel = new CustomTableModel(columns);
-
-        // Tạo JTable với model
-        table = new JTable(tableModel);
-        table.setRowHeight(40); // Đặt chiều cao hàng để chứa nút
+        table = new JTable(tableModel) {
+            @Override
+            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+                Component comp = super.prepareRenderer(renderer, row, column);
+                if (!isRowSelected(row)) {
+                    Color bg = (row % 2 == 0) ? new Color(250, 250, 250) : new Color(230, 230, 230);
+                    comp.setBackground(bg);
+                } else {
+                    comp.setBackground(new Color(204, 153, 255));
+                }
+                return comp;
+            }
+        };
+        table.setRowHeight(40);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoCreateRowSorter(true);
 
-        // Tùy chỉnh header của bảng
         applyHeaderProperties();
 
-        // Tạo scroll pane với JTable
         scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getViewport().setBackground(Color.WHITE);
 
-        // Tùy chỉnh thanh cuộn
         scrollPane.getVerticalScrollBar().setUI(new CustomScrollBarUI());
         scrollPane.getHorizontalScrollBar().setUI(new CustomScrollBarUI());
 
-        // Đặt chiều rộng cột cho cột có nút
-        for (int i = 0; i < columns.length; i++) {
-            if (i >= 5) { // Cột "Thao Tác" và "Dịch Vụ" (index 5, 6)
-                table.getColumnModel().getColumn(i).setPreferredWidth(100);
-            }
-        }
-
         add(scrollPane, BorderLayout.CENTER);
-
-        // Thiết lập kích thước mặc định
         setPreferredSize(new Dimension(400, 300));
 
-        // Lắng nghe thay đổi thuộc tính để cập nhật giao diện
         addPropertyChangeListener("headerBackgroundColor", evt -> applyHeaderProperties());
         addPropertyChangeListener("headerForegroundColor", evt -> applyHeaderProperties());
         addPropertyChangeListener("headerHeight", evt -> applyHeaderProperties());
 
-        // Áp dụng renderer mặc định cho các cột
         updateTableRenderers();
     }
 
-    /**
-     * Áp dụng các thuộc tính cho header
-     */
     private void applyHeaderProperties() {
         if (table != null && table.getTableHeader() != null) {
             JTableHeader header = table.getTableHeader();
@@ -105,13 +80,12 @@ public class CustomTableButton extends JPanel implements Serializable {
             header.setForeground(headerForegroundColor);
             header.setFont(new Font("SansSerif", Font.BOLD, 12));
             header.setPreferredSize(new Dimension(header.getWidth(), headerHeight));
-
-            // Sử dụng renderer tùy chỉnh để căn giữa văn bản và đảm bảo màu hiển thị đúng
             header.setDefaultRenderer(new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value,
                                                                boolean isSelected, boolean hasFocus, int row, int column) {
-                    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    JLabel label = (JLabel) super.getTableCellRendererComponent(
+                            table, value, isSelected, hasFocus, row, column);
                     label.setBackground(headerBackgroundColor);
                     label.setForeground(headerForegroundColor);
                     label.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -121,44 +95,23 @@ public class CustomTableButton extends JPanel implements Serializable {
                     return label;
                 }
             });
-
             header.revalidate();
             header.repaint();
-            table.revalidate();
-            table.repaint();
         }
     }
 
-    /**
-     * Thiết lập tên các cột
-     * @param columnNames Mảng tên các cột
-     */
     public void setColumnNames(String[] columnNames) {
         this.columnNames = columnNames;
         tableModel = new CustomTableModel(columnNames);
         table.setModel(tableModel);
         updateTableRenderers();
         applyHeaderProperties();
-        // Cập nhật chiều rộng cột khi thay đổi tên cột
-        for (int i = 0; i < columnNames.length; i++) {
-            if (i >= 5) {
-                table.getColumnModel().getColumn(i).setPreferredWidth(100);
-            }
-        }
     }
 
-    /**
-     * Lấy tên các cột
-     * @return Mảng tên các cột
-     */
     public String[] getColumnNames() {
         return columnNames;
     }
 
-    /**
-     * Đặt màu nền cho header
-     * @param color Màu nền
-     */
     public void setHeaderBackgroundColor(Color color) {
         Color oldColor = this.headerBackgroundColor;
         this.headerBackgroundColor = color;
@@ -166,18 +119,10 @@ public class CustomTableButton extends JPanel implements Serializable {
         applyHeaderProperties();
     }
 
-    /**
-     * Lấy màu nền cho header
-     * @return Màu nền header
-     */
     public Color getHeaderBackgroundColor() {
         return headerBackgroundColor;
     }
 
-    /**
-     * Đặt màu chữ cho header
-     * @param color Màu chữ
-     */
     public void setHeaderForegroundColor(Color color) {
         Color oldColor = this.headerForegroundColor;
         this.headerForegroundColor = color;
@@ -185,18 +130,10 @@ public class CustomTableButton extends JPanel implements Serializable {
         applyHeaderProperties();
     }
 
-    /**
-     * Lấy màu chữ của header
-     * @return Màu chữ header
-     */
     public Color getHeaderForegroundColor() {
         return headerForegroundColor;
     }
 
-    /**
-     * Đặt chiều cao cho header
-     * @param height Chiều cao
-     */
     public void setHeaderHeight(int height) {
         int oldHeight = this.headerHeight;
         this.headerHeight = height;
@@ -204,97 +141,71 @@ public class CustomTableButton extends JPanel implements Serializable {
         applyHeaderProperties();
     }
 
-    /**
-     * Lấy chiều cao của header
-     * @return Chiều cao header
-     */
     public int getHeaderHeight() {
         return headerHeight;
     }
 
-    /**
-     * Đặt chiều cao cho hàng
-     * @param height Chiều cao
-     */
     public void setRowHeight(int height) {
         table.setRowHeight(height);
     }
 
-    /**
-     * Lấy chiều cao của hàng
-     * @return Chiều cao hàng
-     */
     public int getRowHeight() {
         return table.getRowHeight();
     }
 
-    /**
-     * Thêm dữ liệu vào bảng
-     * @param rowData Dữ liệu hàng
-     * @param buttonTypes Loại nút cho mỗi hàng (có thể null)
-     */
     public void addRow(Object[] rowData, ButtonType[] buttonTypes) {
         tableModel.addRow(rowData, buttonTypes);
     }
 
-    /**
-     * Xóa tất cả dữ liệu trong bảng
-     */
     public void clearTable() {
         tableModel.clearData();
     }
 
-    /**
-     * Đặt kích thước cho JScrollPane
-     * @param width Chiều rộng
-     * @param height Chiều cao
-     */
     public void setScrollPaneSize(int width, int height) {
         scrollPane.setPreferredSize(new Dimension(width, height));
     }
 
-    /**
-     * Lấy JTable đang sử dụng
-     * @return JTable
-     */
     public JTable getTable() {
         return table;
     }
 
-    /**
-     * Lấy JScrollPane đang sử dụng
-     * @return JScrollPane
-     */
     public JScrollPane getScrollPane() {
         return scrollPane;
     }
 
-    /**
-     * Lấy TableModel đang sử dụng
-     * @return CustomTableModel
-     */
     public CustomTableModel getTableModel() {
         return tableModel;
     }
 
-    /**
-     * Cập nhật renderers cho bảng
-     */
     private void updateTableRenderers() {
         for (int i = 0; i < table.getColumnCount(); i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(new ButtonRenderer());
+            if (columnEditorTypes != null && i < columnEditorTypes.length) {
+                switch (columnEditorTypes[i]) {
+                    case SPINNER:
+                        table.getColumnModel().getColumn(i).setCellRenderer(new SpinnerRenderer());
+                        table.getColumnModel().getColumn(i).setCellEditor(new SpinnerEditor());
+                        break;
+                    case BUTTON:
+                        table.getColumnModel().getColumn(i).setCellRenderer(new ButtonRenderer());
+                        table.getColumnModel().getColumn(i).setCellEditor(new ButtonEditor(null));
+                        break;
+                    default:
+                        table.getColumnModel().getColumn(i).setCellRenderer(new ButtonRenderer());
+                        break;
+                }
+            } else {
+                table.getColumnModel().getColumn(i).setCellRenderer(new ButtonRenderer());
+            }
         }
     }
 
-    /**
-     * Định nghĩa các loại nút có thể thêm vào các hàng
-     */
     public enum ButtonType {
         EDIT("Sửa", new Color(66, 139, 202)),
         DELETE("Xóa", new Color(217, 83, 79)),
         VIEW("Xem", new Color(91, 192, 222)),
         ADD("Thêm", new Color(92, 184, 92)),
-        CUSTOM("Tùy chỉnh", new Color(240, 173, 78));
+        CUSTOM("Tùy chỉnh", new Color(240, 173, 78)),
+        SERVICE("Dịch vụ", new Color(153, 102, 255));
 
         private final String text;
         private final Color color;
@@ -313,9 +224,35 @@ public class CustomTableButton extends JPanel implements Serializable {
         }
     }
 
-    /**
-     * Tùy chỉnh model cho JTable
-     */
+    public enum ColumnEditorType {
+        DEFAULT, SPINNER, BUTTON
+    }
+
+    public void setColumnEditorTypes(ColumnEditorType[] editorTypes) {
+        this.columnEditorTypes = editorTypes;
+        setupCellEditors();
+    }
+
+    private void setupCellEditors() {
+        if (columnEditorTypes == null || columnEditorTypes.length != table.getColumnCount()) {
+            return;
+        }
+
+        for (int i = 0; i < columnEditorTypes.length; i++) {
+            switch (columnEditorTypes[i]) {
+                case SPINNER:
+                    table.getColumnModel().getColumn(i).setCellEditor(new SpinnerEditor());
+                    break;
+                case BUTTON:
+                    table.getColumnModel().getColumn(i).setCellEditor(new ButtonEditor(null));
+                    break;
+                default:
+                    // Use default editor
+                    break;
+            }
+        }
+    }
+
     public class CustomTableModel extends AbstractTableModel {
         private String[] columnNames;
         private List<Object[]> data;
@@ -356,6 +293,9 @@ public class CustomTableButton extends JPanel implements Serializable {
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
+            if (columnEditorTypes != null && columnIndex < columnEditorTypes.length) {
+                return columnEditorTypes[columnIndex] != ColumnEditorType.DEFAULT;
+            }
             return buttonTypes.size() > rowIndex &&
                     buttonTypes.get(rowIndex) != null &&
                     buttonTypes.get(rowIndex).length > columnIndex &&
@@ -399,21 +339,22 @@ public class CustomTableButton extends JPanel implements Serializable {
             }
             return null;
         }
+
+        public void setValueAt(Object value, int row, int col) {
+            data.get(row)[col] = value;
+            fireTableCellUpdated(row, col);
+        }
     }
 
-    /**
-     * Cell Renderer tùy chỉnh để hỗ trợ hiển thị nút trong bảng
-     */
-    public class ButtonRenderer extends JButton implements TableCellRenderer {
+    public static class ButtonRenderer extends JButton implements TableCellRenderer {
         public ButtonRenderer() {
             setOpaque(true);
             setBorderPainted(false);
             setFocusPainted(false);
             setContentAreaFilled(true);
-            // Tùy chỉnh kích thước nút ButtonType
-            setPreferredSize(new Dimension(70, 20)); // Chiều rộng 80px, chiều cao 30px
-            setMargin(new Insets(2, 5, 2, 5)); // Lề để văn bản gọn gàng
-            setHorizontalAlignment(SwingConstants.CENTER); // Căn giữa văn bản trong nút
+            setPreferredSize(new Dimension(70, 20));
+            setMargin(new Insets(2, 5, 2, 5));
+            setHorizontalAlignment(SwingConstants.CENTER);
         }
 
         @Override
@@ -426,17 +367,14 @@ public class CustomTableButton extends JPanel implements Serializable {
                 setForeground(Color.WHITE);
             } else {
                 setText(value != null ? value.toString() : "");
-                setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+                setBackground(null);
                 setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
-                setPreferredSize(null); // Không áp dụng kích thước cố định cho ô không phải nút
+                setPreferredSize(null);
             }
             return this;
         }
     }
 
-    /**
-     * Cell Editor tùy chỉnh để hỗ trợ sự kiện click nút trong bảng
-     */
     public class ButtonEditor extends DefaultCellEditor {
         private JButton button;
         private int clickedRow;
@@ -446,22 +384,21 @@ public class CustomTableButton extends JPanel implements Serializable {
         public ButtonEditor(ButtonClickListener listener) {
             super(new JTextField());
             this.listener = listener;
-
             button = new JButton();
             button.setOpaque(true);
             button.setBorderPainted(false);
             button.setFocusPainted(false);
             button.setContentAreaFilled(true);
-            // Tùy chỉnh kích thước nút ButtonType
-            button.setPreferredSize(new Dimension(70, 20)); // Đồng bộ với renderer
-            button.setMargin(new Insets(2, 5, 2, 5)); // Lề để văn bản gọn gàng
-            button.setHorizontalAlignment(SwingConstants.CENTER); // Căn giữa văn bản
-
+            button.setPreferredSize(new Dimension(70, 20));
+            button.setMargin(new Insets(2, 5, 2, 5));
+            button.setHorizontalAlignment(SwingConstants.CENTER);
             button.addActionListener(e -> {
+                System.out.println("Button in table clicked!");
                 fireEditingStopped();
                 if (listener != null) {
                     ButtonType buttonType = ((CustomTableModel) table.getModel())
                             .getButtonTypeAt(clickedRow, clickedColumn);
+                    System.out.println("Button type: " + buttonType);
                     if (buttonType != null) {
                         listener.onButtonClick(buttonType, clickedRow, clickedColumn);
                     }
@@ -474,7 +411,6 @@ public class CustomTableButton extends JPanel implements Serializable {
                                                      boolean isSelected, int row, int column) {
             this.clickedRow = row;
             this.clickedColumn = column;
-
             ButtonType buttonType = ((CustomTableModel) table.getModel()).getButtonTypeAt(row, column);
             if (buttonType != null) {
                 button.setText(buttonType.getText());
@@ -484,9 +420,8 @@ public class CustomTableButton extends JPanel implements Serializable {
                 button.setText(value != null ? value.toString() : "");
                 button.setBackground(table.getBackground());
                 button.setForeground(table.getForeground());
-                button.setPreferredSize(null); // Không áp dụng kích thước cố định cho ô không phải nút
+                button.setPreferredSize(null);
             }
-
             return button;
         }
 
@@ -496,27 +431,59 @@ public class CustomTableButton extends JPanel implements Serializable {
         }
     }
 
-    /**
-     * Interface để lắng nghe sự kiện click nút
-     */
     public interface ButtonClickListener {
         void onButtonClick(ButtonType buttonType, int row, int column);
     }
 
-    /**
-     * Thiết lập listener cho sự kiện click nút
-     * @param listener ButtonClickListener
-     */
     public void setButtonClickListener(ButtonClickListener listener) {
         for (int i = 0; i < table.getColumnCount(); i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(new ButtonRenderer());
-            table.getColumnModel().getColumn(i).setCellEditor(new ButtonEditor(listener));
+            if (columnEditorTypes != null && i < columnEditorTypes.length &&
+                    columnEditorTypes[i] == ColumnEditorType.BUTTON) {
+                table.getColumnModel().getColumn(i).setCellRenderer(new ButtonRenderer());
+                table.getColumnModel().getColumn(i).setCellEditor(new ButtonEditor(listener));
+            }
         }
     }
 
-    /**
-     * UI tùy chỉnh cho thanh cuộn
-     */
+    public static class SpinnerRenderer extends DefaultTableCellRenderer {
+        private JSpinner spinner;
+
+        public SpinnerRenderer() {
+            spinner = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            spinner.setValue(value != null ? value : 1);
+            return spinner;
+        }
+    }
+
+    public static class SpinnerEditor extends DefaultCellEditor {
+        private JSpinner spinner;
+
+        public SpinnerEditor() {
+            super(new JTextField());
+            spinner = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
+            spinner.addChangeListener(e -> fireEditingStopped());
+            editorComponent = spinner;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return spinner.getValue();
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                                                     boolean isSelected, int row, int column) {
+            spinner.setValue(value != null ? value : 1);
+            return spinner;
+        }
+    }
+
     private class CustomScrollBarUI extends BasicScrollBarUI {
         @Override
         protected void configureScrollBarColors() {
@@ -551,11 +518,9 @@ public class CustomTableButton extends JPanel implements Serializable {
             if (thumbBounds.isEmpty() || !scrollbar.isEnabled()) {
                 return;
             }
-
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(thumbColor);
-
             if (scrollbar.getOrientation() == JScrollBar.VERTICAL) {
                 g2.fillRoundRect(thumbBounds.x + 2, thumbBounds.y, thumbBounds.width - 4,
                         thumbBounds.height, 10, 10);
@@ -563,7 +528,6 @@ public class CustomTableButton extends JPanel implements Serializable {
                 g2.fillRoundRect(thumbBounds.x, thumbBounds.y + 2, thumbBounds.width,
                         thumbBounds.height - 4, 10, 10);
             }
-
             g2.dispose();
         }
 
