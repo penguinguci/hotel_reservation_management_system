@@ -96,10 +96,10 @@ public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements 
         try {
             String jpql = "SELECT s FROM Service s WHERE " +
                     "(LOWER(s.name) LIKE LOWER(:keyword) OR " +
-                    "(LOWER(s.description) LIKE LOWER(:keyword)) ";
+                    "LOWER(s.description) LIKE LOWER(:keyword))";
 
             if (availableOnly) {
-                jpql += "AND s.availability = true";
+                jpql += " AND s.availability = true";
             }
 
             return em.createQuery(jpql, Service.class)

@@ -92,30 +92,58 @@ public class RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDAO
     }
 
     @Override
-    public List<Room> searchAvailableRooms(Date checkInDate, Date checkOutDate, int capacity, String roomType, double minPrice, double maxPrice) {
+    public List<Room> findAvailableRooms(Date checkInDate, Date checkOutDate, Integer capacity,
+                                         String roomType, Double minPrice, Double maxPrice) {
         EntityManager em = AppUtil.getEntityManager();
         try {
-            String jpql = "SELECT r FROM Room r WHERE r.status = 0 " + // 0 means available
-                    "AND r.capacity >= :capacity " +
-                    "AND r.price BETWEEN :minPrice AND :maxPrice " +
-                    "AND NOT EXISTS (SELECT rd FROM ReservationDetails rd " +
-                    "JOIN rd.reservation res " +
-                    "WHERE rd.room = r " +
-                    "AND ((res.CheckInDate < :checkOutDate) AND (res.CheckOutDate > :checkInDate)))";
+            // Sử dụng JOIN FETCH để load luôn amenities
+            String jpql = "SELECT DISTINCT r FROM Room r LEFT JOIN FETCH r.amenities " +
+                    "LEFT JOIN FETCH r.roomType " +
+                    "WHERE r.status = :availableStatus";
 
+            // Thêm điều kiện cho ngày nếu có
+            if (checkInDate != null && checkOutDate != null) {
+                jpql += " AND NOT EXISTS (SELECT rd FROM ReservationDetails rd " +
+                        "JOIN rd.reservation res " +
+                        "WHERE rd.room = r " +
+                        "AND ((res.checkInDate < :checkOutDate) AND (res.checkOutDate > :checkInDate)))";
+            }
+
+            // Thêm điều kiện cho sức chứa nếu có
+            if (capacity != null) {
+                jpql += " AND r.capacity >= :capacity";
+            }
+
+            // Thêm điều kiện cho loại phòng nếu có
             if (roomType != null && !roomType.isEmpty()) {
-                jpql += " AND r.roomType.typeID = :roomType";
+                jpql += " AND r.roomType.typeName = :roomType";
+            }
+
+            // Thêm điều kiện cho khoảng giá nếu có
+            if (minPrice != null && maxPrice != null) {
+                jpql += " AND r.price BETWEEN :minPrice AND :maxPrice";
             }
 
             TypedQuery<Room> query = em.createQuery(jpql, Room.class)
-                    .setParameter("capacity", capacity)
-                    .setParameter("minPrice", minPrice)
-                    .setParameter("maxPrice", maxPrice)
-                    .setParameter("checkInDate", checkInDate)
-                    .setParameter("checkOutDate", checkOutDate);
+                    .setParameter("availableStatus", Room.STATUS_AVAILABLE);
+
+            // Set parameters nếu có
+            if (checkInDate != null && checkOutDate != null) {
+                query.setParameter("checkInDate", checkInDate)
+                        .setParameter("checkOutDate", checkOutDate);
+            }
+
+            if (capacity != null) {
+                query.setParameter("capacity", capacity);
+            }
 
             if (roomType != null && !roomType.isEmpty()) {
                 query.setParameter("roomType", roomType);
+            }
+
+            if (minPrice != null && maxPrice != null) {
+                query.setParameter("minPrice", minPrice)
+                        .setParameter("maxPrice", maxPrice);
             }
 
             return query.getResultList();
