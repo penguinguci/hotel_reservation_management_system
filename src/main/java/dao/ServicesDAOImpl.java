@@ -109,4 +109,9 @@ public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements 
             em.close();
         }
     }
+
+    @Override
+    public Service findServiceByID(int id) {
+        return entityManager.find(Service.class, id);
+    }
 }

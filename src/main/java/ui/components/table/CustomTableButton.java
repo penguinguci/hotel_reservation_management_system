@@ -208,12 +208,16 @@ public class CustomTableButton extends JPanel implements Serializable {
         CUSTOM("Tùy chỉnh", new Color(240, 173, 78)),
         SERVICE("Thêm dịch vụ", new Color(153, 102, 255));
 
-        private final String text;
+        private String text;
         private final Color color;
 
         ButtonType(String text, Color color) {
             this.text = text;
             this.color = color;
+        }
+
+        public void setText(String text) {
+            this.text = text;
         }
 
         public String getText() {
@@ -224,6 +228,7 @@ public class CustomTableButton extends JPanel implements Serializable {
             return color;
         }
     }
+
 
     public enum ColumnEditorType {
         DEFAULT, SPINNER, BUTTON
@@ -253,6 +258,7 @@ public class CustomTableButton extends JPanel implements Serializable {
             }
         }
     }
+
 
     public class CustomTableModel extends AbstractTableModel {
         private String[] columnNames;
@@ -285,11 +291,15 @@ public class CustomTableButton extends JPanel implements Serializable {
             if (rowIndex >= data.size() || columnIndex >= columnNames.length) {
                 return null;
             }
+            Object cellValue = data.get(rowIndex)[columnIndex];
+            if (cellValue != null) {
+                return cellValue;
+            }
             ButtonType buttonType = getButtonTypeAt(rowIndex, columnIndex);
             if (buttonType != null) {
                 return buttonType.getText();
             }
-            return data.get(rowIndex)[columnIndex];
+            return null;
         }
 
         @Override
@@ -447,7 +457,8 @@ public class CustomTableButton extends JPanel implements Serializable {
         }
     }
 
-    public static class SpinnerRenderer extends DefaultTableCellRenderer {
+    // Renderer cho Spinner
+    public static class SpinnerRenderer implements TableCellRenderer {
         private JSpinner spinner;
 
         public SpinnerRenderer() {

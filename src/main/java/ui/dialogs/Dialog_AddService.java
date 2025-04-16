@@ -5,13 +5,17 @@
 package ui.dialogs;
 
 import dao.ServicesDAOImpl;
+import entities.ReservationDetails;
 import entities.Service;
 import interfaces.ServicesDAO;
 import org.apache.poi.ss.usermodel.Row;
 import ui.components.table.CustomTableButton;
 
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +24,7 @@ import java.util.List;
  */
 public class Dialog_AddService extends javax.swing.JPanel {
     private String roomID;
+    private static ArrayList<ReservationDetails> selectedService;
 
     /**
      * Creates new form Dialog_AddService
@@ -29,6 +34,39 @@ public class Dialog_AddService extends javax.swing.JPanel {
         initComponents();
         initDataTableService();
         initSearchServices();
+        initCartTable();
+    }
+
+    public static ArrayList<ReservationDetails> getSelectedService() {
+        return selectedService;
+    }
+
+    public  void setSelectedService(ArrayList<ReservationDetails> selectedService) {
+        this.selectedService = selectedService;
+    }
+
+
+    private void initCartTable() {
+        CustomTableButton.ColumnEditorType[] editorTypes = {
+                CustomTableButton.ColumnEditorType.DEFAULT,
+                CustomTableButton.ColumnEditorType.DEFAULT,
+                CustomTableButton.ColumnEditorType.SPINNER,
+                CustomTableButton.ColumnEditorType.DEFAULT,
+                CustomTableButton.ColumnEditorType.DEFAULT,
+        };
+
+        table_CartService.setColumnEditorTypes(editorTypes);
+
+        table_CartService.getTable().getColumnModel().getColumn(2).setCellRenderer(new CustomTableButton.SpinnerRenderer());
+        table_CartService.getTable().getColumnModel().getColumn(2).setCellEditor(new CustomTableButton.SpinnerEditor());
+
+        // Add listener to update row price when quantity changes
+        table_CartService.getTable().getModel().addTableModelListener(e -> {
+            if (e.getColumn() == 2) { // When quantity column changes
+                updateRowPrice(e.getFirstRow());
+                updateCartTotal();
+            }
+        });
     }
 
     private void initSearchServices() {
@@ -99,11 +137,11 @@ public class Dialog_AddService extends javax.swing.JPanel {
         lbl_Title_ListService = new javax.swing.JLabel();
         pnl_ListService = new javax.swing.JPanel();
         table_ListService = new ui.components.table.CustomTableButton();
-        table_CartService = new javax.swing.JPanel();
-        customTableButton1 = new ui.components.table.CustomTableButton();
+        pnl_CartService = new javax.swing.JPanel();
+        table_CartService = new ui.components.table.CustomTableButton();
         pnl_InforAddService = new javax.swing.JPanel();
         pnl_Title_TotalPrice = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        lbl_Title_TotalPrice = new javax.swing.JLabel();
         pnl_TotalPrice = new javax.swing.JPanel();
         lbl_TotalPrice_Value = new javax.swing.JLabel();
         btn_Complete = new ui.components.button.ButtonCustom();
@@ -111,6 +149,8 @@ public class Dialog_AddService extends javax.swing.JPanel {
         btn_AddService = new ui.components.button.ButtonCustom();
         pnl_Title_SelectedService = new javax.swing.JPanel();
         lbl_Title_SelectedService = new javax.swing.JLabel();
+        btn_DeleteOne = new ui.components.button.ButtonCancelCustom();
+        btn_DeleteAll = new ui.components.button.ButtonCancelCustom();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setMinimumSize(new java.awt.Dimension(1000, 600));
@@ -205,14 +245,14 @@ public class Dialog_AddService extends javax.swing.JPanel {
 
         add(pnl_ListService, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 105, 860, 220));
 
-        table_CartService.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        table_CartService.setLayout(new java.awt.BorderLayout());
+        pnl_CartService.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        pnl_CartService.setLayout(new java.awt.BorderLayout());
 
-        customTableButton1.setColumnNames(new String[] {"Mã dịnh vụ", "Tên dịch vụ", "Số lượng", "Giá", "Thành tiền"});
-        customTableButton1.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
-        table_CartService.add(customTableButton1, java.awt.BorderLayout.CENTER);
+        table_CartService.setColumnNames(new String[] {"Mã dịch vụ", "Tên dịch vụ", "Số lượng", "Giá", "Thành tiền"});
+        table_CartService.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
+        pnl_CartService.add(table_CartService, java.awt.BorderLayout.CENTER);
 
-        add(table_CartService, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 400, 550, 180));
+        add(pnl_CartService, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 400, 550, 180));
 
         pnl_InforAddService.setBackground(new java.awt.Color(255, 255, 255));
         pnl_InforAddService.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
@@ -220,9 +260,9 @@ public class Dialog_AddService extends javax.swing.JPanel {
         pnl_Title_TotalPrice.setBackground(new java.awt.Color(255, 255, 255));
         pnl_Title_TotalPrice.setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        jLabel1.setText("Tổng tiền:");
-        pnl_Title_TotalPrice.add(jLabel1, java.awt.BorderLayout.CENTER);
+        lbl_Title_TotalPrice.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_Title_TotalPrice.setText("Tổng tiền:");
+        pnl_Title_TotalPrice.add(lbl_Title_TotalPrice, java.awt.BorderLayout.CENTER);
 
         pnl_TotalPrice.setBackground(new java.awt.Color(255, 255, 255));
         pnl_TotalPrice.setLayout(new java.awt.BorderLayout());
@@ -288,6 +328,20 @@ public class Dialog_AddService extends javax.swing.JPanel {
         lbl_Title_SelectedService.setForeground(new java.awt.Color(153, 153, 255));
         lbl_Title_SelectedService.setText("Dịch vụ được chọn:");
 
+        btn_DeleteOne.setText("Xóa");
+        btn_DeleteOne.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_DeleteOneActionPerformed(evt);
+            }
+        });
+
+        btn_DeleteAll.setText("Xóa tất cả");
+        btn_DeleteAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_DeleteAllActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnl_Title_SelectedServiceLayout = new javax.swing.GroupLayout(pnl_Title_SelectedService);
         pnl_Title_SelectedService.setLayout(pnl_Title_SelectedServiceLayout);
         pnl_Title_SelectedServiceLayout.setHorizontalGroup(
@@ -295,13 +349,22 @@ public class Dialog_AddService extends javax.swing.JPanel {
             .addGroup(pnl_Title_SelectedServiceLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(lbl_Title_SelectedService)
-                .addContainerGap(687, Short.MAX_VALUE))
+                .addGap(233, 233, 233)
+                .addComponent(btn_DeleteOne, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btn_DeleteAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(281, Short.MAX_VALUE))
         );
         pnl_Title_SelectedServiceLayout.setVerticalGroup(
             pnl_Title_SelectedServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_Title_SelectedServiceLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lbl_Title_SelectedService)
+            .addGroup(pnl_Title_SelectedServiceLayout.createSequentialGroup()
+                .addGroup(pnl_Title_SelectedServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_Title_SelectedServiceLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lbl_Title_SelectedService))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_Title_SelectedServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btn_DeleteAll, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btn_DeleteOne, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -309,25 +372,49 @@ public class Dialog_AddService extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_AddServiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddServiceActionPerformed
-        // TODO add your handling code here:
+        addServiceToCart();
     }//GEN-LAST:event_btn_AddServiceActionPerformed
 
     private void btn_CompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_CompleteActionPerformed
-        // TODO add your handling code here:
+        completeSelectedServices();
     }//GEN-LAST:event_btn_CompleteActionPerformed
+
+    private void btn_DeleteOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DeleteOneActionPerformed
+        int selectedRow = table_CartService.getTable().getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn dịch vụ để xóa.",
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int modelRow = table_CartService.getTable().convertRowIndexToModel(selectedRow);
+        CustomTableButton.CustomTableModel model = table_CartService.getTableModel();
+        model.removeRow(modelRow);
+        updateCartTotal();
+    }//GEN-LAST:event_btn_DeleteOneActionPerformed
+
+    private void btn_DeleteAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DeleteAllActionPerformed
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa tất cả dịch vụ trong giỏ hàng?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            CustomTableButton.CustomTableModel model = table_CartService.getTableModel();
+            model.clearData();
+            updateCartTotal();
+        }
+    }//GEN-LAST:event_btn_DeleteAllActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private ui.components.button.ButtonCustom btn_AddService;
     private ui.components.button.ButtonCancelCustom btn_Cancel;
     private ui.components.button.ButtonCustom btn_Complete;
-    private ui.components.table.CustomTableButton customTableButton1;
-    private javax.swing.JLabel jLabel1;
+    private ui.components.button.ButtonCancelCustom btn_DeleteAll;
+    private ui.components.button.ButtonCancelCustom btn_DeleteOne;
     private javax.swing.JLabel lbl_RoomID;
     private javax.swing.JLabel lbl_Title;
     private javax.swing.JLabel lbl_Title_ListService;
     private javax.swing.JLabel lbl_Title_SelectedService;
+    private javax.swing.JLabel lbl_Title_TotalPrice;
     private javax.swing.JLabel lbl_TotalPrice_Value;
+    private javax.swing.JPanel pnl_CartService;
     private javax.swing.JPanel pnl_InforAddService;
     private javax.swing.JPanel pnl_ListService;
     private javax.swing.JPanel pnl_Search;
@@ -336,10 +423,197 @@ public class Dialog_AddService extends javax.swing.JPanel {
     private javax.swing.JPanel pnl_Title_SelectedService;
     private javax.swing.JPanel pnl_Title_TotalPrice;
     private javax.swing.JPanel pnl_TotalPrice;
-    private javax.swing.JPanel table_CartService;
+    private ui.components.table.CustomTableButton table_CartService;
     private ui.components.table.CustomTableButton table_ListService;
     private ui.components.textfield.SearchTextField txt_SearchServices;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * Adds the selected service to the cart.
+     */
+    private void addServiceToCart() {
+        try {
+            int selectedRow = table_ListService.getTable().getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn dịch vụ để thêm vào giỏ hàng.",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
+            int modelRow = table_ListService.getTable().convertRowIndexToModel(selectedRow);
+            Object[] rowData = table_ListService.getTableModel().getRowData(modelRow);
+
+            String status = (String) rowData[4];
+            if (!status.equals("Có sẵn")) {
+                JOptionPane.showMessageDialog(this, "Dịch vụ không có sẵn.",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int serviceId = (int) rowData[0];
+            String serviceName = (String) rowData[1];
+            String priceStr = (String) rowData[2];
+            double price = Double.parseDouble(priceStr.replaceAll("[^\\d.]", ""));
+            int quantity = 1;
+
+            // Kiểm tra xem dịch vụ đã có trong giỏ hàng chưa
+            boolean isInCart = isServiceInCart(serviceId);
+            if (isInCart) {
+                JOptionPane.showMessageDialog(this, "Dịch vụ đã có trong giỏ hàng.",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            addToCart(serviceId, serviceName, price, quantity);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi thêm dịch vụ: " + e.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Checks if a service is already in the cart.
+     *
+     * @param serviceId The ID of the service to check.
+     * @return true if the service is in the cart, false otherwise.
+     */
+    private boolean isServiceInCart(int serviceId) {
+        CustomTableButton.CustomTableModel model = table_CartService.getTableModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Object[] rowData = model.getRowData(i);
+            if ((int) rowData[0] == serviceId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Adds a service to the cart table.
+     *
+     * @param serviceId   The ID of the service.
+     * @param serviceName The name of the service.
+     * @param price       The price of the service.
+     * @param quantity    The quantity of the service.
+     */
+    private void addToCart(int serviceId, String serviceName, double price, int quantity) {
+        try {
+            // Calculate the total price for this item
+            double totalPrice = price * quantity;
+
+            // Create row data with correct types
+            Object[] cartRowData = {
+                    Integer.valueOf(serviceId),         // String
+                    serviceName,                       // String
+                    Integer.valueOf(quantity),         // Integer object, not primitive int
+                    String.format("%,.0f VND", price), // Formatted price string
+                    String.format("%,.0f VND", totalPrice) // Formatted total string
+            };
+
+            // Add to table
+            table_CartService.getTableModel().addRow(cartRowData, null);
+
+            // Update the total price display
+            updateCartTotal();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi thêm dịch vụ: " + e.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Updates the total price label based on the items in the cart.
+     */
+    private void updateCartTotal() {
+        try {
+            double currentTotalPrice = 0;
+            CustomTableButton.CustomTableModel model = table_CartService.getTableModel();
+
+            for (int i = 0; i < model.getRowCount(); i++) {
+                Object[] cartRow = model.getRowData(i);
+                String totalPriceString = (String) cartRow[4]; // Get the formatted total price
+                double rowTotalPrice = Double.parseDouble(totalPriceString.replaceAll("[^\\d.]", ""));
+                currentTotalPrice += rowTotalPrice;
+            }
+
+            lbl_TotalPrice_Value.setText(String.format("%,.0f VND", currentTotalPrice));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi tính tổng tiền: " + e.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+    /**
+     * Updates the price of a specific row in the cart table based on the quantity.
+     *
+     * @param row The index of the row to update.
+     */
+    private void updateRowPrice(int row) {
+        try {
+            CustomTableButton.CustomTableModel model = table_CartService.getTableModel();
+            Object[] rowData = model.getRowData(row);
+
+            int quantity = (int) rowData[2]; // Get the quantity
+            String priceStr = (String) rowData[3]; // Get the price string
+            double price = Double.parseDouble(priceStr.replaceAll("[^\\d.]", "")); // Extract numeric value
+
+            double rowTotal = price * quantity;
+
+            rowData[4] = String.format("%,.0f VND", rowTotal);
+
+            model.fireTableCellUpdated(row, 4);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi cập nhật giá dịch vụ: " + e.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Completes the selected services and closes the dialog.
+     */
+    private void completeSelectedServices() {
+        CustomTableButton.CustomTableModel model = table_CartService.getTableModel();
+        selectedService = new ArrayList<>();
+
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Object[] rowData = model.getRowData(i);
+            int serviceId = (int) rowData[0];
+            int quantity = (int) rowData[2];
+
+            ServicesDAO servicesDAO = new ServicesDAOImpl();
+            Service service = servicesDAO.findServiceByID(serviceId);
+
+            ReservationDetails reservationDetails = new ReservationDetails();
+            reservationDetails.setService(service);
+            reservationDetails.setQuantity(quantity);
+            selectedService.add(reservationDetails);
+        }
+
+        // Close the dialog
+        Window window = SwingUtilities.getWindowAncestor(this);
+        window.dispose();
+    }
+
+    public void updateTableCartAfterClickUpdate(ArrayList<ReservationDetails> listReservationDetails) {
+        CustomTableButton.CustomTableModel model = table_CartService.getTableModel();
+        model.clearData();
+
+        for (ReservationDetails reservationDetails : listReservationDetails) {
+            double price = reservationDetails.getService().getPrice();
+            int quantity = reservationDetails.getQuantity();
+            int serviceId = reservationDetails.getService().getServiceId();
+            String serviceName = reservationDetails.getService().getName();
+            addToCart(serviceId, serviceName, price, quantity);
+        }
+
+        updateCartTotal();
+    }
 }
