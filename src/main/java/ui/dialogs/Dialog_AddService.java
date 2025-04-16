@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class Dialog_AddService extends javax.swing.JPanel {
     private String roomID;
-    private static ArrayList<ReservationDetails> selectedService;
+    private static List<ReservationDetails> selectedService;
 
     /**
      * Creates new form Dialog_AddService
@@ -37,11 +37,11 @@ public class Dialog_AddService extends javax.swing.JPanel {
         initCartTable();
     }
 
-    public static ArrayList<ReservationDetails> getSelectedService() {
+    public static List<ReservationDetails> getSelectedService() {
         return selectedService;
     }
 
-    public  void setSelectedService(ArrayList<ReservationDetails> selectedService) {
+    public  void setSelectedService(List<ReservationDetails> selectedService) {
         this.selectedService = selectedService;
     }
 
@@ -602,7 +602,7 @@ public class Dialog_AddService extends javax.swing.JPanel {
         window.dispose();
     }
 
-    public void updateTableCartAfterClickUpdate(ArrayList<ReservationDetails> listReservationDetails) {
+    public void updateTableCartAfterClickUpdate(List<ReservationDetails> listReservationDetails) {
         CustomTableButton.CustomTableModel model = table_CartService.getTableModel();
         model.clearData();
 

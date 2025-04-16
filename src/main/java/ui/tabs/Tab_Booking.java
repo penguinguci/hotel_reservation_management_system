@@ -5,17 +5,23 @@
 package ui.tabs;
 
 import dao.CustomerDAOImpl;
+import dao.ReservationDAOImpl;
 import dao.RoomDAOImpl;
 import dao.RoomTypesImpl;
 import entities.*;
 import interfaces.CustomerDAO;
+import interfaces.ReservationDAO;
 import interfaces.RoomDAO;
 import interfaces.RoomTypesDAO;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import ui.components.button.ButtonRenderer;
 import ui.components.popup.PopupSearch;
 import ui.components.table.CustomTable;
 import ui.components.table.CustomTableButton;
 import ui.dialogs.Dialog_AddService;
+import ultilities.GenerateString;
+import utils.AppUtil;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -40,7 +46,8 @@ public class Tab_Booking extends javax.swing.JPanel {
     private CustomerDAO customerDAO;
     private RoomDAO roomDAO;
     private PopupSearch popupSearchCustomer;
-    private ArrayList<ReservationDetails> reservationDetailsList = new ArrayList<>();
+    private List<ReservationDetails> reservationDetailsList = new ArrayList<>();
+    private Map<String, List<ReservationDetails>> listMapReservationDetails = new LinkedHashMap<>();
 
     /**
      * Creates new form Tab_Booking
@@ -100,12 +107,6 @@ public class Tab_Booking extends javax.swing.JPanel {
 
         table_Cart.getTable().getColumnModel().getColumn(3).setCellRenderer(new CustomTableButton.SpinnerRenderer());
         table_Cart.getTable().getColumnModel().getColumn(3).setCellEditor(new CustomTableButton.SpinnerEditor());
-
-//        table_Cart.setButtonClickListener((buttonType, row, column) -> {
-//            if (column == 4) {
-//                showServicesDialog(row);
-//            }
-//        });
 
         table_Cart.getTable().getModel().addTableModelListener(e -> {
             if (e.getColumn() == 3) {
@@ -248,9 +249,8 @@ public class Tab_Booking extends javax.swing.JPanel {
         txt_SearchCustomer.getTextField().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (e.getOppositeComponent() != null && !e.getOppositeComponent().equals(txt_SearchCustomer.getTextField())) {
-                    ensureFocus();
-                }
+                // Chỉ ẩn popup khi mất focus, không cố focus lại
+                popupSearchCustomer.hidePopup();
             }
         });
 
@@ -376,7 +376,6 @@ public class Tab_Booking extends javax.swing.JPanel {
                 lbl_CustomerCCCD_Value.setText(selectedCustomer.getCCCD() != null ? selectedCustomer.getCCCD() : "N/A");
                 txt_SearchCustomer.setText("");
                 popupSearchCustomer.hidePopup();
-                ensureFocus();
             }
         });
 
@@ -390,7 +389,6 @@ public class Tab_Booking extends javax.swing.JPanel {
                     lbl_CustomerPhone_Value.setText("");
                     lbl_CustomerCCCD_Value.setText("");
                     popupSearchCustomer.hidePopup();
-                    ensureFocus();
                 }
             }
         });
@@ -747,6 +745,15 @@ public class Tab_Booking extends javax.swing.JPanel {
         pnl_ButtonActions.setBackground(new java.awt.Color(255, 255, 255));
 
         btn_Booking.setText("Đặt phòng");
+        btn_Booking.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                try {
+                    btn_BookingActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
         btn_Cancel.setText("Hủy");
         btn_Cancel.addActionListener(new java.awt.event.ActionListener() {
@@ -1013,6 +1020,10 @@ public class Tab_Booking extends javax.swing.JPanel {
             updateSummaryTotals();
         }
     }//GEN-LAST:event_btn_DeleteAllActionPerformed
+
+    private void btn_BookingActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_BookingActionPerformed
+        bookingRoom();
+    }//GEN-LAST:event_btn_BookingActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1515,9 +1526,10 @@ public class Tab_Booking extends javax.swing.JPanel {
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                ArrayList<ReservationDetails> reservationDetails = addServiceDialog.getSelectedService();
+                List<ReservationDetails> reservationDetails = addServiceDialog.getSelectedService();
                 if (reservationDetails != null && !reservationDetails.isEmpty()) {
                     updateServicesInCart(row, reservationDetails);
+                    listMapReservationDetails.put(roomID, reservationDetails);
                 }
             }
         });
@@ -1532,7 +1544,7 @@ public class Tab_Booking extends javax.swing.JPanel {
      * @param row Hàng cần cập nhật dịch vụ.
      * @param listReservationDetails Danh sách dịch vụ đã chọn.
      */
-    private void showServicesDialogAfterClickUpdate(int row, ArrayList<ReservationDetails> listReservationDetails) {
+    private void showServicesDialogAfterClickUpdate(int row, List<ReservationDetails> listReservationDetails) {
         JDialog dialog = new JDialog();
         dialog.setTitle("Cập nhật dịch vụ đã chọn");
         dialog.setSize(900, 620);
@@ -1555,8 +1567,11 @@ public class Tab_Booking extends javax.swing.JPanel {
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                ArrayList<ReservationDetails> reservationDetails = addServiceDialog.getSelectedService();
+                List<ReservationDetails> reservationDetails = addServiceDialog.getSelectedService();
                 if (reservationDetails != null && !reservationDetails.isEmpty()) {
+                    reservationDetailsList.clear();
+                    reservationDetailsList.addAll(reservationDetails);
+                    listMapReservationDetails.put(roomID, reservationDetails);
                     updateServicesInCart(row, reservationDetails);
                 }
             }
@@ -1573,7 +1588,7 @@ public class Tab_Booking extends javax.swing.JPanel {
      * @param row Hàng cần cập nhật.
      * @param reservationDetails Danh sách dịch vụ đã chọn.
      */
-    private void updateServicesInCart(int row, ArrayList<ReservationDetails> reservationDetails) {
+    private void updateServicesInCart(int row, List<ReservationDetails> reservationDetails) {
         CustomTableButton.CustomTableModel model = table_Cart.getTableModel();
         Object[] rowData = model.getRowData(row);
 
@@ -1602,7 +1617,127 @@ public class Tab_Booking extends javax.swing.JPanel {
         updateSummaryTotals();
     }
 
-    private void bookingRoom() {
+    private void bookingRoom() throws RemoteException {
+        // Validate input
+        int numOfCartRows = table_Cart.getTableModel().getRowCount();
+        if (numOfCartRows == 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng thêm phòng vào giỏ hàng trước khi đặt phòng",
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
+        String bookingMethod = (String) cbx_BookingMethod.getSelectedItem();
+        if (bookingMethod == null || bookingMethod.equals("Chọn hình thức đặt phòng")) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn hình thức đặt phòng",
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String customerName = lbl_CustomerName_Value.getText();
+        String customerPhone = lbl_CustomerPhone_Value.getText();
+        if (customerName == null || customerName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng",
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Get customer and dates
+        Customer customer = customerDAO.getCustomerByPhone(customerPhone);
+        if (customer == null) {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin khách hàng",
+                    "Thông báo", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Date checkInDate = calendar_Checkin.getSelectedDate();
+        Date checkOutDate = calendar_Checout.getSelectedDate();
+        if (checkInDate == null || checkOutDate == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-in và check-out",
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Start transaction
+        EntityManager em = AppUtil.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
+        try {
+            transaction.begin();
+
+            CustomTableButton.CustomTableModel model = table_Cart.getTableModel();
+            int countBooking = 0;
+
+            for (int row = 0; row < numOfCartRows; row++) {
+                Object[] rowData = model.getRowData(row);
+                String roomID = (String) rowData[1];
+                int numberOfNights = (int) rowData[3];
+
+                // Generate a new reservation ID for each room
+                String reservationId = GenerateString.generateReservationId();
+                if (reservationId == null || reservationId.isEmpty()) {
+                    throw new IllegalStateException("Không thể tạo ID đặt phòng");
+                }
+
+                Reservation reservation = new Reservation();
+                reservation.setReservationId(reservationId);
+
+                Room room = em.find(Room.class, roomID);
+                if (room == null) {
+                    throw new IllegalStateException("Không tìm thấy phòng với ID: " + roomID);
+                }
+                reservation.setRoom(room);
+
+                reservation.setCustomer(customer);
+                reservation.setNumberOfNights(numberOfNights);
+                reservation.setBookingDate(new Date());
+                reservation.setCheckInDate(checkInDate);
+                reservation.setCheckOutDate(checkOutDate);
+
+                reservation.setBookingMethod(bookingMethod.equals("Tại quầy") ?
+                        BookingMethod.AT_THE_COUNTER : BookingMethod.CONTACT);
+
+                reservation.setStatus(false); // Assuming false means not checked in yet
+
+                // Add services if any
+                if (listMapReservationDetails.containsKey(roomID)) {
+                    List<ReservationDetails> details = listMapReservationDetails.get(roomID);
+                    for (ReservationDetails detail : details) {
+                        detail.setReservation(reservation); // Set the relationship
+                    }
+                    reservation.setReservationDetails(details);
+                }
+
+                // Calculate prices
+                reservation.calculateTotalPrice();
+                reservation.calculateDepositAmount();
+                reservation.calculateRemainingAmount();
+
+                // Persist reservation
+                em.persist(reservation);
+                countBooking++;
+            }
+
+            transaction.commit();
+
+            if (countBooking == numOfCartRows) {
+                JOptionPane.showMessageDialog(this, "Đặt phòng thành công",
+                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                clear();
+            } else {
+                JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi đặt phòng",
+                        "Thông báo", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi đặt phòng: " + e.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
     }
 }

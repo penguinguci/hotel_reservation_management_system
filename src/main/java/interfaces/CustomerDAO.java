@@ -22,4 +22,6 @@ public interface CustomerDAO extends Remote {
     List<Customer> searchCustomersByPhoneOrCCCD(String keyword);
 
     List<Customer> getAllCustomers()  throws RemoteException;
+
+    Customer getCustomerByPhone(String phone) throws RemoteException;
 }

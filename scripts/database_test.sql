@@ -108,13 +108,13 @@ VALUES
     (100000, 5, 2, 'ORD004'),
     (300000, 1, 3, 'ORD005');
 
-INSERT INTO reservations (reservation_id, bookingMethod, check_in_date, check_out_date, deposit_amount, number_of_nights, remaining_amount, status, total_price, customer_id, room_id, staff_id)
+INSERT INTO reservations (reservation_id, bookingMethod, check_in_date, check_out_date, deposit_amount, number_of_nights, remaining_amount, status, total_price, customer_id, room_id, staff_id, booking_date)
 VALUES
-    ('RES001', 'AT_THE_COUNTER', '2023-11-01 14:00:00', '2023-11-04 12:00:00', 1000000, 3, 2600000, 1, 3600000, 'C001', 'R101', 'ST002'),
-    ('RES002', 'CONTACT', '2023-11-05 14:00:00', '2023-11-07 12:00:00', 1800000, 2, 1800000, 1, 3600000, 'C002', 'R201', 'ST003'),
-    ('RES003', 'AT_THE_COUNTER', '2023-11-10 14:00:00', '2023-11-11 12:00:00', 1000000, 1, 1500000, 0, 2500000, 'C003', 'R301', 'ST002'),
-    ('RES004', 'CONTACT', '2023-11-15 14:00:00', '2023-11-20 12:00:00', 5000000, 5, 12500000, 1, 17500000, 'C004', 'R401', 'ST003'),
-    ('RES005', 'AT_THE_COUNTER', '2023-11-25 14:00:00', '2023-11-27 12:00:00', 8000000, 2, 8000000, 1, 16000000, 'C005', 'R501', 'ST002');
+    ('RES001', 'AT_THE_COUNTER', '2023-11-01 14:00:00', '2023-11-04 12:00:00', 1000000, 3, 2600000, 1, 3600000, 'C001', 'R101', 'ST002', '2023-11-01 14:00:00'),
+    ('RES002', 'CONTACT', '2023-11-05 14:00:00', '2023-11-07 12:00:00', 1800000, 2, 1800000, 1, 3600000, 'C002', 'R201', 'ST003', '2023-11-01 14:00:00'),
+    ('RES003', 'AT_THE_COUNTER', '2023-11-10 14:00:00', '2023-11-11 12:00:00', 1000000, 1, 1500000, 0, 2500000, 'C003', 'R301', 'ST002', '2023-11-01 14:00:00'),
+    ('RES004', 'CONTACT', '2023-11-15 14:00:00', '2023-11-20 12:00:00', 5000000, 5, 12500000, 1, 17500000, 'C004', 'R401', 'ST003', '2023-11-01 14:00:00'),
+    ('RES005', 'AT_THE_COUNTER', '2023-11-25 14:00:00', '2023-11-27 12:00:00', 8000000, 2, 8000000, 1, 16000000, 'C005', 'R501', 'ST002', '2023-11-01 14:00:00');
 
 
 INSERT INTO reservation_details (line_total_amount, note, quantity, service_id, reservation_id)
