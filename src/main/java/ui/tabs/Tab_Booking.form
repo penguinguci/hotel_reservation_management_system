@@ -616,6 +616,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="&#x110;&#x1eb7;t ph&#xf2;ng"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_BookingActionPerformed"/>
+          </Events>
         </Component>
         <Component class="ui.components.button.ButtonCancelCustom" name="btn_Cancel">
           <Properties>

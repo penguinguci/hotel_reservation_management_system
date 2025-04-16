@@ -4,6 +4,7 @@ import entities.Customer;
 import interfaces.CustomerDAO;
 import jakarta.persistence.*;
 
+import java.rmi.RemoteException;
 import java.util.List;
 
 public class CustomerDAOImpl implements CustomerDAO {
@@ -72,6 +73,15 @@ public class CustomerDAOImpl implements CustomerDAO {
     public List<Customer> getAllCustomers() {
         TypedQuery<Customer> query = entityManager.createQuery("SELECT c FROM Customer c", Customer.class);
         return query.getResultList();
+    }
+
+    @Override
+    public Customer getCustomerByPhone(String phone) throws RemoteException {
+        String queryString = "SELECT c FROM Customer c WHERE c.phoneNumber = :phone";
+        TypedQuery<Customer> query = entityManager.createQuery(queryString, Customer.class);
+        query.setParameter("phone", phone);
+        List<Customer> customers = query.getResultList();
+        return customers.isEmpty() ? null : customers.get(0);
     }
 
     // Cập nhật thông tin khách hàng

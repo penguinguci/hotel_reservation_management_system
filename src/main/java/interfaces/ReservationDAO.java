@@ -1,4 +1,6 @@
 package interfaces;
 
-public interface ReservationDAO {
+import entities.Reservation;
+
+public interface ReservationDAO extends GenericDAO<Reservation, String> {
 }
