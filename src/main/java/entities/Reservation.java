@@ -91,4 +91,14 @@ public class Reservation {
         this.remainingAmount = totalPrice - depositAmount;
         return remainingAmount;
     }
+
+    // tính tổng tiền dịch vụ
+    public double calculateTotalServicePrice() {
+        if (reservationDetails == null || reservationDetails.isEmpty()) {
+            return 0;
+        }
+        return reservationDetails.stream()
+                .mapToDouble(ReservationDetails::calculateLineTotal)
+                .sum();
+    }
 }
