@@ -17,6 +17,7 @@ import interfaces.StaffDAO;
 import jakarta.persistence.EntityTransaction;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.poi.ss.usermodel.Cell;
+import ui.components.table.CustomTableButton;
 import ultilities.GenerateString;
 import ultilities.ImageConverter;
 import ultilities.RegexPattern;
@@ -45,21 +46,28 @@ import java.util.Set;
  *
  * @author Lenovo
  */
-public class Form_StaffManagement extends javax.swing.JPanel implements ActionListener, ListSelectionListener {
+public class Form_StaffManagement extends javax.swing.JPanel implements ListSelectionListener{
 
     /** Creates new form Form_StaffManagement */
     public Form_StaffManagement() {
         initComponents();
-         //Add event
-        btn_UploadAvatar.addActionListener(this);
-        btnAdd.addActionListener(this);
-        btnUpdate.addActionListener(this);
-        btnImport.addActionListener(this);
-        btnExport.addActionListener(this);
-        btn_Search.addActionListener(this);
-        customTable1.getSelectionModel().addListSelectionListener(this);
-
+        initTableListener();
+        initComboboxGender();
         loadStaffData();
+    }
+
+    private void initTableListener() {
+        table.getTable().getSelectionModel().addListSelectionListener(this);
+    }
+
+    private void initComboboxGender() {
+        String[] genders = {"Nam", "Nữ"};
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("Chọn giới tính");
+        for (String gender : genders) {
+            model.addElement(gender);
+        }
+        cbx_Gender.setModel(model);
     }
 
     /** This method is called from within the constructor to
@@ -71,571 +79,342 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnl_North = new javax.swing.JPanel();
-        lbl_Title = new javax.swing.JLabel();
-        pnl_Center = new javax.swing.JPanel();
-        pnl_Left = new javax.swing.JPanel();
-        pnl_FisrtName = new javax.swing.JPanel();
+        pnl_Title = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        pnl_Infor = new javax.swing.JPanel();
+        pnl_Input = new javax.swing.JPanel();
+        pnl_InforLeft = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
         lbl_FirstName = new javax.swing.JLabel();
-        txt_FisrtName = new ui.components.textfield.CustomRoundedTextField();
-        pnl_LastName = new javax.swing.JPanel();
-        lbl_LastName = new javax.swing.JLabel();
-        txt_LastName = new ui.components.textfield.CustomRoundedTextField();
-        pnl_Phone = new javax.swing.JPanel();
         lbl_Phone = new javax.swing.JLabel();
-        txt_Phone = new ui.components.textfield.CustomRoundedTextField();
-        pnl_Email = new javax.swing.JPanel();
-        lbl_Email = new javax.swing.JLabel();
-        txt_Email = new ui.components.textfield.CustomRoundedTextField();
-        pnl_Address = new javax.swing.JPanel();
-        lbl_Address = new javax.swing.JLabel();
-        txt_Address = new ui.components.textfield.CustomRoundedTextField();
-        pnl_Password = new javax.swing.JPanel();
-        lbl_Password = new javax.swing.JLabel();
-        txt_Password = new ui.components.textfield.CustomRoundedTextField();
-        pnl_UserName = new javax.swing.JPanel();
-        lbl_UserName = new javax.swing.JLabel();
-        txt_UserName = new ui.components.textfield.CustomRoundedTextField();
-        pnl_Gender = new javax.swing.JPanel();
+        lbl_Username = new javax.swing.JLabel();
         lbl_Gender = new javax.swing.JLabel();
-        cbx_Gender = new ui.components.combobox.StyledComboBox(itemsGender);
-        pnl_DateJoin = new javax.swing.JPanel();
-        lbl_DateJoin = new javax.swing.JLabel();
-        calender_DateJoin = new ui.components.calendar.CustomCalendar();
-        pnl_BirthDate = new javax.swing.JPanel();
         lbl_BirthDate = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        txt_FirstName = new javax.swing.JTextField();
+        txt_Phone = new javax.swing.JTextField();
+        txt_Username = new javax.swing.JTextField();
+        cbx_Gender = new ui.components.combobox.StyledComboBox();
         calendar_BirthDate = new ui.components.calendar.CustomCalendar();
-        btn_UploadAvatar = new ui.components.button.ButtonCustom();
-        lbl_UploadAvatar = new ui.components.label.LabelImage();
-        btnReset = new ui.components.button.ButtonCustom();
-        pnl_Right = new javax.swing.JPanel();
-        pnl_NameSearch = new javax.swing.JPanel();
+        pnl_InforRight = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        lbl_LastName = new javax.swing.JLabel();
+        lbl_Email = new javax.swing.JLabel();
+        lbl_Password = new javax.swing.JLabel();
+        lbl_Address = new javax.swing.JLabel();
+        lbl_JoinDate = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        txt_LastName = new javax.swing.JTextField();
+        txt_Email = new javax.swing.JTextField();
+        txt_Password = new javax.swing.JTextField();
+        txt_Address = new javax.swing.JTextField();
+        calendar_JoinDate = new ui.components.calendar.CustomCalendar();
+        pnl_Image = new javax.swing.JPanel();
+        lbl_Avatar = new ui.components.label.LabelImage();
+        btn_UploadImage = new ui.components.button.ButtonCustom();
+        btn_Clear = new ui.components.button.ButtonCancelCustom();
+        pnl_Search = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        lbl_StaffIDSearch = new javax.swing.JLabel();
         lbl_NameSearch = new javax.swing.JLabel();
-        txt_NameSearch = new ui.components.textfield.CustomRoundedTextField();
-        pnl_IDSearch = new javax.swing.JPanel();
-        lbl_IDSearch = new javax.swing.JLabel();
-        txt_IDSearch = new ui.components.textfield.CustomRoundedTextField();
-        pnl_PhoneSearch = new javax.swing.JPanel();
         lbl_PhoneSearch = new javax.swing.JLabel();
-        txt_PhoneSearch = new ui.components.textfield.CustomRoundedTextField();
-        pnl_GenderSearch = new javax.swing.JPanel();
         lbl_GenderSearch = new javax.swing.JLabel();
-        cbx_GenderSearch = new ui.components.combobox.StyledComboBox(itemsGender);
+        jPanel6 = new javax.swing.JPanel();
+        txt_IDSearch = new javax.swing.JTextField();
+        txt_NameSearch = new javax.swing.JTextField();
+        txt_PhoneSearch = new javax.swing.JTextField();
+        cbx_GenderSearch = new ui.components.combobox.StyledComboBox();
         btn_Search = new ui.components.button.ButtonCustom();
-        pnl_South = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        customTable1 = new ui.components.table.CustomTable();
-        pButton = new javax.swing.JPanel();
-        btnAdd = new ui.components.button.ButtonCustom();
-        btnUpdate = new ui.components.button.ButtonCustom();
-        btnImport = new ui.components.button.ButtonCustom();
-        btnExport = new ui.components.button.ButtonCustom();
+        pnl_ListStaff = new javax.swing.JPanel();
+        table = new ui.components.table.CustomTableButton();
+        pnl_GroupButton = new javax.swing.JPanel();
+        btn_Add = new ui.components.button.ButtonCustom();
+        btn_Update = new ui.components.button.ButtonCustom();
+        btn_Import = new ui.components.button.ButtonCustom();
+        btn_Export = new ui.components.button.ButtonCustom();
 
         setBackground(new java.awt.Color(255, 255, 255));
-        setLayout(new java.awt.BorderLayout());
+        setPreferredSize(new java.awt.Dimension(1200, 1052));
 
-        pnl_North.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_North.setLayout(new java.awt.BorderLayout());
+        pnl_Title.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_Title.setLayout(new java.awt.BorderLayout());
 
-        lbl_Title.setBackground(new java.awt.Color(255, 255, 255));
-        lbl_Title.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        lbl_Title.setForeground(new java.awt.Color(127, 122, 239));
-        lbl_Title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbl_Title.setText(" QUẢN LÝ NHÂN VIÊN");
-        pnl_North.add(lbl_Title, java.awt.BorderLayout.CENTER);
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(153, 153, 255));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Quản lý nhân viên");
+        pnl_Title.add(jLabel1, java.awt.BorderLayout.CENTER);
 
-        add(pnl_North, java.awt.BorderLayout.PAGE_START);
+        pnl_Infor.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_Infor.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin nhân viên", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 16), new java.awt.Color(153, 153, 255))); // NOI18N
 
-        pnl_Center.setLayout(new java.awt.BorderLayout());
+        pnl_Input.setBackground(new java.awt.Color(255, 255, 255));
 
-        pnl_Left.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Left.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin nhân viên", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 16), new java.awt.Color(102, 102, 255))); // NOI18N
-        pnl_Left.setLayout(null);
+        pnl_InforLeft.setBackground(new java.awt.Color(255, 255, 255));
 
-        pnl_FisrtName.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setLayout(new java.awt.GridLayout(5, 1));
 
         lbl_FirstName.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         lbl_FirstName.setText("Họ:");
+        jPanel1.add(lbl_FirstName);
 
-        txt_FisrtName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_FisrtNameActionPerformed(evt);
-            }
-        });
+        lbl_Phone.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Phone.setText("Số điện thoại:");
+        jPanel1.add(lbl_Phone);
 
-        javax.swing.GroupLayout pnl_FisrtNameLayout = new javax.swing.GroupLayout(pnl_FisrtName);
-        pnl_FisrtName.setLayout(pnl_FisrtNameLayout);
-        pnl_FisrtNameLayout.setHorizontalGroup(
-            pnl_FisrtNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_FisrtNameLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_FirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-                .addComponent(txt_FisrtName, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
+        lbl_Username.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Username.setText("Tài khoản:");
+        jPanel1.add(lbl_Username);
+
+        lbl_Gender.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Gender.setText("Giới tính:");
+        jPanel1.add(lbl_Gender);
+
+        lbl_BirthDate.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_BirthDate.setText("Ngày sinh:");
+        jPanel1.add(lbl_BirthDate);
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setLayout(new java.awt.GridLayout(5, 1, 0, 12));
+
+        txt_FirstName.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_FirstName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        jPanel2.add(txt_FirstName);
+
+        txt_Phone.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_Phone.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        jPanel2.add(txt_Phone);
+
+        txt_Username.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_Username.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        jPanel2.add(txt_Username);
+
+        cbx_Gender.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        jPanel2.add(cbx_Gender);
+        jPanel2.add(calendar_BirthDate);
+
+        javax.swing.GroupLayout pnl_InforLeftLayout = new javax.swing.GroupLayout(pnl_InforLeft);
+        pnl_InforLeft.setLayout(pnl_InforLeftLayout);
+        pnl_InforLeftLayout.setHorizontalGroup(
+                pnl_InforLeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_InforLeftLayout.createSequentialGroup()
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        pnl_FisrtNameLayout.setVerticalGroup(
-            pnl_FisrtNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_FisrtNameLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_FisrtNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_FirstName)
-                    .addComponent(txt_FisrtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        pnl_InforLeftLayout.setVerticalGroup(
+                pnl_InforLeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        pnl_Left.add(pnl_FisrtName);
-        pnl_FisrtName.setBounds(30, 30, 350, 41);
+        pnl_InforRight.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_InforRight.setPreferredSize(new java.awt.Dimension(300, 223));
 
-        pnl_LastName.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setLayout(new java.awt.GridLayout(5, 1));
 
         lbl_LastName.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         lbl_LastName.setText("Tên:");
+        jPanel3.add(lbl_LastName);
 
+        lbl_Email.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Email.setText("Email:");
+        jPanel3.add(lbl_Email);
+
+        lbl_Password.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Password.setText("Mật khẩu:");
+        jPanel3.add(lbl_Password);
+
+        lbl_Address.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Address.setText("Địa chỉ:");
+        jPanel3.add(lbl_Address);
+
+        lbl_JoinDate.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_JoinDate.setText("Ngày làm:");
+        jPanel3.add(lbl_JoinDate);
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setLayout(new java.awt.GridLayout(5, 1, 0, 12));
+
+        txt_LastName.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_LastName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         txt_LastName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_LastNameActionPerformed(evt);
             }
         });
+        jPanel4.add(txt_LastName);
 
-        javax.swing.GroupLayout pnl_LastNameLayout = new javax.swing.GroupLayout(pnl_LastName);
-        pnl_LastName.setLayout(pnl_LastNameLayout);
-        pnl_LastNameLayout.setHorizontalGroup(
-            pnl_LastNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_LastNameLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_LastName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 51, Short.MAX_VALUE)
-                .addComponent(txt_LastName, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        pnl_LastNameLayout.setVerticalGroup(
-            pnl_LastNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_LastNameLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_LastNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_LastName)
-                    .addComponent(txt_LastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        txt_Email.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_Email.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        jPanel4.add(txt_Email);
 
-        pnl_Left.add(pnl_LastName);
-        pnl_LastName.setBounds(390, 30, 320, 41);
-
-        pnl_Phone.setBackground(new java.awt.Color(255, 255, 255));
-
-        lbl_Phone.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_Phone.setText("Số điện thoại:");
-
-        txt_Phone.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_PhoneActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnl_PhoneLayout = new javax.swing.GroupLayout(pnl_Phone);
-        pnl_Phone.setLayout(pnl_PhoneLayout);
-        pnl_PhoneLayout.setHorizontalGroup(
-            pnl_PhoneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_PhoneLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_Phone)
-                .addGap(18, 18, 18)
-                .addComponent(txt_Phone, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        pnl_PhoneLayout.setVerticalGroup(
-            pnl_PhoneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_PhoneLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_PhoneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_Phone)
-                    .addComponent(txt_Phone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        pnl_Left.add(pnl_Phone);
-        pnl_Phone.setBounds(30, 70, 360, 41);
-
-        pnl_Email.setBackground(new java.awt.Color(255, 255, 255));
-
-        lbl_Email.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_Email.setText("Email:");
-
-        txt_Email.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_EmailActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnl_EmailLayout = new javax.swing.GroupLayout(pnl_Email);
-        pnl_Email.setLayout(pnl_EmailLayout);
-        pnl_EmailLayout.setHorizontalGroup(
-            pnl_EmailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_EmailLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_Email)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
-                .addComponent(txt_Email, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        pnl_EmailLayout.setVerticalGroup(
-            pnl_EmailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_EmailLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_EmailLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_Email)
-                    .addComponent(txt_Email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        pnl_Left.add(pnl_Email);
-        pnl_Email.setBounds(390, 70, 320, 41);
-
-        pnl_Address.setBackground(new java.awt.Color(255, 255, 255));
-
-        lbl_Address.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_Address.setText("Địa chỉ:");
-
-        txt_Address.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_AddressActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnl_AddressLayout = new javax.swing.GroupLayout(pnl_Address);
-        pnl_Address.setLayout(pnl_AddressLayout);
-        pnl_AddressLayout.setHorizontalGroup(
-            pnl_AddressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_AddressLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_Address)
-                .addGap(32, 32, 32)
-                .addComponent(txt_Address, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
-        );
-        pnl_AddressLayout.setVerticalGroup(
-            pnl_AddressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_AddressLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_AddressLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_Address)
-                    .addComponent(txt_Address, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        pnl_Left.add(pnl_Address);
-        pnl_Address.setBounds(390, 150, 330, 41);
-
-        pnl_Password.setBackground(new java.awt.Color(255, 255, 255));
-
-        lbl_Password.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_Password.setText("Mật khẩu:");
-
+        txt_Password.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_Password.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         txt_Password.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_PasswordActionPerformed(evt);
             }
         });
+        jPanel4.add(txt_Password);
 
-        javax.swing.GroupLayout pnl_PasswordLayout = new javax.swing.GroupLayout(pnl_Password);
-        pnl_Password.setLayout(pnl_PasswordLayout);
-        pnl_PasswordLayout.setHorizontalGroup(
-            pnl_PasswordLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_PasswordLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_Password)
-                .addGap(15, 15, 15)
-                .addComponent(txt_Password, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+        txt_Address.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_Address.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        jPanel4.add(txt_Address);
+        jPanel4.add(calendar_JoinDate);
+
+        javax.swing.GroupLayout pnl_InforRightLayout = new javax.swing.GroupLayout(pnl_InforRight);
+        pnl_InforRight.setLayout(pnl_InforRightLayout);
+        pnl_InforRightLayout.setHorizontalGroup(
+                pnl_InforRightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 347, Short.MAX_VALUE)
+                        .addGroup(pnl_InforRightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(pnl_InforRightLayout.createSequentialGroup()
+                                        .addContainerGap()
+                                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addContainerGap(266, Short.MAX_VALUE)))
+                        .addGroup(pnl_InforRightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_InforRightLayout.createSequentialGroup()
+                                        .addContainerGap(109, Short.MAX_VALUE)
+                                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addContainerGap()))
         );
-        pnl_PasswordLayout.setVerticalGroup(
-            pnl_PasswordLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_PasswordLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_PasswordLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_Password)
-                    .addComponent(txt_Password, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        pnl_InforRightLayout.setVerticalGroup(
+                pnl_InforRightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(pnl_InforRightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE))
+                        .addGroup(pnl_InforRightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE))
         );
 
-        pnl_Left.add(pnl_Password);
-        pnl_Password.setBounds(390, 110, 330, 41);
+        javax.swing.GroupLayout pnl_InputLayout = new javax.swing.GroupLayout(pnl_Input);
+        pnl_Input.setLayout(pnl_InputLayout);
+        pnl_InputLayout.setHorizontalGroup(
+                pnl_InputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_InputLayout.createSequentialGroup()
+                                .addComponent(pnl_InforLeft, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(pnl_InforRight, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnl_InputLayout.setVerticalGroup(
+                pnl_InputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(pnl_InforLeft, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(pnl_InforRight, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
-        pnl_UserName.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_Image.setBackground(new java.awt.Color(255, 255, 255));
 
-        lbl_UserName.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_UserName.setText("Tài khoản:");
-
-        txt_UserName.addActionListener(new java.awt.event.ActionListener() {
+        btn_UploadImage.setText("Thêm ảnh");
+        btn_UploadImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_UserNameActionPerformed(evt);
+                btn_UploadImageActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout pnl_UserNameLayout = new javax.swing.GroupLayout(pnl_UserName);
-        pnl_UserName.setLayout(pnl_UserNameLayout);
-        pnl_UserNameLayout.setHorizontalGroup(
-            pnl_UserNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_UserNameLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_UserName)
-                .addGap(41, 41, 41)
-                .addComponent(txt_UserName, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
+        javax.swing.GroupLayout pnl_ImageLayout = new javax.swing.GroupLayout(pnl_Image);
+        pnl_Image.setLayout(pnl_ImageLayout);
+        pnl_ImageLayout.setHorizontalGroup(
+                pnl_ImageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_ImageLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lbl_Avatar, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE))
+                        .addGroup(pnl_ImageLayout.createSequentialGroup()
+                                .addGap(22, 22, 22)
+                                .addComponent(btn_UploadImage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 21, Short.MAX_VALUE))
         );
-        pnl_UserNameLayout.setVerticalGroup(
-            pnl_UserNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_UserNameLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_UserNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_UserName)
-                    .addComponent(txt_UserName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        pnl_ImageLayout.setVerticalGroup(
+                pnl_ImageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_ImageLayout.createSequentialGroup()
+                                .addComponent(lbl_Avatar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btn_UploadImage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        pnl_Left.add(pnl_UserName);
-        pnl_UserName.setBounds(30, 110, 350, 41);
-
-        pnl_Gender.setBackground(new java.awt.Color(255, 255, 255));
-
-        lbl_Gender.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_Gender.setText("Giới tính:");
-
-        cbx_Gender.setPreferredSize(new java.awt.Dimension(72, 34));
-        cbx_Gender.addActionListener(new java.awt.event.ActionListener() {
+        btn_Clear.setText("Xóa trắng");
+        btn_Clear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbx_GenderActionPerformed(evt);
+                btn_ClearActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout pnl_GenderLayout = new javax.swing.GroupLayout(pnl_Gender);
-        pnl_Gender.setLayout(pnl_GenderLayout);
-        pnl_GenderLayout.setHorizontalGroup(
-            pnl_GenderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_GenderLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_Gender)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-                .addComponent(cbx_Gender, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19))
+        javax.swing.GroupLayout pnl_InforLayout = new javax.swing.GroupLayout(pnl_Infor);
+        pnl_Infor.setLayout(pnl_InforLayout);
+        pnl_InforLayout.setHorizontalGroup(
+                pnl_InforLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_InforLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnl_InforLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(pnl_InforLayout.createSequentialGroup()
+                                                .addComponent(btn_Clear, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addGroup(pnl_InforLayout.createSequentialGroup()
+                                                .addComponent(pnl_Input, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGap(0, 0, 0)
+                                                .addComponent(pnl_Image, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
-        pnl_GenderLayout.setVerticalGroup(
-            pnl_GenderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_GenderLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_GenderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbx_Gender, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(lbl_Gender))
-                .addContainerGap())
-        );
-
-        pnl_Left.add(pnl_Gender);
-        pnl_Gender.setBounds(30, 150, 370, 42);
-
-        pnl_DateJoin.setBackground(new java.awt.Color(255, 255, 255));
-
-        lbl_DateJoin.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_DateJoin.setText("Ngày làm:");
-
-        javax.swing.GroupLayout pnl_DateJoinLayout = new javax.swing.GroupLayout(pnl_DateJoin);
-        pnl_DateJoin.setLayout(pnl_DateJoinLayout);
-        pnl_DateJoinLayout.setHorizontalGroup(
-            pnl_DateJoinLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_DateJoinLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_DateJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(calender_DateJoin, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE))
-        );
-        pnl_DateJoinLayout.setVerticalGroup(
-            pnl_DateJoinLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_DateJoinLayout.createSequentialGroup()
-                .addGap(0, 9, Short.MAX_VALUE)
-                .addGroup(pnl_DateJoinLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbl_DateJoin)
-                    .addComponent(calender_DateJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        pnl_InforLayout.setVerticalGroup(
+                pnl_InforLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_InforLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnl_InforLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(pnl_Image, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(pnl_Input, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addComponent(btn_Clear, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE))
         );
 
-        pnl_Left.add(pnl_DateJoin);
-        pnl_DateJoin.setBounds(390, 190, 320, 40);
+        pnl_Search.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_Search.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Tìm kiếm nhân viên", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 16), new java.awt.Color(153, 153, 255))); // NOI18N
+        pnl_Search.setPreferredSize(new java.awt.Dimension(360, 29));
 
-        pnl_BirthDate.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel5.setLayout(new java.awt.GridLayout(4, 1));
 
-        lbl_BirthDate.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_BirthDate.setText("Ngày sinh:");
-
-        javax.swing.GroupLayout pnl_BirthDateLayout = new javax.swing.GroupLayout(pnl_BirthDate);
-        pnl_BirthDate.setLayout(pnl_BirthDateLayout);
-        pnl_BirthDateLayout.setHorizontalGroup(
-            pnl_BirthDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_BirthDateLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_BirthDate)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
-                .addComponent(calendar_BirthDate, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        pnl_BirthDateLayout.setVerticalGroup(
-            pnl_BirthDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_BirthDateLayout.createSequentialGroup()
-                .addGap(8, 8, 8)
-                .addComponent(lbl_BirthDate)
-                .addContainerGap(11, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_BirthDateLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(calendar_BirthDate, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        pnl_Left.add(pnl_BirthDate);
-        pnl_BirthDate.setBounds(30, 190, 350, 40);
-
-        btn_UploadAvatar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/upload_image.png"))); // NOI18N
-        btn_UploadAvatar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_UploadAvatarActionPerformed(evt);
-            }
-        });
-        pnl_Left.add(btn_UploadAvatar);
-        btn_UploadAvatar.setBounds(760, 200, 70, 30);
-        pnl_Left.add(lbl_UploadAvatar);
-        lbl_UploadAvatar.setBounds(730, 50, 140, 140);
-
-        btnReset.setText("Làm mới");
-        btnReset.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetActionPerformed(evt);
-            }
-        });
-        pnl_Left.add(btnReset);
-        btnReset.setBounds(30, 246, 110, 30);
-
-        pnl_Center.add(pnl_Left, java.awt.BorderLayout.CENTER);
-
-        pnl_Right.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Right.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Tìm kiếm nhân viên", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 0, 16), new java.awt.Color(102, 102, 255))); // NOI18N
-
-        pnl_NameSearch.setBackground(new java.awt.Color(255, 255, 255));
+        lbl_StaffIDSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_StaffIDSearch.setText("Mã nhân viên:");
+        jPanel5.add(lbl_StaffIDSearch);
 
         lbl_NameSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
         lbl_NameSearch.setText("Họ và tên:");
+        jPanel5.add(lbl_NameSearch);
 
+        lbl_PhoneSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_PhoneSearch.setText("Số điện thoại:");
+        jPanel5.add(lbl_PhoneSearch);
+
+        lbl_GenderSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_GenderSearch.setText("Giới tính:");
+        jPanel5.add(lbl_GenderSearch);
+
+        jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel6.setLayout(new java.awt.GridLayout(4, 1, 0, 15));
+
+        txt_IDSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_IDSearch.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        jPanel6.add(txt_IDSearch);
+
+        txt_NameSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_NameSearch.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         txt_NameSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_NameSearchActionPerformed(evt);
             }
         });
+        jPanel6.add(txt_NameSearch);
 
-        javax.swing.GroupLayout pnl_NameSearchLayout = new javax.swing.GroupLayout(pnl_NameSearch);
-        pnl_NameSearch.setLayout(pnl_NameSearchLayout);
-        pnl_NameSearchLayout.setHorizontalGroup(
-            pnl_NameSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_NameSearchLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_NameSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(txt_NameSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        pnl_NameSearchLayout.setVerticalGroup(
-            pnl_NameSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_NameSearchLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_NameSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_NameSearch)
-                    .addComponent(txt_NameSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        txt_PhoneSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_PhoneSearch.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        jPanel6.add(txt_PhoneSearch);
 
-        pnl_IDSearch.setBackground(new java.awt.Color(255, 255, 255));
+        cbx_GenderSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        jPanel6.add(cbx_GenderSearch);
 
-        lbl_IDSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_IDSearch.setText("Mã nhân viên:");
-
-        txt_IDSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_IDSearchActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnl_IDSearchLayout = new javax.swing.GroupLayout(pnl_IDSearch);
-        pnl_IDSearch.setLayout(pnl_IDSearchLayout);
-        pnl_IDSearchLayout.setHorizontalGroup(
-            pnl_IDSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_IDSearchLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_IDSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txt_IDSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        pnl_IDSearchLayout.setVerticalGroup(
-            pnl_IDSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_IDSearchLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_IDSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_IDSearch)
-                    .addComponent(txt_IDSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        pnl_PhoneSearch.setBackground(new java.awt.Color(255, 255, 255));
-
-        lbl_PhoneSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_PhoneSearch.setText("Số điện thoại:");
-
-        txt_PhoneSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_PhoneSearchActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnl_PhoneSearchLayout = new javax.swing.GroupLayout(pnl_PhoneSearch);
-        pnl_PhoneSearch.setLayout(pnl_PhoneSearchLayout);
-        pnl_PhoneSearchLayout.setHorizontalGroup(
-            pnl_PhoneSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_PhoneSearchLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_PhoneSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txt_PhoneSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        pnl_PhoneSearchLayout.setVerticalGroup(
-            pnl_PhoneSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_PhoneSearchLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_PhoneSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lbl_PhoneSearch)
-                    .addComponent(txt_PhoneSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        pnl_GenderSearch.setBackground(new java.awt.Color(255, 255, 255));
-
-        lbl_GenderSearch.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_GenderSearch.setText("Giới tính:");
-
-        cbx_GenderSearch.setPreferredSize(new java.awt.Dimension(72, 34));
-        cbx_GenderSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbx_GenderSearchActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnl_GenderSearchLayout = new javax.swing.GroupLayout(pnl_GenderSearch);
-        pnl_GenderSearch.setLayout(pnl_GenderSearchLayout);
-        pnl_GenderSearchLayout.setHorizontalGroup(
-            pnl_GenderSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_GenderSearchLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lbl_GenderSearch)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
-                .addComponent(cbx_GenderSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19))
-        );
-        pnl_GenderSearchLayout.setVerticalGroup(
-            pnl_GenderSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_GenderSearchLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_GenderSearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbx_GenderSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(lbl_GenderSearch))
-                .addContainerGap())
-        );
-
-        btn_Search.setIcon(new javax.swing.ImageIcon(getClass().getResource("/search.png"))); // NOI18N
         btn_Search.setText("Tìm kiếm");
         btn_Search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -643,200 +422,152 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
             }
         });
 
-        javax.swing.GroupLayout pnl_RightLayout = new javax.swing.GroupLayout(pnl_Right);
-        pnl_Right.setLayout(pnl_RightLayout);
-        pnl_RightLayout.setHorizontalGroup(
-            pnl_RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_RightLayout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addGroup(pnl_RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnl_IDSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnl_GenderSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnl_PhoneSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pnl_NameSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_RightLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26))
+        javax.swing.GroupLayout pnl_SearchLayout = new javax.swing.GroupLayout(pnl_Search);
+        pnl_Search.setLayout(pnl_SearchLayout);
+        pnl_SearchLayout.setHorizontalGroup(
+                pnl_SearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_SearchLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnl_SearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(pnl_SearchLayout.createSequentialGroup()
+                                                .addGap(0, 0, Short.MAX_VALUE)
+                                                .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(pnl_SearchLayout.createSequentialGroup()
+                                                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 253, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(12, 12, 12))
         );
-        pnl_RightLayout.setVerticalGroup(
-            pnl_RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_RightLayout.createSequentialGroup()
-                .addComponent(pnl_IDSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6)
-                .addComponent(pnl_NameSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnl_PhoneSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnl_GenderSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(376, Short.MAX_VALUE))
+        pnl_SearchLayout.setVerticalGroup(
+                pnl_SearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_SearchLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnl_SearchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btn_Search, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
 
-        pnl_Center.add(pnl_Right, java.awt.BorderLayout.EAST);
+        pnl_ListStaff.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_ListStaff.setLayout(new java.awt.BorderLayout());
 
-        add(pnl_Center, java.awt.BorderLayout.CENTER);
+        table.setColumnNames(new String[] {"Mã nhân viên", "Tên nhân viên", "Giới tính", "Ngày sinh", "Số điện thoại", "Email", "Địa chỉ", "Chức vụ", "Ngày vào làm", "Trạng thái"});
+        table.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
+        pnl_ListStaff.add(table, java.awt.BorderLayout.CENTER);
 
-        pnl_South.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_GroupButton.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_GroupButton.setLayout(new java.awt.GridLayout(4, 1, 0, 20));
 
-        customTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "Mã nhân viên", "Tên nhân viên", "Giới tính", "Ngày sinh", "Số điện thoại", "Email", "Địa chỉ", "Chức vụ", "Ngày vào làm", "Trạng thái"
-            }
-        ));
-        jScrollPane1.setViewportView(customTable1);
-
-        pButton.setBackground(new java.awt.Color(255, 255, 255));
-        pButton.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        btnAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/plus.png"))); // NOI18N
-        btnAdd.setText("Thêm");
-        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+        btn_Add.setText("Thêm");
+        btn_Add.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddActionPerformed(evt);
+                btn_AddActionPerformed(evt);
             }
         });
-        pButton.add(btnAdd, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 140, 50));
+        pnl_GroupButton.add(btn_Add);
 
-        btnUpdate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/update.png"))); // NOI18N
-        btnUpdate.setText("Cập nhật");
-        pButton.add(btnUpdate, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 140, 50));
-
-        btnImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/import.png"))); // NOI18N
-        btnImport.setText("Import");
-        pButton.add(btnImport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 140, 50));
-
-        btnExport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/export.png"))); // NOI18N
-        btnExport.setText("Export");
-        btnExport.addActionListener(new java.awt.event.ActionListener() {
+        btn_Update.setText("Cập nhật");
+        btn_Update.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExportActionPerformed(evt);
+                btn_UpdateActionPerformed(evt);
             }
         });
-        pButton.add(btnExport, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 260, 140, 50));
+        pnl_GroupButton.add(btn_Update);
 
-        javax.swing.GroupLayout pnl_SouthLayout = new javax.swing.GroupLayout(pnl_South);
-        pnl_South.setLayout(pnl_SouthLayout);
-        pnl_SouthLayout.setHorizontalGroup(
-            pnl_SouthLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_SouthLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1097, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pButton, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(3451, Short.MAX_VALUE))
+        btn_Import.setText("Import");
+        btn_Import.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_ImportActionPerformed(evt);
+            }
+        });
+        pnl_GroupButton.add(btn_Import);
+
+        btn_Export.setText("Export");
+        btn_Export.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_ExportActionPerformed(evt);
+            }
+        });
+        pnl_GroupButton.add(btn_Export);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(pnl_Title, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(pnl_Infor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnl_Search, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(pnl_ListStaff, javax.swing.GroupLayout.PREFERRED_SIZE, 1102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnl_GroupButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
-        pnl_SouthLayout.setVerticalGroup(
-            pnl_SouthLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(pButton, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE)
+        layout.setVerticalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(pnl_Title, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(pnl_Infor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(pnl_Search, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(pnl_ListStaff, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(pnl_GroupButton, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
-
-        pButton.getAccessibleContext().setAccessibleDescription("");
-
-        add(pnl_South, java.awt.BorderLayout.SOUTH);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txt_FisrtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_FisrtNameActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_FisrtNameActionPerformed
 
     private void txt_LastNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_LastNameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_LastNameActionPerformed
 
-    private void txt_PhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_PhoneActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_PhoneActionPerformed
-
-    private void txt_EmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_EmailActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_EmailActionPerformed
-
-    private void txt_AddressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_AddressActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_AddressActionPerformed
-
     private void txt_PasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_PasswordActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_PasswordActionPerformed
-
-    private void txt_UserNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_UserNameActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_UserNameActionPerformed
-
-    private void cbx_GenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbx_GenderActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbx_GenderActionPerformed
-
-    private void btn_UploadAvatarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_UploadAvatarActionPerformed
-        // TODO add your handling code here:
-        uploadImage();
-    }//GEN-LAST:event_btn_UploadAvatarActionPerformed
 
     private void txt_NameSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_NameSearchActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_NameSearchActionPerformed
 
-    private void txt_IDSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_IDSearchActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_IDSearchActionPerformed
+    private void btn_UploadImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_UploadImageActionPerformed
+        uploadImage();
+    }//GEN-LAST:event_btn_UploadImageActionPerformed
 
-    private void txt_PhoneSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_PhoneSearchActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txt_PhoneSearchActionPerformed
+    private void btn_AddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddActionPerformed
+        add();
+    }//GEN-LAST:event_btn_AddActionPerformed
 
-    private void cbx_GenderSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbx_GenderSearchActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbx_GenderSearchActionPerformed
+    private void btn_UpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_UpdateActionPerformed
+        update();
+    }//GEN-LAST:event_btn_UpdateActionPerformed
+
+    private void btn_ImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ImportActionPerformed
+        importData();
+    }//GEN-LAST:event_btn_ImportActionPerformed
+
+    private void btn_ExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ExportActionPerformed
+        exportData();
+    }//GEN-LAST:event_btn_ExportActionPerformed
 
     private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
-        // TODO add your handling code here:
         search();
     }//GEN-LAST:event_btn_SearchActionPerformed
 
-    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        // TODO add your handling code here:
-        add();
-    }//GEN-LAST:event_btnAddActionPerformed
-
-    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
-        // TODO add your handling code here:
-        exportData();
-    }//GEN-LAST:event_btnExportActionPerformed
-    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btn_ClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ClearActionPerformed
         clearForm();
+    }//GEN-LAST:event_btn_ClearActionPerformed
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {
+
     }
 
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object o = e.getSource();
-        if (o == btn_UploadAvatar) {
-            uploadImage();
-        } else if (o == btnAdd) {
-            add();
-        } else if (o == btnUpdate) {
-            update();
-        } else  if (o == btn_Search) {
-            search();
-        } else if (o == btnImport) {
-            importData();
-        } else if (o == btnExport) {
-            exportData();
-        }
-    }
 
 
     // Hàm upload ảnh
@@ -856,7 +587,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
                         .asBufferedImage();
 
                 // Hiển thị ảnh lên label
-                lbl_UploadAvatar.setIcon(new ImageIcon(resizedImage));
+                lbl_Avatar.setIcon(new ImageIcon(resizedImage));
 
                 String imageBase64 = ImageConverter.imageToBase64String(resizedImage, "png");
 
@@ -871,9 +602,9 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
 
     // Hàm Validate dữ liệu
     private boolean validateInput() {
-        if (txt_FisrtName.getText().trim().isEmpty() || txt_LastName.getText().trim().isEmpty()) {
+        if (txt_FirstName.getText().trim().isEmpty() || txt_LastName.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Họ và tên không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            txt_FisrtName.requestFocus();
+            txt_FirstName.requestFocus();
             return false;
         }
 
@@ -902,29 +633,30 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
     }
 
     private void clearForm() {
-        txt_FisrtName.setText("");
+        txt_FirstName.setText("");
         txt_LastName.setText("");
         txt_Phone.setText("");
         txt_Email.setText("");
         txt_Address.setText("");
         cbx_Gender.setSelectedIndex(0);
-        txt_UserName.setText("");
-        txt_UserName.setEnabled(true);
+        txt_Username.setText("");
+        txt_Username.setEnabled(true);
         txt_Password.setText("");
         calendar_BirthDate.setSelectedDate(null);
-        calender_DateJoin.setSelectedDate(null);
-        lbl_UploadAvatar.setIcon(null);
+        calendar_JoinDate.setSelectedDate(null);
+        lbl_Avatar.setIcon(null);
+        table.getTable().clearSelection();
+        loadStaffData();
     }
 
     private void loadStaffData() {
         try {
-            GenericDAO<Staff, String> staffDAO = new GenericDAOImpl<>(Staff.class);
-
-            DefaultTableModel model = (DefaultTableModel) customTable1.getModel();
-            model.setRowCount(0); // Xóa dữ liệu cũ
+            StaffDAO staffDAO = new StaffDAOImpl();
+            CustomTableButton.CustomTableModel model = table.getTableModel();
+            model.clearData();
 
             for (Staff staff : staffDAO.findAll()) {
-                model.addRow(new Object[]{
+                Object[] rowData = {
                         staff.getStaffId(),
                         staff.getFirstName() + " " + staff.getLastName(),
                         staff.isGender() ? "Nam" : "Nữ",
@@ -935,7 +667,8 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
                         staff.getAccount().getRole() != null ? staff.getAccount().getRole() : "",
                         staff.getDateOfJoin(),
                         staff.isStatus() ? "Đang làm" : "Đã nghỉ"
-                });
+                };
+                model.addRow(rowData, null);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -971,7 +704,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
             }
 
             // Kiểm tra tên đăng nhập
-            String username = txt_UserName.getText().trim();
+            String username = txt_Username.getText().trim();
             if (accountDAO.isUsernameExists(username)) {
                 JOptionPane.showMessageDialog(this, "Tên đăng nhập đã tồn tại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -980,7 +713,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
             // Tạo đối tượng Staff
             Staff newStaff = new Staff();
             newStaff.setStaffId(GenerateString.generateStaffId());
-            newStaff.setFirstName(txt_FisrtName.getText().trim());
+            newStaff.setFirstName(txt_FirstName.getText().trim());
             newStaff.setLastName(txt_LastName.getText().trim());
             newStaff.setGender(cbx_Gender.getSelectedIndex() == 1); // 1 là Nam, 2 là Nữ
             newStaff.setDateOfBirth(calendar_BirthDate.getSelectedDate());
@@ -991,12 +724,12 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
 
             newStaff.setAddress(txt_Address.getText().trim());
             newStaff.setEmail(txt_Email.getText().trim());
-            newStaff.setDateOfJoin(calender_DateJoin.getSelectedDate());
+            newStaff.setDateOfJoin(calendar_JoinDate.getSelectedDate());
             newStaff.setStatus(true); // Mặc định active
 
             // Xử lý ảnh đại diện nếu có
-            if (lbl_UploadAvatar.getIcon() != null) {
-                String imageBase64 = ImageConverter.convertImageToBase64((ImageIcon) lbl_UploadAvatar.getIcon());
+            if (lbl_Avatar.getIcon() != null) {
+                String imageBase64 = ImageConverter.convertImageToBase64((ImageIcon) lbl_Avatar.getIcon());
                 newStaff.setStaffImage(imageBase64);
             }
 
@@ -1031,7 +764,8 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-            int row = customTable1.getSelectedRow();
+            int row = table.getTable().getSelectedRow();
+            System.out.println(row);
             if (row >= 0) {
                 try {
                     fillRow(row);
@@ -1043,21 +777,24 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
     }
 
     private void fillRow(int row) throws RemoteException {
-        String id = customTable1.getValueAt(row, 0).toString();
-        GenericDAO<Staff, String> staffDAO = new GenericDAOImpl<>(Staff.class);
+        CustomTableButton.CustomTableModel model = table.getTableModel();
+        Object[] rowData = model.getRowData(row);
+
+        String id = rowData[0].toString();
+        StaffDAO staffDAO = new StaffDAOImpl();
         AccountDAO accountDAO = new AccountDAOImpl();
         Staff staff = staffDAO.findById(id);
         Account account = accountDAO.findAccoutByStaffID(staff.getStaffId());
-        txt_FisrtName.setText(staff.getFirstName());
+        txt_FirstName.setText(staff.getFirstName());
         txt_LastName.setText(staff.getLastName());
         txt_Phone.setText(staff.getPhoneNumbers().iterator().next());
         txt_Email.setText(staff.getEmail());
         txt_Address.setText(staff.getAddress());
-        txt_UserName.setText(account.getUsername());
-        txt_UserName.setEnabled(false);
+        txt_Username.setText(account.getUsername());
+        txt_Username.setEnabled(false);
         txt_Password.setText(account.getPassword());
         calendar_BirthDate.setSelectedDate(staff.getDateOfBirth());
-        calender_DateJoin.setSelectedDate(staff.getDateOfJoin());
+        calendar_JoinDate.setSelectedDate(staff.getDateOfJoin());
         cbx_Gender.setSelectedItem(staff.isGender() == true ? "Nam" : "Nữ");
 
         try {
@@ -1070,16 +807,16 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
                             .size(140, 140)
                             .asBufferedImage();
 
-                    lbl_UploadAvatar.setIcon(new ImageIcon(resizedImage));
+                    lbl_Avatar.setIcon(new ImageIcon(resizedImage));
                 } else {
-                    lbl_UploadAvatar.setIcon(null);
+                    lbl_Avatar.setIcon(null);
                 }
             } else {
-                lbl_UploadAvatar.setIcon(null);
+                lbl_Avatar.setIcon(null);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            lbl_UploadAvatar.setIcon(null);
+            lbl_Avatar.setIcon(null);
         }
 
     }
@@ -1087,7 +824,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
 
     // Update staff
     private void update() {
-        int selectedRow = customTable1.getSelectedRow();
+        int selectedRow = table.getTable().getSelectedRow();
         if (selectedRow < 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn nhân viên cần cập nhật!",
                     "Thông báo", JOptionPane.WARNING_MESSAGE);
@@ -1102,10 +839,13 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
             GenericDAO<Staff, String> staffDAO = new GenericDAOImpl<>(Staff.class);
             GenericDAO<Account, String> accountDAO = new GenericDAOImpl<>(Account.class);
 
-            String staffID = customTable1.getValueAt(selectedRow, 0).toString();
+            CustomTableButton.CustomTableModel model = table.getTableModel();
+            Object[] rowData = model.getRowData(selectedRow);
+
+            String staffID = rowData[0].toString();
             Staff staff = staffDAO.findById(staffID);
 
-            staff.setFirstName(txt_FisrtName.getText() != null ? txt_FisrtName.getText().trim() : "");
+            staff.setFirstName(txt_FirstName.getText() != null ? txt_FirstName.getText().trim() : "");
             staff.setLastName(txt_LastName.getText() != null ? txt_LastName.getText().trim() : "");
             staff.setGender(cbx_Gender.getSelectedIndex() == 1);
             staff.setDateOfBirth(calendar_BirthDate.getSelectedDate());
@@ -1117,10 +857,10 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
 
             staff.setAddress(txt_Address.getText() != null ? txt_Address.getText().trim() : "");
             staff.setEmail(txt_Email.getText() != null ? txt_Email.getText().trim() : "");
-            staff.setDateOfJoin(calender_DateJoin.getSelectedDate());
+            staff.setDateOfJoin(calendar_JoinDate.getSelectedDate());
 
-            if (lbl_UploadAvatar.getIcon() != null) {
-                String imageBase64 = ImageConverter.convertImageToBase64((ImageIcon) lbl_UploadAvatar.getIcon());
+            if (lbl_Avatar.getIcon() != null) {
+                String imageBase64 = ImageConverter.convertImageToBase64((ImageIcon) lbl_Avatar.getIcon());
                 if (imageBase64 != null) {
                     staff.setStaffImage(imageBase64);
                 } else {
@@ -1129,7 +869,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
             }
 
             // Cập nhật thông tin Account
-            String username = txt_UserName.getText() != null ? txt_UserName.getText().trim() : "";
+            String username = txt_Username.getText() != null ? txt_Username.getText().trim() : "";
             Account account = accountDAO.findById(username);
             String newPassword = txt_Password.getText() != null ? txt_Password.getText().trim() : "";
             if (!newPassword.isEmpty() && !newPassword.equals(account.getPassword())) {
@@ -1171,11 +911,11 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
         StaffDAO staffDAO = new StaffDAOImpl();
         List<Staff> staffList = staffDAO.searchStaffAdvanced(id, name, phone, gender);
 
-        DefaultTableModel model = (DefaultTableModel) customTable1.getModel();
-        model.setRowCount(0);
+        CustomTableButton.CustomTableModel model = table.getTableModel();
+        model.clearData();
 
         for (Staff staff : staffList) {
-            model.addRow(new Object[]{
+            Object[] rowData = {
                     staff.getStaffId(),
                     staff.getFirstName() + " " + staff.getLastName(),
                     staff.isGender() ? "Nam" : "Nữ",
@@ -1186,14 +926,15 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
                     staff.getAccount().getRole() != null ? staff.getAccount().getRole() : "",
                     staff.getDateOfJoin(),
                     staff.isStatus() ? "Đang làm" : "Đã nghỉ"
-            });
+            };
+            model.addRow(rowData, null);
         }
     }
 
-    // Export
+    //    // Export
     private void exportData() {
         ExcelUtil.exportToExcel(
-                customTable1,
+                table,
                 "Xuất dữ liệu nhân viên",
                 "Danh sách nhân viên",
                 this
@@ -1282,66 +1023,59 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ActionLi
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private ui.components.button.ButtonCustom btnAdd;
-    private ui.components.button.ButtonCustom btnExport;
-    private ui.components.button.ButtonCustom btnImport;
-    private ui.components.button.ButtonCustom btnReset;
-    private ui.components.button.ButtonCustom btnUpdate;
+    private ui.components.button.ButtonCustom btn_Add;
+    private ui.components.button.ButtonCancelCustom btn_Clear;
+    private ui.components.button.ButtonCustom btn_Export;
+    private ui.components.button.ButtonCustom btn_Import;
     private ui.components.button.ButtonCustom btn_Search;
-    private ui.components.button.ButtonCustom btn_UploadAvatar;
+    private ui.components.button.ButtonCustom btn_Update;
+    private ui.components.button.ButtonCustom btn_UploadImage;
     private ui.components.calendar.CustomCalendar calendar_BirthDate;
-    private ui.components.calendar.CustomCalendar calender_DateJoin;
+    private ui.components.calendar.CustomCalendar calendar_JoinDate;
     private ui.components.combobox.StyledComboBox cbx_Gender;
     private ui.components.combobox.StyledComboBox cbx_GenderSearch;
-    private ui.components.table.CustomTable customTable1;
-    private String[] itemsGender = {"Chọn giới tính", "Nam", "Nữ"};
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JLabel lbl_Address;
+    private ui.components.label.LabelImage lbl_Avatar;
     private javax.swing.JLabel lbl_BirthDate;
-    private javax.swing.JLabel lbl_DateJoin;
     private javax.swing.JLabel lbl_Email;
     private javax.swing.JLabel lbl_FirstName;
     private javax.swing.JLabel lbl_Gender;
     private javax.swing.JLabel lbl_GenderSearch;
-    private javax.swing.JLabel lbl_IDSearch;
+    private javax.swing.JLabel lbl_JoinDate;
     private javax.swing.JLabel lbl_LastName;
     private javax.swing.JLabel lbl_NameSearch;
     private javax.swing.JLabel lbl_Password;
     private javax.swing.JLabel lbl_Phone;
     private javax.swing.JLabel lbl_PhoneSearch;
-    private javax.swing.JLabel lbl_Title;
-    private ui.components.label.LabelImage lbl_UploadAvatar;
-    private javax.swing.JLabel lbl_UserName;
-    private javax.swing.JPanel pButton;
-    private javax.swing.JPanel pnl_Address;
-    private javax.swing.JPanel pnl_BirthDate;
-    private javax.swing.JPanel pnl_Center;
-    private javax.swing.JPanel pnl_DateJoin;
-    private javax.swing.JPanel pnl_Email;
-    private javax.swing.JPanel pnl_FisrtName;
-    private javax.swing.JPanel pnl_Gender;
-    private javax.swing.JPanel pnl_GenderSearch;
-    private javax.swing.JPanel pnl_IDSearch;
-    private javax.swing.JPanel pnl_LastName;
-    private javax.swing.JPanel pnl_Left;
-    private javax.swing.JPanel pnl_NameSearch;
-    private javax.swing.JPanel pnl_North;
-    private javax.swing.JPanel pnl_Password;
-    private javax.swing.JPanel pnl_Phone;
-    private javax.swing.JPanel pnl_PhoneSearch;
-    private javax.swing.JPanel pnl_Right;
-    private javax.swing.JPanel pnl_South;
-    private javax.swing.JPanel pnl_UserName;
-    private ui.components.textfield.CustomRoundedTextField txt_Address;
-    private ui.components.textfield.CustomRoundedTextField txt_Email;
-    private ui.components.textfield.CustomRoundedTextField txt_FisrtName;
-    private ui.components.textfield.CustomRoundedTextField txt_IDSearch;
-    private ui.components.textfield.CustomRoundedTextField txt_LastName;
-    private ui.components.textfield.CustomRoundedTextField txt_NameSearch;
-    private ui.components.textfield.CustomRoundedTextField txt_Password;
-    private ui.components.textfield.CustomRoundedTextField txt_Phone;
-    private ui.components.textfield.CustomRoundedTextField txt_PhoneSearch;
-    private ui.components.textfield.CustomRoundedTextField txt_UserName;
+    private javax.swing.JLabel lbl_StaffIDSearch;
+    private javax.swing.JLabel lbl_Username;
+    private javax.swing.JPanel pnl_GroupButton;
+    private javax.swing.JPanel pnl_Image;
+    private javax.swing.JPanel pnl_Infor;
+    private javax.swing.JPanel pnl_InforLeft;
+    private javax.swing.JPanel pnl_InforRight;
+    private javax.swing.JPanel pnl_Input;
+    private javax.swing.JPanel pnl_ListStaff;
+    private javax.swing.JPanel pnl_Search;
+    private javax.swing.JPanel pnl_Title;
+    private ui.components.table.CustomTableButton table;
+    private javax.swing.JTextField txt_Address;
+    private javax.swing.JTextField txt_Email;
+    private javax.swing.JTextField txt_FirstName;
+    private javax.swing.JTextField txt_IDSearch;
+    private javax.swing.JTextField txt_LastName;
+    private javax.swing.JTextField txt_NameSearch;
+    private javax.swing.JTextField txt_Password;
+    private javax.swing.JTextField txt_Phone;
+    private javax.swing.JTextField txt_PhoneSearch;
+    private javax.swing.JTextField txt_Username;
     // End of variables declaration//GEN-END:variables
 
 }
