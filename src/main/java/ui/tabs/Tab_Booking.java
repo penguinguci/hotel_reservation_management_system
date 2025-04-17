@@ -1796,12 +1796,31 @@ public class Tab_Booking extends javax.swing.JPanel {
     private void showViewDetailsRoom(String roomID) {
         JDialog dialog = new JDialog();
         dialog.setTitle("Chi tiết phòng");
-        dialog.setSize(700, 900);
+        dialog.setSize(800, 500);
         dialog.setModal(true);
         dialog.setLayout(new BorderLayout());
 
         Dialog_ViewRoomDetails viewDetailsRoomDialog = new Dialog_ViewRoomDetails(roomID);
         dialog.add(viewDetailsRoomDialog, BorderLayout.CENTER);
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                Room room = viewDetailsRoomDialog.getRoom();
+                if (room != null) {
+                    int numberOfNights = calculateNumberOfNights();
+                    String roomID = room.getRoomId();
+                    double price = room.getPrice();
+                    if (isRoomAlreadyInCart(roomID)) {
+                        JOptionPane.showMessageDialog(dialog, "Phòng này đã có trong giỏ hàng",
+                                "Thông báo", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                    addToCart(roomID, price, numberOfNights);
+                    updateSummaryTotals();
+                }
+            }
+        });
 
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setLocationRelativeTo(this);
