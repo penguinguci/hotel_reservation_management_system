@@ -9,11 +9,12 @@ package ui.dialogs;
  * @author TRAN LONG VU
  */
 public class Dialog_ViewRoomDetails extends javax.swing.JPanel {
-
+    private String roomID;
     /**
      * Creates new form Dialog_ViewRoomDetails
      */
-    public Dialog_ViewRoomDetails() {
+    public Dialog_ViewRoomDetails(String roomID) {
+        this.roomID = roomID;
         initComponents();
     }
 
@@ -30,11 +31,11 @@ public class Dialog_ViewRoomDetails extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGap(0, 691, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGap(0, 566, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 

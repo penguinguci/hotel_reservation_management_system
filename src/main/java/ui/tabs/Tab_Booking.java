@@ -15,11 +15,14 @@ import interfaces.RoomDAO;
 import interfaces.RoomTypesDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import lombok.SneakyThrows;
 import ui.components.button.ButtonRenderer;
 import ui.components.popup.PopupSearch;
 import ui.components.table.CustomTable;
 import ui.components.table.CustomTableButton;
+import ui.dialogs.Dialog_AddCustomer;
 import ui.dialogs.Dialog_AddService;
+import ui.dialogs.Dialog_ViewRoomDetails;
 import ultilities.GenerateString;
 import utils.AppUtil;
 
@@ -140,13 +143,14 @@ public class Tab_Booking extends javax.swing.JPanel {
         spinner_Capacity.setPreferredSize(new Dimension(100, 30));
         spinner_Capacity.setFocusable(true);
 
-        // Sử dụng BasicSpinnerUI với các nút được tùy chỉnh
         spinner_Capacity.setUI(new javax.swing.plaf.basic.BasicSpinnerUI() {
             @Override
             protected Component createNextButton() {
-                JButton button = new JButton("▲"); // Mũi tên lên
+                JButton button = new JButton("▲");
                 button.setFocusable(false);
-                button.setPreferredSize(new Dimension(20, 10));
+                button.setForeground(new Color(109, 104, 230));
+                button.setFont(new Font("Arial", Font.BOLD, 10));
+                button.setPreferredSize(new Dimension(40, 40));
                 button.setBackground(new Color(255, 255, 255));
 
                 button.addMouseListener(new MouseAdapter() {
@@ -161,10 +165,7 @@ public class Tab_Booking extends javax.swing.JPanel {
                     }
                 });
 
-                button.addActionListener(e -> {
-                    spinner_Capacity.setValue(spinner_Capacity.getNextValue());
-                });
-
+                button.addActionListener(e -> spinner_Capacity.setValue(spinner_Capacity.getNextValue()));
                 return button;
             }
 
@@ -172,10 +173,11 @@ public class Tab_Booking extends javax.swing.JPanel {
             protected Component createPreviousButton() {
                 JButton button = new JButton("▼");
                 button.setFocusable(false);
-                button.setPreferredSize(new Dimension(20, 10));
+                button.setFont(new Font("Arial", Font.BOLD, 10));
+                button.setForeground(new Color(109, 104, 230));
+                button.setPreferredSize(new Dimension(40, 40));
                 button.setBackground(new Color(255, 255, 255));
 
-                // Hiệu ứng hover
                 button.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseEntered(MouseEvent e) {
@@ -188,14 +190,11 @@ public class Tab_Booking extends javax.swing.JPanel {
                     }
                 });
 
-                // Xử lý sự kiện click
-                button.addActionListener(e -> {
-                    spinner_Capacity.setValue(spinner_Capacity.getPreviousValue());
-                });
-
+                button.addActionListener(e -> spinner_Capacity.setValue(spinner_Capacity.getPreviousValue()));
                 return button;
             }
         });
+
 
         spinner_Capacity.addChangeListener(e -> {
             System.out.println("Spinner value changed: " + spinner_Capacity.getValue());
@@ -645,6 +644,11 @@ public class Tab_Booking extends javax.swing.JPanel {
         });
 
         btn_SeeDetails.setText("Xem chi tiết");
+        btn_SeeDetails.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_SeeDetailsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnl_EmptyRoomLayout = new javax.swing.GroupLayout(pnl_EmptyRoom);
         pnl_EmptyRoom.setLayout(pnl_EmptyRoomLayout);
@@ -919,6 +923,7 @@ public class Tab_Booking extends javax.swing.JPanel {
         pnl_Right_InforBooking.setLayout(new java.awt.GridLayout(4, 1, 0, 10));
 
         lbl_LastTotalPrice_Value.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_LastTotalPrice_Value.setForeground(new java.awt.Color(255, 0, 51));
         lbl_LastTotalPrice_Value.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         pnl_Right_InforBooking.add(lbl_LastTotalPrice_Value);
 
@@ -969,7 +974,7 @@ public class Tab_Booking extends javax.swing.JPanel {
     }//GEN-LAST:event_btn_AddRoomActionPerformed
 
     private void btn_AddCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddCustomerActionPerformed
-        // TODO add your handling code here:
+        showFormAddCustomer();
     }//GEN-LAST:event_btn_AddCustomerActionPerformed
 
     private void txt_SearchCustomerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txt_SearchCustomerMouseClicked
@@ -1024,6 +1029,16 @@ public class Tab_Booking extends javax.swing.JPanel {
     private void btn_BookingActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_BookingActionPerformed
         bookingRoom();
     }//GEN-LAST:event_btn_BookingActionPerformed
+
+    private void btn_SeeDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SeeDetailsActionPerformed
+        int seletedRow = table_EntityRoom.getTable().getSelectedRow();
+        if (seletedRow != -1) {
+            String roomID = table_EntityRoom.getTable().getValueAt(seletedRow, 1).toString();
+            showViewDetailsRoom(roomID);
+        } else {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn phòng để xem chi tiết", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_btn_SeeDetailsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1617,6 +1632,12 @@ public class Tab_Booking extends javax.swing.JPanel {
         updateSummaryTotals();
     }
 
+    /**
+     * Đặt phòng.
+     * @throws RemoteException
+     * @throws IllegalStateException
+     *
+     */
     private void bookingRoom() throws RemoteException {
         // Validate input
         int numOfCartRows = table_Cart.getTableModel().getRowCount();
@@ -1641,7 +1662,6 @@ public class Tab_Booking extends javax.swing.JPanel {
             return;
         }
 
-        // Get customer and dates
         Customer customer = customerDAO.getCustomerByPhone(customerPhone);
         if (customer == null) {
             JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin khách hàng",
@@ -1672,7 +1692,6 @@ public class Tab_Booking extends javax.swing.JPanel {
                 String roomID = (String) rowData[1];
                 int numberOfNights = (int) rowData[3];
 
-                // Generate a new reservation ID for each room
                 String reservationId = GenerateString.generateReservationId();
                 if (reservationId == null || reservationId.isEmpty()) {
                     throw new IllegalStateException("Không thể tạo ID đặt phòng");
@@ -1696,23 +1715,19 @@ public class Tab_Booking extends javax.swing.JPanel {
                 reservation.setBookingMethod(bookingMethod.equals("Tại quầy") ?
                         BookingMethod.AT_THE_COUNTER : BookingMethod.CONTACT);
 
-                reservation.setStatus(false); // Assuming false means not checked in yet
+                reservation.setStatus(false);
 
-                // Add services if any
                 if (listMapReservationDetails.containsKey(roomID)) {
                     List<ReservationDetails> details = listMapReservationDetails.get(roomID);
                     for (ReservationDetails detail : details) {
-                        detail.setReservation(reservation); // Set the relationship
+                        detail.setReservation(reservation);
                     }
                     reservation.setReservationDetails(details);
                 }
 
-                // Calculate prices
                 reservation.calculateTotalPrice();
                 reservation.calculateDepositAmount();
                 reservation.calculateRemainingAmount();
-
-                // Persist reservation
                 em.persist(reservation);
                 countBooking++;
             }
@@ -1739,5 +1754,57 @@ public class Tab_Booking extends javax.swing.JPanel {
                 em.close();
             }
         }
+    }
+
+    private void showFormAddCustomer() {
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Thêm khách hàng");
+        dialog.setSize(750, 400);
+        dialog.setModal(true);
+        dialog.setLayout(new BorderLayout());
+
+        Dialog_AddCustomer addCustomerDialog = new Dialog_AddCustomer();
+        dialog.add(addCustomerDialog, BorderLayout.CENTER);
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                Customer customer = addCustomerDialog.getCustomer();
+                if (customer != null) {
+                    showInforCustomerAfterAdd(customer);
+                }
+            }
+        });
+
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private void showInforCustomerAfterAdd(Customer customer) {
+        if (customer != null) {
+            lbl_CustomerName_Value.setText(customer.getFirstName() + " " + customer.getLastName());
+            lbl_CustomerPhone_Value.setText(customer.getPhoneNumber());
+            lbl_CustomerCCCD_Value.setText(customer.getCCCD());
+            lbl_CustomerGender_Value.setText(customer.isGender() == true ? "Nam" : "Nữ");
+        } else {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin khách hàng",
+                    "Thông báo", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void showViewDetailsRoom(String roomID) {
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Chi tiết phòng");
+        dialog.setSize(700, 900);
+        dialog.setModal(true);
+        dialog.setLayout(new BorderLayout());
+
+        Dialog_ViewRoomDetails viewDetailsRoomDialog = new Dialog_ViewRoomDetails(roomID);
+        dialog.add(viewDetailsRoomDialog, BorderLayout.CENTER);
+
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 }

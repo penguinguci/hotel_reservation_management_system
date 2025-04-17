@@ -279,6 +279,11 @@ public class Dialog_AddService extends javax.swing.JPanel {
         });
 
         btn_Cancel.setText("Hủy");
+        btn_Cancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_CancelActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnl_InforAddServiceLayout = new javax.swing.GroupLayout(pnl_InforAddService);
         pnl_InforAddService.setLayout(pnl_InforAddServiceLayout);
@@ -400,6 +405,10 @@ public class Dialog_AddService extends javax.swing.JPanel {
             updateCartTotal();
         }
     }//GEN-LAST:event_btn_DeleteAllActionPerformed
+
+    private void btn_CancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_CancelActionPerformed
+        cancel();
+    }//GEN-LAST:event_btn_CancelActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -615,5 +624,10 @@ public class Dialog_AddService extends javax.swing.JPanel {
         }
 
         updateCartTotal();
+    }
+
+    private void cancel() {
+        Window window = SwingUtilities.getWindowAncestor(this);
+        window.dispose();
     }
 }

@@ -11,7 +11,6 @@ public class Runner {
         em.getTransaction().begin();
         em.getTransaction().commit();
 
-        StaffDAOImpl staffDAO = new StaffDAOImpl(em);
 
         // test chức năng create
 //        DataGenerator dataGenerator = new DataGenerator();

@@ -6,9 +6,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public interface CustomerDAO extends Remote {
-    void addCustomer(Customer customer) throws RemoteException;
-    void updateCustomer(Customer customer) throws RemoteException;
+public interface CustomerDAO extends GenericDAO<Customer, String>, Remote {
+
   //  void deleteCustomer(Customer customer) throws RemoteException;
     List<Customer> searchCustomerById(String id)  throws RemoteException;
 
@@ -24,4 +23,8 @@ public interface CustomerDAO extends Remote {
     List<Customer> getAllCustomers()  throws RemoteException;
 
     Customer getCustomerByPhone(String phone) throws RemoteException;
+
+    boolean isEmailExists(String email);
+
+    boolean isPhoneExists(String phone);
 }
