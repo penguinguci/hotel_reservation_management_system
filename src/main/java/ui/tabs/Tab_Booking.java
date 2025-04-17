@@ -962,7 +962,7 @@ public class Tab_Booking extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_CancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_CancelActionPerformed
-        // TODO add your handling code here:
+        cancel();
     }//GEN-LAST:event_btn_CancelActionPerformed
 
     private void btn_SearchRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchRoomActionPerformed
@@ -1825,5 +1825,18 @@ public class Tab_Booking extends javax.swing.JPanel {
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+    }
+
+    private void cancel() {
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn hủy không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            table_Cart.getTableModel().clearData();
+            table_EntityRoom.getTableModel().clearData();
+            lbl_CustomerName_Value.setText("");
+            lbl_CustomerPhone_Value.setText("");
+            lbl_CustomerCCCD_Value.setText("");
+            lbl_CustomerGender_Value.setText("");
+            clear();
+        }
     }
 }

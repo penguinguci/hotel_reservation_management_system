@@ -2,6 +2,8 @@ package utils;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import ui.components.table.CustomTableButton;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
@@ -20,7 +22,7 @@ public class ExcelUtil {
      * @param parentComponent Parent component for dialogs
      * @return true if export succeeded, false otherwise
      */
-    public static boolean exportToExcel(JTable table, String title, String sheetName, java.awt.Component parentComponent) {
+    public static boolean exportToExcel(CustomTableButton table, String title, String sheetName, java.awt.Component parentComponent) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle(title);
         fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
@@ -42,7 +44,7 @@ public class ExcelUtil {
 
             // Create header
             Row headerRow = sheet.createRow(0);
-            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            CustomTableButton.CustomTableModel model = table.getTableModel();
 
             for (int i = 0; i < model.getColumnCount(); i++) {
                 Cell cell = headerRow.createCell(i);
