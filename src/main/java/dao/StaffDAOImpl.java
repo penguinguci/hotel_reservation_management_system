@@ -12,11 +12,11 @@ import utils.AppUtil;
 import java.lang.reflect.Field;
 import java.util.List;
 
-@AllArgsConstructor
-public class StaffDAOImpl implements StaffDAO {
+public class StaffDAOImpl extends GenericDAOImpl<Staff, String> implements StaffDAO {
     private EntityManager em;
 
     public StaffDAOImpl () {
+        super(Staff.class);
         em = AppUtil.getEntityManager();
     }
 
@@ -74,21 +74,6 @@ public class StaffDAOImpl implements StaffDAO {
         return em.createQuery(query, Staff.class)
                 .setParameter("name", "%" + name + "%")
                 .getResultList();
-    }
-
-    // Count by prefix
-    @Override
-    public long countByPrefix(String prefix) {
-        try {
-            String idFieldName = getIdFieldName();
-            String queryStr = "SELECT COUNT(s) FROM Staff s WHERE LOWER(s." + idFieldName + ") LIKE LOWER(:prefix)";
-            return em.createQuery(queryStr, Long.class)
-                    .setParameter("prefix", prefix + "%")
-                    .getSingleResult();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error counting by prefix", e);
-        }
     }
 
 
@@ -162,5 +147,20 @@ public class StaffDAOImpl implements StaffDAO {
         }
 
         return query.getResultList();
+    }
+
+    // Count by prefix
+    @Override
+    public long countByPrefix(String prefix) {
+        try {
+            String idFieldName = getIdFieldName();
+            String queryStr = "SELECT COUNT(s) FROM Staff s WHERE LOWER(s." + idFieldName + ") LIKE LOWER(:prefix)";
+            return em.createQuery(queryStr, Long.class)
+                    .setParameter("prefix", prefix + "%")
+                    .getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error counting by prefix", e);
+        }
     }
 }

@@ -1,6 +1,9 @@
 package ultilities;
 
+import dao.CustomerDAOImpl;
 import dao.StaffDAOImpl;
+import entities.Customer;
+import interfaces.CustomerDAO;
 import interfaces.StaffDAO;
 
 import java.text.SimpleDateFormat;
@@ -19,14 +22,20 @@ public class GenerateString {
         return prefix + String.format("%03d", count + 1);
     }
 
+
     private static final AtomicInteger sequence = new AtomicInteger(0);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
 
     public static synchronized String generateReservationId() {
-        // Format: RS + yyyyMMddHHmm + sequence (3 digits)
         String timestamp = dateFormat.format(new Date());
         int seq = sequence.incrementAndGet() % 1000;
         return String.format("RS%s%03d", timestamp, seq);
+    }
+
+    public static synchronized String generateCustomerID() {
+        String timestamp = dateFormat.format(new Date());
+        int seq = sequence.incrementAndGet() % 1000;
+        return String.format("KH%s%03d", timestamp, seq);
     }
 
     public static String generateUserName(String name) {
