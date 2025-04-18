@@ -7,6 +7,7 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -35,12 +36,15 @@ public class Reservation {
     @Column(name = "check_out_date")
     private Date checkOutDate;
 
+    @Column(name = "booking_date")
+    private Date bookingDate;
+
     @Column(columnDefinition = "bit", nullable = false)
     private boolean status;
 
     @ToString.Exclude
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ReservationDetails> reservationDetails;
+    private List<ReservationDetails> reservationDetails;
 
     @Column(name = "total_price")
     private double totalPrice;
@@ -54,13 +58,21 @@ public class Reservation {
     @Column(name = "remaining_amount")
     private double remainingAmount;
 
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room;
+
+    @Column(name = "number_of_nights")
+    private int numberOfNights = 1;
+
     // Tính toán tổng tiền từ chi tiết đặt phòng
     public double calculateTotalPrice() {
         if (reservationDetails == null || reservationDetails.isEmpty()) {
-            return 0.0;
+            this.totalPrice = room.getPrice() * numberOfNights;
+            return room.getPrice() * numberOfNights;
         }
 
-        double total = reservationDetails.stream()
+        double total = room.getPrice() * numberOfNights + reservationDetails.stream()
                 .mapToDouble(ReservationDetails::calculateLineTotal)
                 .sum();
 
@@ -71,7 +83,7 @@ public class Reservation {
     // Tính tiền cọc dựa trên hình thức đặt
     public double calculateDepositAmount() {
         if (bookingMethod == BookingMethod.AT_THE_COUNTER) {
-            this.depositAmount = 0;
+            this.depositAmount = Math.min(1000000, totalPrice * 0.3); // 30% cho đặt tại quầy
         } else {
             this.depositAmount = totalPrice * 0.5; // 50% cho đặt liên hệ
         }
@@ -82,5 +94,15 @@ public class Reservation {
     public double calculateRemainingAmount() {
         this.remainingAmount = totalPrice - depositAmount;
         return remainingAmount;
+    }
+
+    // tính tổng tiền dịch vụ
+    public double calculateTotalServicePrice() {
+        if (reservationDetails == null || reservationDetails.isEmpty()) {
+            return 0;
+        }
+        return reservationDetails.stream()
+                .mapToDouble(ReservationDetails::calculateLineTotal)
+                .sum();
     }
 }

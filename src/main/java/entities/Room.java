@@ -44,15 +44,15 @@ public class Room {
     @Column(name = "room_image", columnDefinition = "varchar(1024)")
     protected String roomImage;
 
-    @OneToMany(mappedBy = "room")
-    protected Set<OrderDetails> orderDetails;
-
-    @OneToMany(mappedBy = "room")
-    protected Set<ReservationDetails> reservationDetailsDetails;
-
     @ManyToOne
     @JoinColumn(name = "type_id")
     protected RoomType roomType;
+
+    @OneToMany(mappedBy = "room")
+    protected List<Orders> orders;
+
+    @OneToMany(mappedBy = "room")
+    protected List<Reservation> reservations;
 
     // Status constants
     public static final int STATUS_AVAILABLE = 0;
@@ -63,4 +63,3 @@ public class Room {
     public boolean isAvailable() {
         return status == STATUS_AVAILABLE;
     }
-}

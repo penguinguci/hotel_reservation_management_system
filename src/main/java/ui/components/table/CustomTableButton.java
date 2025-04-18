@@ -44,7 +44,8 @@ public class CustomTableButton extends JPanel implements Serializable {
                     Color bg = (row % 2 == 0) ? new Color(250, 250, 250) : new Color(230, 230, 230);
                     comp.setBackground(bg);
                 } else {
-                    comp.setBackground(new Color(204, 153, 255));
+                    comp.setBackground(new Color(156, 151, 246));
+                    comp.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 }
                 return comp;
             }
@@ -205,14 +206,18 @@ public class CustomTableButton extends JPanel implements Serializable {
         VIEW("Xem", new Color(91, 192, 222)),
         ADD("Thêm", new Color(92, 184, 92)),
         CUSTOM("Tùy chỉnh", new Color(240, 173, 78)),
-        SERVICE("Dịch vụ", new Color(153, 102, 255));
+        SERVICE("Thêm dịch vụ", new Color(153, 102, 255));
 
-        private final String text;
+        private String text;
         private final Color color;
 
         ButtonType(String text, Color color) {
             this.text = text;
             this.color = color;
+        }
+
+        public void setText(String text) {
+            this.text = text;
         }
 
         public String getText() {
@@ -223,6 +228,7 @@ public class CustomTableButton extends JPanel implements Serializable {
             return color;
         }
     }
+
 
     public enum ColumnEditorType {
         DEFAULT, SPINNER, BUTTON
@@ -252,6 +258,7 @@ public class CustomTableButton extends JPanel implements Serializable {
             }
         }
     }
+
 
     public class CustomTableModel extends AbstractTableModel {
         private String[] columnNames;
@@ -284,11 +291,15 @@ public class CustomTableButton extends JPanel implements Serializable {
             if (rowIndex >= data.size() || columnIndex >= columnNames.length) {
                 return null;
             }
+            Object cellValue = data.get(rowIndex)[columnIndex];
+            if (cellValue != null) {
+                return cellValue;
+            }
             ButtonType buttonType = getButtonTypeAt(rowIndex, columnIndex);
             if (buttonType != null) {
                 return buttonType.getText();
             }
-            return data.get(rowIndex)[columnIndex];
+            return null;
         }
 
         @Override
@@ -363,7 +374,8 @@ public class CustomTableButton extends JPanel implements Serializable {
             ButtonType buttonType = ((CustomTableModel) table.getModel()).getButtonTypeAt(row, column);
             if (buttonType != null) {
                 setText(buttonType.getText());
-                setBackground(buttonType.getColor());
+                setBackground(new Color(6, 157, 213));
+                setOpaque(true);
                 setForeground(Color.WHITE);
             } else {
                 setText(value != null ? value.toString() : "");
@@ -445,7 +457,8 @@ public class CustomTableButton extends JPanel implements Serializable {
         }
     }
 
-    public static class SpinnerRenderer extends DefaultTableCellRenderer {
+    // Renderer cho Spinner
+    public static class SpinnerRenderer implements TableCellRenderer {
         private JSpinner spinner;
 
         public SpinnerRenderer() {

@@ -18,11 +18,6 @@ public class ReservationDetails {
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
-    @Id
-    @EqualsAndHashCode.Include
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
 
     @Id
     @EqualsAndHashCode.Include
@@ -35,17 +30,12 @@ public class ReservationDetails {
     @Column(name = "line_total_amount")
     private double lineTotalAmount;
 
-    @Column(name = "number_of_nights")
-    private int numberOfNights = 1;
 
     @Column(name = "note")
     private String note;
 
     public double calculateLineTotal() {
         double total = 0;
-        if (room != null) {
-            total += numberOfNights * room.getPrice();
-        }
         if (service != null) {
             total += quantity * service.getPrice();
         }
