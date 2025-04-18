@@ -40,8 +40,8 @@ public class GUI_Main extends javax.swing.JFrame {
                     showForm(roomManagement);
                 }else if(index == 4){
                     showForm(formCustomerManagement);
-                    formCustomerManagement.loadCustomerData();
-                    formCustomerManagement.clearSearchFields();
+//                    formCustomerManagement.loadCustomerData();
+//                    formCustomerManagement.clearSearchFields();
                 }
                 else if (index == 5) {
                     showForm(staffManagementForm);
