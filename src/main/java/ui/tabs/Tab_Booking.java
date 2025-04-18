@@ -33,6 +33,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
+import java.rmi.RemoteException;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;

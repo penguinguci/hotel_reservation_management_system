@@ -63,3 +63,4 @@ public class Room {
     public boolean isAvailable() {
         return status == STATUS_AVAILABLE;
     }
+}
