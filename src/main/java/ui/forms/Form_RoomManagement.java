@@ -813,16 +813,16 @@ public class Form_RoomManagement extends JPanel  {
             String statusText;
             switch (room.getStatus()) {
                 case Room.STATUS_AVAILABLE:
-                    statusText = "Sẵn sàng";
-                    break;
-                case Room.STATUS_OCCUPIED:
-                    statusText = "Đã sử dụng";
-                    break;
-                case Room.STATUS_MAINTENANCE:
-                    statusText = "Bảo trì";
+                    statusText = "Có sẵn";
                     break;
                 case Room.STATUS_RESERVED:
                     statusText = "Đã đặt trước";
+                    break;
+                case Room.STATUS_OCCUPIED:
+                    statusText = "Đang sử dụng";
+                    break;
+                case Room.STATUS_MAINTENANCE:
+                    statusText = "Bảo trì";
                     break;
                 default:
                     statusText = "Không xác định";
@@ -842,8 +842,8 @@ public class Form_RoomManagement extends JPanel  {
         updateRoomTable(rooms);
         cb_Status.removeAllItems();
         cb_Status.addItem("Tất cả");
-        cb_Status.addItem("Sẵn sàng");
-        cb_Status.addItem("Đã sử dụng");
+        cb_Status.addItem("Có sẵn");
+        cb_Status.addItem("Đang sử dụng");
         cb_Status.addItem("Bảo trì");
         cb_Status.addItem("Đã đặt trước");
 
@@ -963,10 +963,10 @@ public class Form_RoomManagement extends JPanel  {
         if (statusFilter != null && !statusFilter.equals("Tất cả")) {
             Integer status = null;
             switch (statusFilter) {
-                case "Sẵn sàng":
+                case "Có sẵn":
                     status = Room.STATUS_AVAILABLE;
                     break;
-                case "Đã sử dụng":
+                case "Đang sử dụng":
                     status = Room.STATUS_OCCUPIED;
                     break;
                 case "Bảo trì":
