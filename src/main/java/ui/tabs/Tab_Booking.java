@@ -1118,6 +1118,17 @@ public class Tab_Booking extends javax.swing.JPanel {
                 return;
             }
 
+            // bắt buộc chọn ngày
+            if (checkinDate == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-in", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (checkoutDate == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-out", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             // Lấy các tham số khác (cho phép null)
             Integer capacity = null;
             try {
