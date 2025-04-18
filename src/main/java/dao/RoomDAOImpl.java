@@ -125,10 +125,9 @@ public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDA
 
             // Thêm điều kiện cho ngày nếu có
             if (checkInDate != null && checkOutDate != null) {
-                jpql += " AND NOT EXISTS (SELECT rd FROM ReservationDetails rd " +
-                        "JOIN rd.reservation res " +
-                        "WHERE rd.room = r " +
-                        "AND ((res.checkInDate < :checkOutDate) AND (res.checkOutDate > :checkInDate)))";
+                jpql += " AND r NOT IN (SELECT res.room FROM Reservation res " +
+                        "WHERE (res.checkInDate < :checkOutDate) " +
+                        "AND (res.checkOutDate > :checkInDate))";
             }
 
             // Thêm điều kiện cho sức chứa nếu có
@@ -148,7 +147,7 @@ public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDA
             if (maxPrice != null) {
                 jpql += " AND r.price <= :maxPrice";
             }
-            
+
             // Tạo query
             TypedQuery<Room> query = em.createQuery(jpql, Room.class)
                     .setParameter("availableStatus", Room.STATUS_AVAILABLE);
@@ -167,9 +166,12 @@ public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDA
                 query.setParameter("roomType", roomType);
             }
 
-            if (minPrice != null && maxPrice != null) {
-                query.setParameter("minPrice", minPrice)
-                        .setParameter("maxPrice", maxPrice);
+            if (minPrice != null) {
+                query.setParameter("minPrice", minPrice);
+            }
+
+            if (maxPrice != null) {
+                query.setParameter("maxPrice", maxPrice);
             }
 
             return query.getResultList();
