@@ -147,7 +147,7 @@ public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDA
         try {
             String jpql = "SELECT COUNT(rd) FROM ReservationDetails rd " +
                     "JOIN rd.reservation res " +
-                    "WHERE rd.room.roomId = :roomId " +
+                    "WHERE res.room.id = :roomId " +
                     "AND ((res.checkInDate < :checkOutDate) AND (res.checkOutDate > :checkInDate))";
 
             Long count = em.createQuery(jpql, Long.class)

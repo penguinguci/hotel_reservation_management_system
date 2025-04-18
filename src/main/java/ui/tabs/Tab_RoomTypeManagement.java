@@ -17,18 +17,9 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
      * Creates new form Tab_ServicesManagement
      */
     public Tab_RoomTypeManagement() {
-        setUndecorated(true);
         initComponents();
         //setShape(new RoundRectangle2D.Double(0, 0, 850, 500, 30, 30));
         setBackground(new Color(255, 255, 255));
-    }
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setColor(Color.BLACK); // Màu đường viền
-        g2.setStroke(new BasicStroke(4)); // Độ dày của đường viền
-        g2.draw(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 30, 30)); // Vẽ đường viền
     }
 
     /**
@@ -40,6 +31,7 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        customTableButtonBeanInfo1 = new ui.components.table.CustomTableButtonBeanInfo();
         jPanel6 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -52,26 +44,27 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
-        btnAddAmentity = new ui.components.button.ButtonCustom();
-        btnUpdateAmentity = new ui.components.button.ButtonCustom();
-        btnResetAmentity = new ui.components.button.ButtonCustom();
-        btnResetAmentity1 = new ui.components.button.ButtonCustom();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        customTable1 = new ui.components.table.CustomTable();
+        btnAddType = new ui.components.button.ButtonCustom();
+        btnUpdateType = new ui.components.button.ButtonCustom();
+        btnResetType = new ui.components.button.ButtonCustom();
+        btnExit = new ui.components.button.ButtonCancelCustom();
+        customTableButton1 = new ui.components.table.CustomTableButton();
+        jLabel4 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Quản lý loại phòng");
         setBackground(new java.awt.Color(255, 255, 255));
         setBounds(new java.awt.Rectangle(0, 0, 850, 400));
-        setForeground(java.awt.Color.white);
+        setForeground(new java.awt.Color(0, 0, 0));
         setUndecorated(true);
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Thông tin"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -165,35 +158,34 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        btnAddAmentity.setIcon(new javax.swing.ImageIcon(getClass().getResource("/plus.png"))); // NOI18N
-        btnAddAmentity.setText("Thêm");
-        btnAddAmentity.addActionListener(new java.awt.event.ActionListener() {
+        btnAddType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/plus.png"))); // NOI18N
+        btnAddType.setText("Thêm");
+        btnAddType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddAmentityActionPerformed(evt);
+                btnAddTypeActionPerformed(evt);
             }
         });
 
-        btnUpdateAmentity.setIcon(new javax.swing.ImageIcon(getClass().getResource("/update.png"))); // NOI18N
-        btnUpdateAmentity.setText("Cập nhật");
-        btnUpdateAmentity.addActionListener(new java.awt.event.ActionListener() {
+        btnUpdateType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/update.png"))); // NOI18N
+        btnUpdateType.setText("Cập nhật");
+        btnUpdateType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUpdateAmentityActionPerformed(evt);
+                btnUpdateTypeActionPerformed(evt);
             }
         });
 
-        btnResetAmentity.setIcon(new javax.swing.ImageIcon(getClass().getResource("/update.png"))); // NOI18N
-        btnResetAmentity.setText("Làm mới");
-        btnResetAmentity.addActionListener(new java.awt.event.ActionListener() {
+        btnResetType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/update.png"))); // NOI18N
+        btnResetType.setText("Làm mới");
+        btnResetType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetAmentityActionPerformed(evt);
+                btnResetTypeActionPerformed(evt);
             }
         });
 
-        btnResetAmentity1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/update.png"))); // NOI18N
-        btnResetAmentity1.setText("Thoát");
-        btnResetAmentity1.addActionListener(new java.awt.event.ActionListener() {
+        btnExit.setText("Thoát");
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetAmentity1ActionPerformed(evt);
+                btnExitActionPerformed(evt);
             }
         });
 
@@ -210,14 +202,12 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(btnAddAmentity, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnUpdateAmentity, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(btnResetAmentity, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnResetAmentity1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(btnAddType, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnResetType, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnExit, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUpdateType, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -231,32 +221,22 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnAddAmentity, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnUpdateAmentity, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnResetAmentity, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnResetAmentity1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnAddType, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUpdateType, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnResetType, javax.swing.GroupLayout.DEFAULT_SIZE, 50, Short.MAX_VALUE)
+                    .addComponent(btnExit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
 
-        customTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+        customTableButton1.setColumnNames(new String[] {"Mã loại phòng", "Loại phòng", "Mô tả"});
+        customTableButton1.setHeaderBackgroundColor(new java.awt.Color(149, 145, 239));
 
-            },
-            new String [] {
-                "Mã loại phòng", "Tên loại", "Mô tả"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, true
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane1.setViewportView(customTable1);
+        jLabel4.setBackground(new java.awt.Color(149, 145, 239));
+        jLabel4.setFont(new java.awt.Font("Segoe UI Black", 0, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(149, 145, 239));
+        jLabel4.setText("QUẢN LÝ LOẠI PHÒNG");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -264,22 +244,31 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addComponent(customTableButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(137, 137, 137)
+                        .addComponent(jLabel4)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(customTableButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 427, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(-2, 1, 860, 450));
+        getContentPane().add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, 450));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -292,21 +281,21 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_customRoundedTextField2ActionPerformed
 
-    private void btnAddAmentityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddAmentityActionPerformed
+    private void btnAddTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddTypeActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnAddAmentityActionPerformed
+    }//GEN-LAST:event_btnAddTypeActionPerformed
 
-    private void btnUpdateAmentityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateAmentityActionPerformed
+    private void btnUpdateTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateTypeActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnUpdateAmentityActionPerformed
+    }//GEN-LAST:event_btnUpdateTypeActionPerformed
 
-    private void btnResetAmentityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetAmentityActionPerformed
+    private void btnResetTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetTypeActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnResetAmentityActionPerformed
+    }//GEN-LAST:event_btnResetTypeActionPerformed
 
-    private void btnResetAmentity1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetAmentity1ActionPerformed
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_btnResetAmentity1ActionPerformed
+    }//GEN-LAST:event_btnExitActionPerformed
 
     /**
      * @param args the command line arguments
@@ -345,22 +334,23 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private ui.components.button.ButtonCustom btnAddAmentity;
-    private ui.components.button.ButtonCustom btnResetAmentity;
-    private ui.components.button.ButtonCustom btnResetAmentity1;
-    private ui.components.button.ButtonCustom btnUpdateAmentity;
+    private ui.components.button.ButtonCustom btnAddType;
+    private ui.components.button.ButtonCancelCustom btnExit;
+    private ui.components.button.ButtonCustom btnResetType;
+    private ui.components.button.ButtonCustom btnUpdateType;
     private ui.components.textfield.CustomRoundedTextField customRoundedTextField1;
     private ui.components.textfield.CustomRoundedTextField customRoundedTextField2;
-    private ui.components.table.CustomTable customTable1;
+    private ui.components.table.CustomTableButton customTableButton1;
+    private ui.components.table.CustomTableButtonBeanInfo customTableButtonBeanInfo1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
