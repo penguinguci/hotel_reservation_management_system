@@ -14,23 +14,28 @@ VALUES
     ('RT004', 'Phòng gia đình với 2 giường đơn', 'Phòng Family'),
     ('RT005', 'Phòng tổng thống với đầy đủ tiện nghi cao cấp', 'Phòng President');
 
-INSERT INTO rooms (room_id, capacity, price, room_image, room_size, status, type_id)
+-- Insert data into `rooms`
+INSERT INTO rooms (room_id, capacity, price, room_image, room_size, status, type_id, floor)
 VALUES
-    ('R101', 2, 1200000, 'https://example.com/room1.jpg', 25.5, 1, 'RT001'),
-    ('R102', 2, 1200000, 'https://example.com/room2.jpg', 25.5, 1, 'RT001'),
-    ('R201', 2, 1800000, 'https://example.com/room3.jpg', 32.0, 1, 'RT002'),
-    ('R202', 2, 1800000, 'https://example.com/room4.jpg', 32.0, 0, 'RT002'),
-    ('R301', 4, 2500000, 'https://example.com/room5.jpg', 45.0, 1, 'RT004'),
-    ('R302', 4, 2500000, 'https://example.com/room6.jpg', 45.0, 1, 'RT004'),
-    ('R401', 2, 3500000, 'https://example.com/room7.jpg', 50.0, 1, 'RT003'),
-    ('R501', 2, 8000000, 'https://example.com/room8.jpg', 80.0, 1, 'RT005');
+    ('R001', 2, 150.0, 'deluxe.jpg', 25.0, 1, 'RT02',1),
+    ('R002', 1, 100.0, 'standard.jpg', 18.0, 1, 'RT01',1),
+    ('R003', 3, 200.0, 'family.jpg', 30.0, 1, 'RT01',1),
+    ('R004', 4, 300.0, 'suite.jpg', 40.0, 1, 'RT01',1),
+    ('R005', 1, 80.0, 'single.jpg', 15.0, 1, 'RT01',2),
+    ('R006', 2, 120.0, 'standard_plus.jpg', 20.0, 1, 'RT02',2),
+    ('R007', 5, 400.0, 'penthouse.jpg', 50.0, 1, 'RT02',2),
+    ('R008', 3, 12200.0, 'family.jpg', 30.0, 1, 'RT02',2),
+    ('R009', 4, 30000.0, 'suite.jpg', 40.0, 1, 'RT02',3),
+    ('R010', 1, 80000.0, 'single.jpg', 15.0, 1, 'RT02',3),
+    ('R011', 2, 100000.0, 'standard_plus.jpg', 20.0, 1, 'RT02',3),
+    ('R012', 5, 4000000.0, 'penthouse.jpg', 50.0, 1, 'RT02',3),
+    ('R013', 3, 12200.0, 'family.jpg', 30.0, 0, 'RT02',4),
+    ('R014', 4, 30000.0, 'suite.jpg', 40.0, 0, 'RT01',4),
+    ('R015', 1, 80000.0, 'single.jpg', 15.0, 0, 'RT02',4),
+    ('R016', 2, 100000.0, 'standard_plus.jpg', 20.0, 0, 'RT01',4),
+    ('R017', 5, 4000000.0, 'penthouse.jpg', 50.0, 0, 'RT01',5);
 
-INSERT INTO rooms (room_id, capacity, price, room_image, room_size, status, type_id)
-VALUES
-    ('R502', 2, 1200000, 'https://example.com/room1.jpg', 25.5, 0, 'RT001'),
-    ('R601', 3, 1200000, 'https://example.com/room2.jpg', 25.5, 0, 'RT001'),
-    ('R602', 4, 1800000, 'https://example.com/room3.jpg', 32.0, 0, 'RT002');
-
+-- Insert data into `amentities`
 INSERT INTO amentities (room_id, amentities)
 VALUES
     ('R101', 'TV'),

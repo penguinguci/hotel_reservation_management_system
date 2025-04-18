@@ -38,12 +38,13 @@ public class GUI_Main extends javax.swing.JFrame {
                 }
                 else if(index == 2){
                     showForm(roomManagement);
-                }else if(index == 4){
+                    roomManagement.loadRoomData();
+                }else if(index == 3){
                     showForm(formCustomerManagement);
 //                    formCustomerManagement.loadCustomerData();
 //                    formCustomerManagement.clearSearchFields();
                 }
-                else if (index == 5) {
+                else if (index == 4) {
                     showForm(staffManagementForm);
                 }
                 else{
