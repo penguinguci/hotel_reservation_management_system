@@ -17,49 +17,49 @@ VALUES
 -- Insert data into `rooms`
 INSERT INTO rooms (room_id, capacity, price, room_image, room_size, status, type_id, floor)
 VALUES
-    ('R001', 2, 150.0, 'deluxe.jpg', 25.0, 1, 'RT02',1),
-    ('R002', 1, 100.0, 'standard.jpg', 18.0, 1, 'RT01',1),
-    ('R003', 3, 200.0, 'family.jpg', 30.0, 1, 'RT01',1),
-    ('R004', 4, 300.0, 'suite.jpg', 40.0, 1, 'RT01',1),
-    ('R005', 1, 80.0, 'single.jpg', 15.0, 1, 'RT01',2),
-    ('R006', 2, 120.0, 'standard_plus.jpg', 20.0, 1, 'RT02',2),
-    ('R007', 5, 400.0, 'penthouse.jpg', 50.0, 1, 'RT02',2),
-    ('R008', 3, 12200.0, 'family.jpg', 30.0, 1, 'RT02',2),
-    ('R009', 4, 30000.0, 'suite.jpg', 40.0, 1, 'RT02',3),
-    ('R010', 1, 80000.0, 'single.jpg', 15.0, 1, 'RT02',3),
-    ('R011', 2, 100000.0, 'standard_plus.jpg', 20.0, 1, 'RT02',3),
-    ('R012', 5, 4000000.0, 'penthouse.jpg', 50.0, 1, 'RT02',3),
-    ('R013', 3, 12200.0, 'family.jpg', 30.0, 0, 'RT02',4),
-    ('R014', 4, 30000.0, 'suite.jpg', 40.0, 0, 'RT01',4),
-    ('R015', 1, 80000.0, 'single.jpg', 15.0, 0, 'RT02',4),
-    ('R016', 2, 100000.0, 'standard_plus.jpg', 20.0, 0, 'RT01',4),
-    ('R017', 5, 4000000.0, 'penthouse.jpg', 50.0, 0, 'RT01',5);
+    ('R001', 2, 150.0, 'deluxe.jpg', 25.0, 1, 'RT002',1),
+    ('R002', 1, 100.0, 'standard.jpg', 18.0, 1, 'RT001',1),
+    ('R003', 3, 200.0, 'family.jpg', 30.0, 1, 'RT001',1),
+    ('R004', 4, 300.0, 'suite.jpg', 40.0, 1, 'RT001',1),
+    ('R005', 1, 80.0, 'single.jpg', 15.0, 1, 'RT001',2),
+    ('R006', 2, 120.0, 'standard_plus.jpg', 20.0, 1, 'RT002',2),
+    ('R007', 5, 400.0, 'penthouse.jpg', 50.0, 1, 'RT002',2),
+    ('R008', 3, 12200.0, 'family.jpg', 30.0, 1, 'RT002',2),
+    ('R009', 4, 30000.0, 'suite.jpg', 40.0, 1, 'RT002',3),
+    ('R010', 1, 80000.0, 'single.jpg', 15.0, 1, 'RT002',3),
+    ('R011', 2, 100000.0, 'standard_plus.jpg', 20.0, 1, 'RT002',3),
+    ('R012', 5, 4000000.0, 'penthouse.jpg', 50.0, 1, 'RT002',3),
+    ('R013', 3, 12200.0, 'family.jpg', 30.0, 0, 'RT002',4),
+    ('R014', 4, 30000.0, 'suite.jpg', 40.0, 0, 'RT001',4),
+    ('R015', 1, 80000.0, 'single.jpg', 15.0, 0, 'RT002',4),
+    ('R016', 2, 100000.0, 'standard_plus.jpg', 20.0, 0, 'RT001',4),
+    ('R017', 5, 4000000.0, 'penthouse.jpg', 50.0, 0, 'RT001',5);
 
 -- Insert data into `amentities`
 INSERT INTO amentities (room_id, amentities)
 VALUES
-    ('R101', 'TV'),
-    ('R101', 'Điều hòa'),
-    ('R101', 'Wifi'),
-    ('R201', 'TV'),
-    ('R201', 'Điều hòa'),
-    ('R201', 'Wifi'),
-    ('R201', 'Mini bar'),
-    ('R301', 'TV'),
-    ('R301', 'Điều hòa'),
-    ('R301', 'Wifi'),
-    ('R301', '2 giường đơn'),
-    ('R401', 'TV màn hình phẳng'),
-    ('R401', 'Điều hòa'),
-    ('R401', 'Wifi tốc độ cao'),
-    ('R401', 'Bồn tắm'),
-    ('R401', 'Mini bar'),
-    ('R501', 'TV màn hình phẳng 55 inch'),
-    ('R501', 'Điều hòa'),
-    ('R501', 'Wifi tốc độ cao'),
-    ('R501', 'Bồn tắm Jacuzzi'),
-    ('R501', 'Mini bar cao cấp'),
-    ('R501', 'Phòng làm việc');
+    ('R001', 'TV'),
+    ('R001', 'Điều hòa'),
+    ('R001', 'Wifi'),
+    ('R002', 'TV'),
+    ('R002', 'Điều hòa'),
+    ('R002', 'Wifi'),
+    ('R002', 'Mini bar'),
+    ('R003', 'TV'),
+    ('R003', 'Điều hòa'),
+    ('R003', 'Wifi'),
+    ('R003', '2 giường đơn'),
+    ('R004', 'TV màn hình phẳng'),
+    ('R004', 'Điều hòa'),
+    ('R004', 'Wifi tốc độ cao'),
+    ('R004', 'Bồn tắm'),
+    ('R004', 'Mini bar'),
+    ('R005', 'TV màn hình phẳng 55 inch'),
+    ('R005', 'Điều hòa'),
+    ('R005', 'Wifi tốc độ cao'),
+    ('R005', 'Bồn tắm Jacuzzi'),
+    ('R005', 'Mini bar cao cấp'),
+    ('R005', 'Phòng làm việc');
 
 INSERT INTO services (service_id, availability, description, name, price)
 VALUES
@@ -98,11 +98,11 @@ VALUES
 
 INSERT INTO orders (order_id, number_of_nights, order_date, paymentMethod, status, total_price, customer_id, room_id, staff_id)
 VALUES
-    ('ORD001', 3, '2023-10-01 14:30:00', 'CASH', 1, 3600000, 'C001', 'R101', 'ST002'),
-    ('ORD002', 2, '2023-10-02 15:45:00', 'E_WALLET', 1, 3600000, 'C002', 'R201', 'ST003'),
-    ('ORD003', 1, '2023-10-03 10:15:00', 'CASH', 1, 2500000, 'C003', 'R301', 'ST002'),
-    ('ORD004', 5, '2023-10-04 16:20:00', 'E_WALLET', 1, 17500000, 'C004', 'R401', 'ST003'),
-    ('ORD005', 2, '2023-10-05 11:30:00', 'CASH', 0, 16000000, 'C005', 'R501', 'ST002');
+    ('ORD001', 3, '2023-10-01 14:30:00', 'CASH', 1, 3600000, 'C001', 'R001', 'ST002'),
+    ('ORD002', 2, '2023-10-02 15:45:00', 'E_WALLET', 1, 3600000, 'C002', 'R002', 'ST003'),
+    ('ORD003', 1, '2023-10-03 10:15:00', 'CASH', 1, 2500000, 'C003', 'R003', 'ST002'),
+    ('ORD004', 5, '2023-10-04 16:20:00', 'E_WALLET', 1, 17500000, 'C004', 'R004', 'ST003'),
+    ('ORD005', 2, '2023-10-05 11:30:00', 'CASH', 0, 16000000, 'C005', 'R005', 'ST002');
 
 INSERT INTO order_details (line_total_amount, quantity, service_id, order_id)
 VALUES
@@ -115,11 +115,11 @@ VALUES
 
 INSERT INTO reservations (reservation_id, bookingMethod, check_in_date, check_out_date, deposit_amount, number_of_nights, remaining_amount, status, total_price, customer_id, room_id, staff_id, booking_date)
 VALUES
-    ('RES001', 'AT_THE_COUNTER', '2023-11-01 14:00:00', '2023-11-04 12:00:00', 1000000, 3, 2600000, 1, 3600000, 'C001', 'R101', 'ST002', '2023-11-01 14:00:00'),
-    ('RES002', 'CONTACT', '2023-11-05 14:00:00', '2023-11-07 12:00:00', 1800000, 2, 1800000, 1, 3600000, 'C002', 'R201', 'ST003', '2023-11-01 14:00:00'),
-    ('RES003', 'AT_THE_COUNTER', '2023-11-10 14:00:00', '2023-11-11 12:00:00', 1000000, 1, 1500000, 0, 2500000, 'C003', 'R301', 'ST002', '2023-11-01 14:00:00'),
-    ('RES004', 'CONTACT', '2023-11-15 14:00:00', '2023-11-20 12:00:00', 5000000, 5, 12500000, 1, 17500000, 'C004', 'R401', 'ST003', '2023-11-01 14:00:00'),
-    ('RES005', 'AT_THE_COUNTER', '2023-11-25 14:00:00', '2023-11-27 12:00:00', 8000000, 2, 8000000, 1, 16000000, 'C005', 'R501', 'ST002', '2023-11-01 14:00:00');
+    ('RES001', 'AT_THE_COUNTER', '2023-11-01 14:00:00', '2023-11-04 12:00:00', 1000000, 3, 2600000, 1, 3600000, 'C001', 'R001', 'ST002', '2023-11-01 14:00:00'),
+    ('RES002', 'CONTACT', '2023-11-05 14:00:00', '2023-11-07 12:00:00', 1800000, 2, 1800000, 1, 3600000, 'C002', 'R002', 'ST003', '2023-11-01 14:00:00'),
+    ('RES003', 'AT_THE_COUNTER', '2023-11-10 14:00:00', '2023-11-11 12:00:00', 1000000, 1, 1500000, 0, 2500000, 'C003', 'R003', 'ST002', '2023-11-01 14:00:00'),
+    ('RES004', 'CONTACT', '2023-11-15 14:00:00', '2023-11-20 12:00:00', 5000000, 5, 12500000, 1, 17500000, 'C004', 'R004', 'ST003', '2023-11-01 14:00:00'),
+    ('RES005', 'AT_THE_COUNTER', '2023-11-25 14:00:00', '2023-11-27 12:00:00', 8000000, 2, 8000000, 1, 16000000, 'C005', 'R005', 'ST002', '2023-11-01 14:00:00');
 
 
 INSERT INTO reservation_details (line_total_amount, note, quantity, service_id, reservation_id)
