@@ -378,7 +378,6 @@ public class Dialog_AddCustomer extends javax.swing.JPanel {
             return false;
         }
 
-
         return true;
     }
 

@@ -1,6 +1,7 @@
 package dao;
 
 import entities.Customer;
+import entities.Staff;
 import interfaces.CustomerDAO;
 import jakarta.persistence.*;
 import utils.AppUtil;
@@ -93,5 +94,48 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements
                 .getSingleResult();
 
         return count > 0;
+    }
+
+    @Override
+    public List<Customer> searchCustomerAdvanced(String id, String name, String phone, Boolean gender, String cccd) {
+        StringBuilder queryStr = new StringBuilder(
+                "SELECT DISTINCT c FROM Customer c WHERE 1=1"
+        );
+
+        if (id != null && !id.isEmpty()) {
+            queryStr.append(" AND c.customerId LIKE :id");
+        }
+        if (name != null && !name.isEmpty()) {
+            queryStr.append(" AND (LOWER(c.firstName) LIKE LOWER(:name) OR LOWER(c.lastName) LIKE LOWER(:name))");
+        }
+        if (phone != null && !phone.isEmpty()) {
+            queryStr.append(" AND c.phoneNumber LIKE :phone");
+        }
+        if (gender != null) {
+            queryStr.append(" AND c.gender = :gender");
+        }
+        if (cccd != null && !cccd.isEmpty()) {
+            queryStr.append(" AND c.CCCD LIKE :cccd");
+        }
+
+        TypedQuery<Customer> query = em.createQuery(queryStr.toString(), Customer.class);
+
+        if (id != null && !id.isEmpty()) {
+            query.setParameter("id", "%" + id + "%");
+        }
+        if (name != null && !name.isEmpty()) {
+            query.setParameter("name", "%" + name + "%");
+        }
+        if (phone != null && !phone.isEmpty()) {
+            query.setParameter("phone", "%" + phone + "%");
+        }
+        if (gender != null) {
+            query.setParameter("gender", gender);
+        }
+        if (cccd != null && !cccd.isEmpty()) {
+            query.setParameter("cccd", "%" + cccd + "%");
+        }
+
+        return query.getResultList();
     }
 }
