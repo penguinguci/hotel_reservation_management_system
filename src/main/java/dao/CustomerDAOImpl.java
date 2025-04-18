@@ -1,41 +1,28 @@
 package dao;
 
 import entities.Customer;
+import entities.Staff;
 import interfaces.CustomerDAO;
 import jakarta.persistence.*;
+import utils.AppUtil;
 
+import java.rmi.RemoteException;
 import java.util.List;
 
-public class CustomerDAOImpl implements CustomerDAO {
-    private EntityManagerFactory entityManagerFactory;
-    private EntityManager entityManager;
+public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements CustomerDAO {
+    private EntityManager em;
 
     public CustomerDAOImpl() {
-        entityManagerFactory = Persistence.createEntityManagerFactory("mariadb");
-        entityManager = entityManagerFactory.createEntityManager();
+        super(Customer.class);
+        em = AppUtil.getEntityManager();
     }
 
-    // Thêm khách hàng
-    @Override
-    public void addCustomer(Customer customer) {
-        EntityTransaction transaction = entityManager.getTransaction();
-        try {
-            transaction.begin();
-            entityManager.persist(customer);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
-            throw new RuntimeException("Failed to add customer: " + e.getMessage(), e);
-        }
-    }
 
     // Lấy khách hàng theo ID
     @Override
     public List<Customer> searchCustomerById(String id) {
         String queryString = "SELECT c FROM Customer c WHERE c.customerId = :id";
-        TypedQuery<Customer> query = entityManager.createQuery(queryString, Customer.class);
+        TypedQuery<Customer> query = em.createQuery(queryString, Customer.class);
         query.setParameter("id", id);
         return query.getResultList();
     }
@@ -44,7 +31,7 @@ public class CustomerDAOImpl implements CustomerDAO {
     @Override
     public List<Customer> searchCustomersByPhone(String phone) {
         String queryString = "SELECT c FROM Customer c WHERE c.phoneNumber = :phone";
-        TypedQuery<Customer> query = entityManager.createQuery(queryString, Customer.class);
+        TypedQuery<Customer> query = em.createQuery(queryString, Customer.class);
         query.setParameter("phone", phone);
         return query.getResultList();
     }
@@ -53,7 +40,7 @@ public class CustomerDAOImpl implements CustomerDAO {
     @Override
     public List<Customer> searchCustomersByName(String name) {
         String queryString = "SELECT c FROM Customer c WHERE LOWER(c.firstName) LIKE :name OR LOWER(c.lastName) LIKE :name";
-        TypedQuery<Customer> query = entityManager.createQuery(queryString, Customer.class);
+        TypedQuery<Customer> query = em.createQuery(queryString, Customer.class);
         query.setParameter("name", "%" + name.toLowerCase() + "%");
         return query.getResultList();
     }
@@ -62,7 +49,7 @@ public class CustomerDAOImpl implements CustomerDAO {
     @Override
     public List<Customer> searchCustomersByPhoneOrCCCD(String keyword) {
         String queryString = "SELECT c FROM Customer c WHERE LOWER(c.phoneNumber) LIKE :keyword OR LOWER(c.CCCD) LIKE :keyword";
-        TypedQuery<Customer> query = entityManager.createQuery(queryString, Customer.class);
+        TypedQuery<Customer> query = em.createQuery(queryString, Customer.class);
         query.setParameter("keyword", "%" + keyword.toLowerCase() + "%");
         return query.getResultList();
     }
@@ -70,33 +57,85 @@ public class CustomerDAOImpl implements CustomerDAO {
     // Lấy tất cả khách hàng
     @Override
     public List<Customer> getAllCustomers() {
-        TypedQuery<Customer> query = entityManager.createQuery("SELECT c FROM Customer c", Customer.class);
+        TypedQuery<Customer> query = em.createQuery("SELECT c FROM Customer c", Customer.class);
         return query.getResultList();
     }
 
-    // Cập nhật thông tin khách hàng
     @Override
-    public void updateCustomer(Customer customer) {
-        EntityTransaction transaction = entityManager.getTransaction();
-        try {
-            transaction.begin();
-            entityManager.merge(customer);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
-            throw new RuntimeException("Failed to update customer: " + e.getMessage(), e);
-        }
+    public Customer getCustomerByPhone(String phone) throws RemoteException {
+        String queryString = "SELECT c FROM Customer c WHERE c.phoneNumber = :phone";
+        TypedQuery<Customer> query = em.createQuery(queryString, Customer.class);
+        query.setParameter("phone", phone);
+        List<Customer> customers = query.getResultList();
+        return customers.isEmpty() ? null : customers.get(0);
     }
 
-    // Đóng kết nối
-    public void close() {
-        if (entityManager != null && entityManager.isOpen()) {
-            entityManager.close();
+
+    @Override
+    public boolean isEmailExists(String email) {
+        if (email == null || email.isEmpty()) return false;
+
+        Long count = em.createQuery("SELECT COUNT(c) FROM Customer c WHERE c.email = :email", Long.class)
+                .setParameter("email", email)
+                .getSingleResult();
+        return count > 0;
+    }
+
+    @Override
+    public boolean isPhoneExists(String phone) {
+        if (phone == null || phone.isEmpty()) {
+            return false;
         }
-        if (entityManagerFactory != null && entityManagerFactory.isOpen()) {
-            entityManagerFactory.close();
+
+        Long count = em.createQuery(
+                        "SELECT COUNT(c) FROM Customer c WHERE c.phoneNumber = :phone",
+                        Long.class)
+                .setParameter("phone", phone)
+                .getSingleResult();
+
+        return count > 0;
+    }
+
+    @Override
+    public List<Customer> searchCustomerAdvanced(String id, String name, String phone, Boolean gender, String cccd) {
+        StringBuilder queryStr = new StringBuilder(
+                "SELECT DISTINCT c FROM Customer c WHERE 1=1"
+        );
+
+        if (id != null && !id.isEmpty()) {
+            queryStr.append(" AND c.customerId LIKE :id");
         }
+        if (name != null && !name.isEmpty()) {
+            queryStr.append(" AND (LOWER(c.firstName) LIKE LOWER(:name) OR LOWER(c.lastName) LIKE LOWER(:name))");
+        }
+        if (phone != null && !phone.isEmpty()) {
+            queryStr.append(" AND c.phoneNumber LIKE :phone");
+        }
+        if (gender != null) {
+            queryStr.append(" AND c.gender = :gender");
+        }
+        if (cccd != null && !cccd.isEmpty()) {
+            queryStr.append(" AND c.CCCD LIKE :cccd");
+        }
+
+        TypedQuery<Customer> query = em.createQuery(queryStr.toString(), Customer.class);
+
+        if (id != null && !id.isEmpty()) {
+            query.setParameter("id", "%" + id + "%");
+        }
+        if (name != null && !name.isEmpty()) {
+            query.setParameter("name", "%" + name + "%");
+        }
+        if (phone != null && !phone.isEmpty()) {
+            query.setParameter("phone", "%" + phone + "%");
+        }
+        if (gender != null) {
+            query.setParameter("gender", gender);
+        }
+        if (cccd != null && !cccd.isEmpty()) {
+            query.setParameter("cccd", "%" + cccd + "%");
+        }
+
+        return query.getResultList();
     }
 }

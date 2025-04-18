@@ -83,6 +83,7 @@ public class GenericDAOImpl<T, ID> implements GenericDAO<T, ID> {
         return em.createQuery(query, entityClass).getResultList();
     }
 
+
     // Find with pagination
     public List<T> findAll(int page, int pageSize) {
         String queryStr = "SELECT e FROM " + entityClass.getSimpleName() + " e";

@@ -6,12 +6,12 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public interface AccountDAO extends Remote {
-    public void deleteAccount(String username) throws RemoteException;
-    public void updateAccount(Account account) throws RemoteException;
-    public List<Account> getAllAccounts() throws RemoteException;
-    public Account getAccount(String username) throws RemoteException;
-    public void createAccount(Account account) throws RemoteException;
-    public Account findAccoutByStaffID(String staffID) throws RemoteException;
+public interface AccountDAO extends GenericDAO<Account, String>, Remote {
+    void deleteAccount(String username) throws RemoteException;
+    void updateAccount(Account account) throws RemoteException;
+    List<Account> getAllAccounts() throws RemoteException;
+    Account getAccount(String username) throws RemoteException;
+    void createAccount(Account account) throws RemoteException;
+    Account findAccoutByStaffID(String staffID) throws RemoteException;
     boolean isUsernameExists(String username);
 }

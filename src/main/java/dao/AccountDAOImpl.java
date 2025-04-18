@@ -3,27 +3,23 @@ package dao;
 import entities.Account;
 import interfaces.AccountDAO;
 import jakarta.persistence.*;
+import utils.AppUtil;
 
 import java.rmi.RemoteException;
 import java.util.List;
-public class AccountDAOImpl implements AccountDAO {
-
-    @PersistenceContext
-    private EntityManagerFactory entityManagerFactory;
-
-    @PersistenceContext
-    private EntityManager entityManager;
+public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements AccountDAO {
+    private EntityManager em;
 
     public AccountDAOImpl() {
-        entityManagerFactory = Persistence.createEntityManagerFactory("mariadb");
-        entityManager = entityManagerFactory.createEntityManager();
+        super(Account.class);
+        em = AppUtil.getEntityManager();
     }
 
     public void createAccount(Account account) {
-        EntityTransaction transaction = entityManager.getTransaction();
+        EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            entityManager.persist(account);
+            em.persist(account);
             transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) {
@@ -34,19 +30,20 @@ public class AccountDAOImpl implements AccountDAO {
     }
 
     public Account getAccount(String username) {
-        return entityManager.find(Account.class, username);
+        return em.find(Account.class, username);
     }
 
+    @Override
     public List<Account> getAllAccounts() {
-        TypedQuery<Account> query = entityManager.createQuery("SELECT a FROM Account a", Account.class);
+        TypedQuery<Account> query = em.createQuery("SELECT a FROM Account a", Account.class);
         return query.getResultList();
     }
 
     public void updateAccount(Account account) {
-        EntityTransaction transaction = entityManager.getTransaction();
+        EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            entityManager.merge(account);
+            em.merge(account);
             transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) {
@@ -57,12 +54,12 @@ public class AccountDAOImpl implements AccountDAO {
     }
 
     public void deleteAccount(String username) {
-        EntityTransaction transaction = entityManager.getTransaction();
+        EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            Account account = entityManager.find(Account.class, username);
+            Account account = em.find(Account.class, username);
             if (account != null) {
-                entityManager.remove(account);
+                em.remove(account);
             }
             transaction.commit();
         } catch (Exception e) {
@@ -73,19 +70,10 @@ public class AccountDAOImpl implements AccountDAO {
         }
     }
 
-    public void close() {
-        if (entityManager != null) {
-            entityManager.close();
-        }
-        if (entityManagerFactory != null) {
-            entityManagerFactory.close();
-        }
-    }
-
     @Override
     public Account findAccoutByStaffID(String staffID) throws RemoteException {
         String query = "SELECT a FROM Account a WHERE a.staff.id = :staffID";
-        TypedQuery<Account> typedQuery = entityManager.createQuery(query, Account.class);
+        TypedQuery<Account> typedQuery = em.createQuery(query, Account.class);
         typedQuery.setParameter("staffID", staffID);
         List<Account> accounts = typedQuery.getResultList();
         return accounts.isEmpty() ? null : accounts.get(0);
@@ -95,7 +83,7 @@ public class AccountDAOImpl implements AccountDAO {
     public boolean isUsernameExists(String username) {
         if (username == null || username.isEmpty()) return false;
 
-        Long count = entityManager.createQuery("SELECT COUNT(a) FROM Account a WHERE a.username = :username", Long.class)
+        Long count = em.createQuery("SELECT COUNT(a) FROM Account a WHERE a.username = :username", Long.class)
                 .setParameter("username", username)
                 .getSingleResult();
         return count > 0;

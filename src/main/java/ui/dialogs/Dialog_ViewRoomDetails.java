@@ -4,17 +4,49 @@
  */
 package ui.dialogs;
 
+import dao.RoomDAOImpl;
+import entities.Room;
+import interfaces.RoomDAO;
+
+import javax.swing.*;
+import java.awt.*;
+
 /**
  *
  * @author TRAN LONG VU
  */
 public class Dialog_ViewRoomDetails extends javax.swing.JPanel {
-
+    private String roomID;
+    private Room room;
+    RoomDAO roomDAO = new RoomDAOImpl();
     /**
      * Creates new form Dialog_ViewRoomDetails
      */
-    public Dialog_ViewRoomDetails() {
+    public Dialog_ViewRoomDetails(String roomID) {
+        this.roomID = roomID;
         initComponents();
+        initRoomDetailByID();
+    }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
+    public Room getRoom() {
+        return room;
+    }
+
+    private void initRoomDetailByID() {
+        Room roomInfor = roomDAO.findById(roomID);
+        if (room != null) {
+            lbl_RoomID_Value.setText(roomInfor.getRoomId());
+            lbl_TypeRoom_Value.setText(roomInfor.getRoomType().getTypeName());
+            lbl_Price_Value.setText(String.format("%,.0f", roomInfor.getPrice()) + " VNĐ");
+            lbl_Capacity_Value.setText(roomInfor.getCapacity() + " người/phòng");
+            lbl_RoomSize_Value.setText(roomInfor.getRoomSize() + " m2");
+            lbl_Status_Value.setText(roomInfor.getStatus() == 1 ? "Trống" : "Đã thuê");
+            lbl_Amenities_Value.setText(String.join(", ", roomInfor.getAmenities()));
+        }
     }
 
     /**
@@ -26,19 +58,216 @@ public class Dialog_ViewRoomDetails extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        pnl_ImageRoom = new javax.swing.JPanel();
+        lbl_ImageRoom = new javax.swing.JLabel();
+        pnl_Infor = new javax.swing.JPanel();
+        pnl_Left = new javax.swing.JPanel();
+        lbl_RoomID = new javax.swing.JLabel();
+        lbl_TypeRoom = new javax.swing.JLabel();
+        lbl_Price = new javax.swing.JLabel();
+        lbl_Capacity = new javax.swing.JLabel();
+        lbl_RoomSize = new javax.swing.JLabel();
+        lbl_Status = new javax.swing.JLabel();
+        lbl_Amenities = new javax.swing.JLabel();
+        pnl_Right = new javax.swing.JPanel();
+        lbl_RoomID_Value = new javax.swing.JLabel();
+        lbl_TypeRoom_Value = new javax.swing.JLabel();
+        lbl_Price_Value = new javax.swing.JLabel();
+        lbl_Capacity_Value = new javax.swing.JLabel();
+        lbl_RoomSize_Value = new javax.swing.JLabel();
+        lbl_Status_Value = new javax.swing.JLabel();
+        lbl_Amenities_Value = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        btn_Cancel = new ui.components.button.ButtonCancelCustom();
+        btn_AddEntityRoom = new ui.components.button.ButtonCustom();
+
+        setBackground(new java.awt.Color(255, 255, 255));
+
+        pnl_ImageRoom.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_ImageRoom.setLayout(new java.awt.BorderLayout());
+        pnl_ImageRoom.add(lbl_ImageRoom, java.awt.BorderLayout.CENTER);
+
+        pnl_Infor.setBackground(new java.awt.Color(255, 255, 255));
+
+        pnl_Left.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_Left.setLayout(new java.awt.GridLayout(7, 1));
+
+        lbl_RoomID.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_RoomID.setText("Số phòng:");
+        pnl_Left.add(lbl_RoomID);
+
+        lbl_TypeRoom.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_TypeRoom.setText("Loại phòng:");
+        pnl_Left.add(lbl_TypeRoom);
+
+        lbl_Price.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Price.setText("Giá/đêm:");
+        pnl_Left.add(lbl_Price);
+
+        lbl_Capacity.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Capacity.setText("Sức chứa:");
+        pnl_Left.add(lbl_Capacity);
+
+        lbl_RoomSize.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_RoomSize.setText("Kích thước phòng:");
+        pnl_Left.add(lbl_RoomSize);
+
+        lbl_Status.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Status.setText("Trạng thái:");
+        pnl_Left.add(lbl_Status);
+
+        lbl_Amenities.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Amenities.setText("Tiện nghi:");
+        pnl_Left.add(lbl_Amenities);
+
+        pnl_Right.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_Right.setLayout(new java.awt.GridLayout(7, 1));
+
+        lbl_RoomID_Value.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
+        pnl_Right.add(lbl_RoomID_Value);
+
+        lbl_TypeRoom_Value.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        pnl_Right.add(lbl_TypeRoom_Value);
+
+        lbl_Price_Value.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
+        lbl_Price_Value.setForeground(new java.awt.Color(255, 0, 51));
+        pnl_Right.add(lbl_Price_Value);
+
+        lbl_Capacity_Value.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        pnl_Right.add(lbl_Capacity_Value);
+
+        lbl_RoomSize_Value.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        pnl_Right.add(lbl_RoomSize_Value);
+
+        lbl_Status_Value.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        pnl_Right.add(lbl_Status_Value);
+
+        lbl_Amenities_Value.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        pnl_Right.add(lbl_Amenities_Value);
+
+        javax.swing.GroupLayout pnl_InforLayout = new javax.swing.GroupLayout(pnl_Infor);
+        pnl_Infor.setLayout(pnl_InforLayout);
+        pnl_InforLayout.setHorizontalGroup(
+            pnl_InforLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_InforLayout.createSequentialGroup()
+                .addComponent(pnl_Left, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(pnl_Right, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        pnl_InforLayout.setVerticalGroup(
+            pnl_InforLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(pnl_Left, javax.swing.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
+            .addComponent(pnl_Right, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+
+        btn_Cancel.setText("Thoát");
+        btn_Cancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_CancelActionPerformed(evt);
+            }
+        });
+
+        btn_AddEntityRoom.setText("Thêm");
+        btn_AddEntityRoom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_AddEntityRoomActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btn_AddEntityRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(21, 21, 21))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_AddEntityRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(11, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(pnl_ImageRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 402, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnl_Infor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(pnl_ImageRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(pnl_Infor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btn_AddEntityRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddEntityRoomActionPerformed
+        addToCart();
+    }//GEN-LAST:event_btn_AddEntityRoomActionPerformed
+
+    private void btn_CancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_CancelActionPerformed
+        cancel();
+    }//GEN-LAST:event_btn_CancelActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private ui.components.button.ButtonCustom btn_AddEntityRoom;
+    private ui.components.button.ButtonCancelCustom btn_Cancel;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JLabel lbl_Amenities;
+    private javax.swing.JLabel lbl_Amenities_Value;
+    private javax.swing.JLabel lbl_Capacity;
+    private javax.swing.JLabel lbl_Capacity_Value;
+    private javax.swing.JLabel lbl_ImageRoom;
+    private javax.swing.JLabel lbl_Price;
+    private javax.swing.JLabel lbl_Price_Value;
+    private javax.swing.JLabel lbl_RoomID;
+    private javax.swing.JLabel lbl_RoomID_Value;
+    private javax.swing.JLabel lbl_RoomSize;
+    private javax.swing.JLabel lbl_RoomSize_Value;
+    private javax.swing.JLabel lbl_Status;
+    private javax.swing.JLabel lbl_Status_Value;
+    private javax.swing.JLabel lbl_TypeRoom;
+    private javax.swing.JLabel lbl_TypeRoom_Value;
+    private javax.swing.JPanel pnl_ImageRoom;
+    private javax.swing.JPanel pnl_Infor;
+    private javax.swing.JPanel pnl_Left;
+    private javax.swing.JPanel pnl_Right;
     // End of variables declaration//GEN-END:variables
+
+    private void addToCart() {
+        Room roomInfor = roomDAO.findById(roomID);
+        setRoom(roomInfor);
+        Window window = SwingUtilities.getWindowAncestor(this);
+        window.dispose();
+    }
+
+    private void cancel() {
+        Window window = SwingUtilities.getWindowAncestor(this);
+        window.dispose();
+    }
 }
