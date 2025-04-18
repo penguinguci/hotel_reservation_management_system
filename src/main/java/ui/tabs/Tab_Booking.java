@@ -1248,10 +1248,31 @@ public class Tab_Booking extends javax.swing.JPanel {
                     roomTypeStr,
                     String.format("%,.0f VND", room.getPrice()),
                     amenitiesStr,
-                    room.getStatus() == Room.STATUS_AVAILABLE ? "Trống" : "Đã thuê"
+                    convertStatus(room.getStatus())
             };
             model.addRow(rowData, null);
         }
+    }
+
+    private String convertStatus(int status) {
+        String statusText;
+        switch (status) {
+            case Room.STATUS_AVAILABLE:
+                statusText = "Có sẵn";
+                break;
+            case Room.STATUS_RESERVED:
+                statusText = "Đã đặt trước";
+                break;
+            case Room.STATUS_OCCUPIED:
+                statusText = "Đang sử dụng";
+                break;
+            case Room.STATUS_MAINTENANCE:
+                statusText = "Bảo trì";
+                break;
+            default:
+                statusText = "Không xác định";
+        }
+        return statusText;
     }
 
     /**
@@ -1379,8 +1400,8 @@ public class Tab_Booking extends javax.swing.JPanel {
 
             // Kiểm tra trạng thái phòng
             String status = (String) rowData[5];
-            if (!"Trống".equals(status)) {
-                JOptionPane.showMessageDialog(this, "Chỉ có thể thêm phòng có trạng thái Trống",
+            if (!"Có sẵn".equals(status)) {
+                JOptionPane.showMessageDialog(this, "Chỉ có thể thêm phòng có trạng thái Có sẵn",
                         "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -1728,6 +1749,10 @@ public class Tab_Booking extends javax.swing.JPanel {
                 reservation.calculateDepositAmount();
                 reservation.calculateRemainingAmount();
                 em.persist(reservation);
+
+                room.setStatus(Room.STATUS_RESERVED);
+                em.merge(room);
+
                 countBooking++;
             }
 

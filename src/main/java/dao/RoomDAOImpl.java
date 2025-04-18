@@ -70,6 +70,31 @@ public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDA
         }
     }
 
+    @Override
+    public boolean updateRoomStatus(String roomId, int status) {
+        EntityTransaction transaction = null;
+        try {
+            transaction = em.getTransaction();
+            transaction.begin();
+
+            String jpql = "UPDATE Room r SET r.status = :status WHERE r.roomId = :roomId";
+            int updatedCount = em.createQuery(jpql)
+                    .setParameter("status", status)
+                    .setParameter("roomId", roomId)
+                    .executeUpdate();
+
+            transaction.commit();
+
+            return updatedCount > 0;
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // Cập nhật thông tin phòng
     public void updateRoom(Room room) {
         EntityManager em = AppUtil.getEntityManager();
