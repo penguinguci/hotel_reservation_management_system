@@ -203,7 +203,7 @@ public class CustomTab extends JPanel {
             // Căn giữa text
             setHorizontalAlignment(SwingConstants.CENTER);
             setHorizontalTextPosition(SwingConstants.CENTER);
-            setFont(new Font("Arial", Font.PLAIN, 14));
+            setFont(new Font("Segoe UI", Font.PLAIN, 15));
             // Bỏ margin nếu cần
             setMargin(new Insets(0, 5, 0, 5));
         }

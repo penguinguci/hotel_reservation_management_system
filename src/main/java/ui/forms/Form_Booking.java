@@ -14,6 +14,7 @@ public class Form_Booking extends javax.swing.JPanel {
      * Creates new form Form_Booking
      */
     public Form_Booking() {
+        initTabs();
         initComponents();
     }
 
@@ -25,15 +26,6 @@ public class Form_Booking extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
-        customTab = new ui.components.tab.CustomTab();
-
-        tabBooking = new ui.tabs.Tab_Booking();
-        tabListBooking = new ui.tabs.Tab_ListBooking();
-
-        customTab.addTabPanel("Đặt phòng", tabBooking);
-        customTab.addTabPanel("Danh sách đặt phòng", tabListBooking);
-
         setBackground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -48,11 +40,26 @@ public class Form_Booking extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void initTabs(){
+        customTab = new ui.components.tab.CustomTab();
+
+        tabBooking = new ui.tabs.Tab_Booking();
+        tabListBooking = new ui.tabs.Tab_ListBooking();
+        tabBookingByTime = new ui.tabs.Tab_BookingByTime();
+        tabListOrder = new ui.tabs.Tab_ListOrder();
+
+        customTab.addTabPanel("Đặt phòng theo đêm", tabBooking);
+        customTab.addTabPanel("Đặt phòng theo giờ", tabBookingByTime);
+        customTab.addTabPanel("Danh sách đặt phòng", tabListBooking);
+        customTab.addTabPanel("Danh sách hóa đơn", tabListOrder);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private ui.components.tab.CustomTab customTab;
     private ui.tabs.Tab_Booking tabBooking;
     private ui.tabs.Tab_ListBooking tabListBooking;
+    private ui.tabs.Tab_BookingByTime tabBookingByTime;
+    private ui.tabs.Tab_ListOrder tabListOrder;
 
     // End of variables declaration//GEN-END:variables
 }
