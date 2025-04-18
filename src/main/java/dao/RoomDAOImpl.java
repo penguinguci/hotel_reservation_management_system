@@ -89,21 +89,17 @@ public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDA
     @Override
     public List<Room> findAvailableRooms(Date checkInDate, Date checkOutDate, Integer capacity,
                                          String roomType, Double minPrice, Double maxPrice) {
-        EntityManager em = entityManagerFactory.createEntityManager();
+        EntityManager em = AppUtil.getEntityManager();
         try {
-
             String jpql = "SELECT DISTINCT r FROM Room r LEFT JOIN FETCH r.amenities " +
-         // Xây dựng câu truy vấn cơ bản
-            String jpql = "SELECT DISTINCT r FROM Room r " +
-                    "LEFT JOIN FETCH r.amenities " +
-
                     "LEFT JOIN FETCH r.roomType " +
                     "WHERE r.status = :availableStatus";
 
             if (checkInDate != null && checkOutDate != null) {
-                jpql += " AND r NOT IN (SELECT res.room FROM Reservation res " +
-                        "WHERE (res.checkInDate < :checkOutDate) " +
-                        "AND (res.checkOutDate > :checkInDate))";
+                jpql += " AND NOT EXISTS (SELECT rd FROM ReservationDetails rd " +
+                        "JOIN rd.reservation res " +
+                        "WHERE rd.room = r " +
+                        "AND ((res.checkInDate < :checkOutDate) AND (res.checkOutDate > :checkInDate)))";
             }
 
             if (capacity != null) {
@@ -114,19 +110,10 @@ public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDA
                 jpql += " AND r.roomType.typeName = :roomType";
             }
 
-
             if (minPrice != null && maxPrice != null) {
                 jpql += " AND r.price BETWEEN :minPrice AND :maxPrice";
-        // Thêm điều kiện cho khoảng giá nếu có
-            if (minPrice != null) {
-                jpql += " AND r.price >= :minPrice";
-            }
-            if (maxPrice != null) {
-                jpql += " AND r.price <= :maxPrice";
-
             }
 
-            // Tạo query
             TypedQuery<Room> query = em.createQuery(jpql, Room.class)
                     .setParameter("availableStatus", Room.STATUS_AVAILABLE);
 
@@ -143,12 +130,9 @@ public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDA
                 query.setParameter("roomType", roomType);
             }
 
-            if (minPrice != null) {
-                query.setParameter("minPrice", minPrice);
-            }
-
-            if (maxPrice != null) {
-                query.setParameter("maxPrice", maxPrice);
+            if (minPrice != null && maxPrice != null) {
+                query.setParameter("minPrice", minPrice)
+                        .setParameter("maxPrice", maxPrice);
             }
 
             return query.getResultList();
@@ -163,11 +147,7 @@ public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDA
         try {
             String jpql = "SELECT COUNT(rd) FROM ReservationDetails rd " +
                     "JOIN rd.reservation res " +
-
                     "WHERE rd.room.roomId = :roomId " +
-
-                    "WHERE res.room.id = :roomId " +
-
                     "AND ((res.checkInDate < :checkOutDate) AND (res.checkOutDate > :checkInDate))";
 
             Long count = em.createQuery(jpql, Long.class)
