@@ -6,14 +6,12 @@ package ui.tabs;
 
 import dao.CustomerDAOImpl;
 import dao.RoomDAOImpl;
-import dao.RoomTypesImpl;
+import dao.RoomTypeDAOImpl;
 import entities.*;
 import interfaces.CustomerDAO;
 import interfaces.RoomDAO;
 import interfaces.RoomTypesDAO;
-import ui.components.button.ButtonRenderer;
 import ui.components.popup.PopupSearch;
-import ui.components.table.CustomTable;
 import ui.components.table.CustomTableButton;
 import ui.dialogs.Dialog_AddService;
 
@@ -21,11 +19,9 @@ import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -203,7 +199,7 @@ public class Tab_Booking extends javax.swing.JPanel {
     }
 
     private void initializeRoomTypeComboBox() {
-        RoomTypesDAO roomTypesDAO = new RoomTypesImpl();
+        RoomTypesDAO roomTypesDAO = new RoomTypeDAOImpl();
         List<RoomType> roomTypes = roomTypesDAO.getAllRoomTypes();
 
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();

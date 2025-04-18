@@ -26,10 +26,10 @@ public class Room {
 
     protected int capacity;
 
-//    @Column(columnDefinition = "nvarchar(1024)")
-//    protected String description;
-
     protected int status;
+
+    @Column(name = "floor")
+    protected int floor;
 
     @ToString.Exclude
     @ElementCollection
@@ -40,10 +40,6 @@ public class Room {
 
     @Column(name = "room_size")
     protected double roomSize;
-//
-//    @OneToOne
-//    @JoinColumn(name = "promotion_id", unique = true, nullable = true)
-//    protected Promotion promotion;
 
     @Column(name = "room_image", columnDefinition = "varchar(1024)")
     protected String roomImage;

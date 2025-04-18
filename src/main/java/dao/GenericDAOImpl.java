@@ -1,5 +1,6 @@
 package dao;
 
+import entities.Room;
 import interfaces.GenericDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;

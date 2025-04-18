@@ -8,10 +8,10 @@ import utils.AppUtil;
 
 import java.util.List;
 
-public class RoomTypesImpl extends GenericDAOImpl<RoomType, String> implements RoomTypesDAO {
+public class RoomTypeDAOImpl extends GenericDAOImpl<RoomType, String> implements RoomTypesDAO {
     private EntityManager em;
 
-    public RoomTypesImpl() {
+    public RoomTypeDAOImpl() {
         super(RoomType.class);
         em = AppUtil.getEntityManager();
     }
@@ -28,4 +28,5 @@ public class RoomTypesImpl extends GenericDAOImpl<RoomType, String> implements R
             em.close();
         }
     }
+
 }
