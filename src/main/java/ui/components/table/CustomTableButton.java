@@ -44,15 +44,42 @@ public class CustomTableButton extends JPanel implements Serializable {
                     Color bg = (row % 2 == 0) ? new Color(250, 250, 250) : new Color(230, 230, 230);
                     comp.setBackground(bg);
                 } else {
-                    comp.setBackground(new Color(156, 151, 246));
+                    comp.setBackground(new Color(156, 151, 246, 180));
                     comp.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 }
+
+                // Add better padding for text cells
+                if (comp instanceof JLabel) {
+                    ((JLabel) comp).setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                    ((JLabel) comp).setHorizontalAlignment(JLabel.LEFT);
+                }
+
                 return comp;
             }
         };
         table.setRowHeight(40);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoCreateRowSorter(true);
+        table.setShowGrid(true);
+        table.setGridColor(new Color(220, 220, 220));
+        table.setIntercellSpacing(new Dimension(1, 1));
+        table.setFillsViewportHeight(true);
+
+        // Set default renderer for cells
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(
+                        table, value, isSelected, hasFocus, row, column);
+                if (!isSelected) {
+                    Color bg = (row % 2 == 0) ? new Color(250, 250, 250) : new Color(230, 230, 230);
+                    label.setBackground(bg);
+                }
+                label.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+                return label;
+            }
+        });
 
         applyHeaderProperties();
 
@@ -92,7 +119,7 @@ public class CustomTableButton extends JPanel implements Serializable {
                     label.setFont(new Font("SansSerif", Font.BOLD, 12));
                     label.setOpaque(true);
                     label.setHorizontalAlignment(JLabel.CENTER);
-                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, Color.GRAY));
+                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, new Color(200, 200, 200)));
                     return label;
                 }
             });
@@ -179,8 +206,15 @@ public class CustomTableButton extends JPanel implements Serializable {
     }
 
     private void updateTableRenderers() {
+        // Reset all columns to use default renderer first
         for (int i = 0; i < table.getColumnCount(); i++) {
-            if (columnEditorTypes != null && i < columnEditorTypes.length) {
+            table.getColumnModel().getColumn(i).setCellRenderer(null);
+            table.getColumnModel().getColumn(i).setCellEditor(null);
+        }
+
+        // Then apply specific renderers for columns that need them
+        if (columnEditorTypes != null) {
+            for (int i = 0; i < Math.min(table.getColumnCount(), columnEditorTypes.length); i++) {
                 switch (columnEditorTypes[i]) {
                     case SPINNER:
                         table.getColumnModel().getColumn(i).setCellRenderer(new SpinnerRenderer());
@@ -191,11 +225,9 @@ public class CustomTableButton extends JPanel implements Serializable {
                         table.getColumnModel().getColumn(i).setCellEditor(new ButtonEditor(null));
                         break;
                     default:
-                        table.getColumnModel().getColumn(i).setCellRenderer(new ButtonRenderer());
+                        // Use default renderer
                         break;
                 }
-            } else {
-                table.getColumnModel().getColumn(i).setCellRenderer(new ButtonRenderer());
             }
         }
     }
@@ -291,15 +323,7 @@ public class CustomTableButton extends JPanel implements Serializable {
             if (rowIndex >= data.size() || columnIndex >= columnNames.length) {
                 return null;
             }
-            Object cellValue = data.get(rowIndex)[columnIndex];
-            if (cellValue != null) {
-                return cellValue;
-            }
-            ButtonType buttonType = getButtonTypeAt(rowIndex, columnIndex);
-            if (buttonType != null) {
-                return buttonType.getText();
-            }
-            return null;
+            return data.get(rowIndex)[columnIndex];
         }
 
         @Override
@@ -360,12 +384,14 @@ public class CustomTableButton extends JPanel implements Serializable {
     public static class ButtonRenderer extends JButton implements TableCellRenderer {
         public ButtonRenderer() {
             setOpaque(true);
-            setBorderPainted(false);
+            setBorderPainted(true);
             setFocusPainted(false);
             setContentAreaFilled(true);
-            setPreferredSize(new Dimension(70, 20));
+            setPreferredSize(new Dimension(70, 25));
             setMargin(new Insets(2, 5, 2, 5));
             setHorizontalAlignment(SwingConstants.CENTER);
+            setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+            setFont(new Font("SansSerif", Font.BOLD, 11));
         }
 
         @Override
@@ -374,9 +400,13 @@ public class CustomTableButton extends JPanel implements Serializable {
             ButtonType buttonType = ((CustomTableModel) table.getModel()).getButtonTypeAt(row, column);
             if (buttonType != null) {
                 setText(buttonType.getText());
-                setBackground(new Color(6, 157, 213));
+                setBackground(buttonType.getColor());
                 setOpaque(true);
                 setForeground(Color.WHITE);
+                setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(0, 0, 0, 40), 1, true),
+                        BorderFactory.createEmptyBorder(4, 8, 4, 8)
+                ));
             } else {
                 setText(value != null ? value.toString() : "");
                 setBackground(null);
@@ -398,19 +428,20 @@ public class CustomTableButton extends JPanel implements Serializable {
             this.listener = listener;
             button = new JButton();
             button.setOpaque(true);
-            button.setBorderPainted(false);
+            button.setBorderPainted(true);
             button.setFocusPainted(false);
             button.setContentAreaFilled(true);
-            button.setPreferredSize(new Dimension(70, 20));
+            button.setPreferredSize(new Dimension(70, 25));
             button.setMargin(new Insets(2, 5, 2, 5));
             button.setHorizontalAlignment(SwingConstants.CENTER);
+            button.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+            button.setFont(new Font("SansSerif", Font.BOLD, 11));
+
             button.addActionListener(e -> {
-                System.out.println("Button in table clicked!");
                 fireEditingStopped();
                 if (listener != null) {
                     ButtonType buttonType = ((CustomTableModel) table.getModel())
                             .getButtonTypeAt(clickedRow, clickedColumn);
-                    System.out.println("Button type: " + buttonType);
                     if (buttonType != null) {
                         listener.onButtonClick(buttonType, clickedRow, clickedColumn);
                     }
@@ -428,6 +459,10 @@ public class CustomTableButton extends JPanel implements Serializable {
                 button.setText(buttonType.getText());
                 button.setBackground(buttonType.getColor());
                 button.setForeground(Color.WHITE);
+                button.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(0, 0, 0, 40), 1, true),
+                        BorderFactory.createEmptyBorder(4, 8, 4, 8)
+                ));
             } else {
                 button.setText(value != null ? value.toString() : "");
                 button.setBackground(table.getBackground());
@@ -463,6 +498,16 @@ public class CustomTableButton extends JPanel implements Serializable {
 
         public SpinnerRenderer() {
             spinner = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
+            // Improve spinner styling
+            spinner.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+                    BorderFactory.createEmptyBorder(2, 2, 2, 2)
+            ));
+            Component editor = spinner.getEditor();
+            if (editor instanceof JSpinner.DefaultEditor) {
+                JTextField tf = ((JSpinner.DefaultEditor) editor).getTextField();
+                tf.setHorizontalAlignment(JTextField.CENTER);
+            }
         }
 
         @Override
@@ -480,6 +525,17 @@ public class CustomTableButton extends JPanel implements Serializable {
         public SpinnerEditor() {
             super(new JTextField());
             spinner = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
+            // Improve spinner styling
+            spinner.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+                    BorderFactory.createEmptyBorder(2, 2, 2, 2)
+            ));
+            Component editor = spinner.getEditor();
+            if (editor instanceof JSpinner.DefaultEditor) {
+                JTextField tf = ((JSpinner.DefaultEditor) editor).getTextField();
+                tf.setHorizontalAlignment(JTextField.CENTER);
+            }
+
             spinner.addChangeListener(e -> fireEditingStopped());
             editorComponent = spinner;
         }
