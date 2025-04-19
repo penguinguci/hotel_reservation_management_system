@@ -684,12 +684,16 @@ public class Form_RoomManagement extends JPanel  {
         } else {
             txtRoomName.setText(newRoomId);
         }
-        updateAmenitiesTable(selectedRoom.getAmenities());
+        //updateAmenitiesTable(selectedRoom.getAmenities());
+        cb_RoomTypeSearch.setSelectedIndex(0);
         txtPrice.setText("");
         txtPosition.setText("");
         txtNumOfPeople.setText("");
-        cb_RoomTypeSearch.setSelectedIndex(0);
         selectedRoom = null;
+        cb_Status.setSelectedItem(0);
+        cb_Position.setSelectedItem(0);
+        cb_Price.setSelectedItem(0);
+        cb_RoomType.setSelectedIndex(0);
         loadRoomData();
         jTextArea1.setText("");
     }
