@@ -54,6 +54,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ListSele
         initComponents();
         initTableListener();
         initComboboxGender();
+        initComboboxGenderSearch();
         loadStaffData();
     }
 
@@ -69,6 +70,16 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ListSele
             model.addElement(gender);
         }
         cbx_Gender.setModel(model);
+    }
+
+    private void initComboboxGenderSearch() {
+        String[] genders = {"Nam", "Nữ"};
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("Chọn giới tính");
+        for (String gender : genders) {
+            model.addElement(gender);
+        }
+        cbx_GenderSearch.setModel(model);
     }
 
     /** This method is called from within the constructor to

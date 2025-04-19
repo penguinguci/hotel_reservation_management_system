@@ -19,4 +19,6 @@ public interface RoomDAO extends GenericDAO<Room, String> {
     List<Room> getAllRooms();
     List<Integer> getAllFloors();
     boolean updateRoomStatus(String roomId, int status);
+    List<Room> findAvailableRoomsForHourlyBooking(Date startTime, Date endTime, Integer capacity, String roomType);
+    boolean isRoomAvailableForHourlyBooking(String roomId, Date startTime, Date endTime);
 }

@@ -1,8 +1,10 @@
 package utils;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -44,5 +46,40 @@ public class DateUtil {
 
         System.err.println("Error: No matching date format for input: " + dateStr);
         return null;
+    }
+
+    public static Date combineDateAndTime(Date date, Date time) {
+        if (date == null || time == null) return null;
+
+        Calendar dateCal = Calendar.getInstance();
+        dateCal.setTime(date);
+
+        Calendar timeCal = Calendar.getInstance();
+        timeCal.setTime(time);
+
+        dateCal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
+        dateCal.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
+        dateCal.set(Calendar.SECOND, 0);
+        dateCal.set(Calendar.MILLISECOND, 0);
+
+        return dateCal.getTime();
+    }
+
+    public static Date combineDateTime(Date date, Time time) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+
+        Calendar timeCal = Calendar.getInstance();
+        timeCal.setTime(time);
+
+        cal.set(Calendar.HOUR_OF_DAY, timeCal.get(Calendar.HOUR_OF_DAY));
+        cal.set(Calendar.MINUTE, timeCal.get(Calendar.MINUTE));
+
+        return cal.getTime();
+    }
+
+    public static Date parseDateTime(String dateTimeStr) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return format.parse(dateTimeStr);
     }
 }

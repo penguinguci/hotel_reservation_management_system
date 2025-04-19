@@ -1235,33 +1235,35 @@ public class Tab_Booking extends javax.swing.JPanel {
         model.clearData();
 
         for (Room room : rooms) {
-            // Xử lý amenities an toàn
-            String amenitiesStr = "N/A";
-            try {
-                amenitiesStr = room.getAmenities() != null ?
-                        String.join(", ", room.getAmenities()) : "N/A";
-            } catch (Exception e) {
-                amenitiesStr = "Lỗi khi tải tiện nghi";
-            }
+            if (room.getStatus() == Room.STATUS_AVAILABLE) {
+                // Xử lý amenities an toàn
+                String amenitiesStr = "N/A";
+                try {
+                    amenitiesStr = room.getAmenities() != null ?
+                            String.join(", ", room.getAmenities()) : "N/A";
+                } catch (Exception e) {
+                    amenitiesStr = "Lỗi khi tải tiện nghi";
+                }
 
-            // Xử lý loại phòng an toàn
-            String roomTypeStr = "N/A";
-            try {
-                roomTypeStr = room.getRoomType() != null ?
-                        room.getRoomType().getTypeName() : "N/A";
-            } catch (Exception e) {
-                roomTypeStr = "Lỗi khi tải loại phòng";
-            }
+                // Xử lý loại phòng an toàn
+                String roomTypeStr = "N/A";
+                try {
+                    roomTypeStr = room.getRoomType() != null ?
+                            room.getRoomType().getTypeName() : "N/A";
+                } catch (Exception e) {
+                    roomTypeStr = "Lỗi khi tải loại phòng";
+                }
 
-            Object[] rowData = {
-                    model.getRowCount() + 1,
-                    room.getRoomId(),
-                    roomTypeStr,
-                    String.format("%,.0f VND", room.getPrice()),
-                    amenitiesStr,
-                    convertStatus(room.getStatus())
-            };
-            model.addRow(rowData, null);
+                Object[] rowData = {
+                        model.getRowCount() + 1,
+                        room.getRoomId(),
+                        roomTypeStr,
+                        String.format("%,.0f VND", room.getPrice()),
+                        amenitiesStr,
+                        convertStatus(room.getStatus())
+                };
+                model.addRow(rowData, null);
+            }
         }
     }
 
