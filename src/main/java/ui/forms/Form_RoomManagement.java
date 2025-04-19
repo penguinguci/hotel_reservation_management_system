@@ -39,6 +39,8 @@ public class Form_RoomManagement extends JPanel  {
     private RoomTypesDAO roomTypeDAO = new RoomTypeDAOImpl();
     EntityManagerFactory entityManagerFactory = null;
     private Room selectedRoom;
+    Tab_RoomTypeManagement tabRTM = new Tab_RoomTypeManagement();
+    Tab_ServicesManagement tabSM  = new Tab_ServicesManagement();
     public Form_RoomManagement() {
         initComponents();
         initializeTableModels();
@@ -527,7 +529,7 @@ public class Form_RoomManagement extends JPanel  {
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Quản lí loại phòng - dịch vụ"));
 
-        btnManageRoomType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/plus.png"))); // NOI18N
+        //btnManageRoomType.setIcon(new javax.swing.ImageIcon(getClass().getResource("/plus.png"))); // NOI18N
         btnManageRoomType.setText("Quản lý loại phòng");
         btnManageRoomType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -535,8 +537,8 @@ public class Form_RoomManagement extends JPanel  {
             }
         });
 
-        btnManageService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/update.png"))); // NOI18N
-        btnManageService.setText("Cập nhật");
+        //btnManageService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/update.png"))); // NOI18N
+        btnManageService.setText("Quản lý dịch vụ");
         btnManageService.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnManageServiceActionPerformed(evt);
@@ -693,18 +695,18 @@ public class Form_RoomManagement extends JPanel  {
     }
     private void btnManageServiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageRoomTypeActionPerformed
         // TODO add your handling code here:
-        Tab_ServicesManagement tabRTM = new Tab_ServicesManagement();
-        tabRTM.setLocationRelativeTo(null);
-        tabRTM.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        tabRTM.setVisible(true);
+
+        tabSM.setLocationRelativeTo(null);
+        tabSM.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        tabSM.setVisible(true);
     }//GEN-LAST:event_btnManageRoomTypeActionPerformed
 
     private void btnManageRoomTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageServiceActionPerformed
         // TODO add your handling code here:
-        Tab_RoomTypeManagement  tabTSM = new Tab_RoomTypeManagement();
-        tabTSM.setLocationRelativeTo(null);
-        tabTSM.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        tabTSM.setVisible(true);
+
+        tabRTM.setLocationRelativeTo(null);
+        tabRTM.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        tabRTM.setVisible(true);
     }//GEN-LAST:event_btnManageServiceActionPerformed
 
     private void txtRoomNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRoomNameActionPerformed

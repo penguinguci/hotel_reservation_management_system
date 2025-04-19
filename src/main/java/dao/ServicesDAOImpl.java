@@ -3,6 +3,7 @@ package dao;
 import entities.Service;
 import interfaces.ServicesDAO;
 import jakarta.persistence.*;
+import org.hibernate.Session;
 import utils.AppUtil;
 
 import java.util.List;
@@ -113,5 +114,20 @@ public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements 
     @Override
     public Service findServiceByID(int id) {
         return entityManager.find(Service.class, id);
+    }
+
+    public List<Service> searchServicesByName(String keyword) {
+        EntityManager em = AppUtil.getEntityManager();
+        try {
+            String jpql = "SELECT s FROM Service s WHERE " +
+                    "(LOWER(s.name) LIKE LOWER(:keyword) OR " +
+                    "LOWER(s.description) LIKE LOWER(:keyword))";
+
+            return em.createQuery(jpql, Service.class)
+                    .setParameter("keyword", "%" + keyword + "%")
+                    .getResultList();
+        } finally {
+            em.close();
+        }
     }
 }
