@@ -18,6 +18,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import lombok.SneakyThrows;
 import ui.components.button.ButtonRenderer;
+import ui.components.combobox.StyledComboBox;
 import ui.components.popup.PopupSearch;
 import ui.components.table.CustomTableButton;
 import ui.dialogs.Dialog_AddCustomer;
@@ -117,7 +118,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
 
         // Thêm gợi ý số giờ
         String[] hourSuggestions = {"2", "4", "6", "8", "10"};
-        JComboBox<String> hourComboBox = new JComboBox<>(hourSuggestions);
+        StyledComboBox<String> hourComboBox = new StyledComboBox<>(hourSuggestions);
         txt_NumberOfHour.setLayout(new BorderLayout());
         txt_NumberOfHour.add(hourComboBox, BorderLayout.EAST);
         hourComboBox.addActionListener(e -> {
@@ -136,19 +137,6 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         }
     }
 
-    private void initializeCartTable() {
-        CustomTableButton.ColumnEditorType[] editorTypes = {
-                CustomTableButton.ColumnEditorType.DEFAULT,    // STT
-                CustomTableButton.ColumnEditorType.DEFAULT,    // Số phòng
-                CustomTableButton.ColumnEditorType.DEFAULT,    // Giá/giờ
-                CustomTableButton.ColumnEditorType.DEFAULT,    // Số đêm
-                CustomTableButton.ColumnEditorType.DEFAULT,    // Khoảng thời gian
-                CustomTableButton.ColumnEditorType.DEFAULT,     // Dịch vụ
-                CustomTableButton.ColumnEditorType.DEFAULT     // Thành tiền
-        };
-
-        table_Cart.setColumnEditorTypes(editorTypes);
-    }
 
     private void initComboboxBookingMethod() {
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
@@ -522,13 +510,11 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         btn_DeleteAll = new ui.components.button.ButtonCancelCustom();
         pnl_InforBooking = new javax.swing.JPanel();
         pnl_Left_InforBooking = new javax.swing.JPanel();
-        lbl_TotalTime = new javax.swing.JLabel();
         lbl_LastTotalPrice = new javax.swing.JLabel();
         lbl_BookingMethod = new javax.swing.JLabel();
         lbl_Deposit = new javax.swing.JLabel();
         lbl_RemainingAmount = new javax.swing.JLabel();
         pnl_Right_InforBooking = new javax.swing.JPanel();
-        lbl_TotalTime_Value = new javax.swing.JLabel();
         lbl_LastTotalPrice_Value = new javax.swing.JLabel();
         cbx_BookingMethod = new ui.components.combobox.StyledComboBox();
         lbl_Deposit_Value = new javax.swing.JLabel();
@@ -765,9 +751,9 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
             .addComponent(table_EntityRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE)
             .addComponent(pnl_InforBookingRoom, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl_EmptyRoomLayout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(12, 12, 12)
                 .addComponent(btn_AddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btn_SeeDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
@@ -777,11 +763,11 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
                 .addComponent(pnl_InforBookingRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(table_EntityRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_AddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_SeeDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btn_SeeDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_AddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         add(pnl_EmptyRoom, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 820, 490));
@@ -1006,11 +992,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         pnl_InforBooking.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin đặt phòng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 16), new java.awt.Color(153, 153, 255))); // NOI18N
 
         pnl_Left_InforBooking.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Left_InforBooking.setLayout(new java.awt.GridLayout(5, 1));
-
-        lbl_TotalTime.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lbl_TotalTime.setText("Tổng thời gian:");
-        pnl_Left_InforBooking.add(lbl_TotalTime);
+        pnl_Left_InforBooking.setLayout(new java.awt.GridLayout(4, 1));
 
         lbl_LastTotalPrice.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lbl_LastTotalPrice.setText("Tổng tiền:");
@@ -1029,12 +1011,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         pnl_Left_InforBooking.add(lbl_RemainingAmount);
 
         pnl_Right_InforBooking.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Right_InforBooking.setLayout(new java.awt.GridLayout(5, 1, 0, 10));
-
-        lbl_TotalTime_Value.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lbl_TotalTime_Value.setForeground(new java.awt.Color(255, 0, 51));
-        lbl_TotalTime_Value.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        pnl_Right_InforBooking.add(lbl_TotalTime_Value);
+        pnl_Right_InforBooking.setLayout(new java.awt.GridLayout(4, 1, 0, 10));
 
         lbl_LastTotalPrice_Value.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lbl_LastTotalPrice_Value.setForeground(new java.awt.Color(255, 0, 51));
@@ -1066,13 +1043,13 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         pnl_InforBookingLayout.setVerticalGroup(
             pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_InforBookingLayout.createSequentialGroup()
-                .addGroup(pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(pnl_Right_InforBooking, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
-                    .addComponent(pnl_Left_InforBooking, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnl_Left_InforBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnl_Right_InforBooking, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)))
         );
 
-        add(pnl_InforBooking, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 300, 480, 270));
+        add(pnl_InforBooking, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 310, 480, 260));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_CancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_CancelActionPerformed
@@ -1203,8 +1180,6 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
     private javax.swing.JLabel lbl_RangePrice;
     private javax.swing.JLabel lbl_RemainingAmount;
     private javax.swing.JLabel lbl_RemainingAmount_Value;
-    private javax.swing.JLabel lbl_TotalTime;
-    private javax.swing.JLabel lbl_TotalTime_Value;
     private javax.swing.JPanel pnl_BottomService;
     private javax.swing.JPanel pnl_ButtonActions;
     private javax.swing.JPanel pnl_Cart;
@@ -1271,45 +1246,6 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         return priceRanges;
     }
 
-    /**
-     * Hiển thị danh sách phòng trong bảng.
-     */
-    private void displayRoomsInTable(List<Room> rooms) {
-        CustomTableButton.CustomTableModel model = table_EntityRoom.getTableModel();
-        model.clearData();
-
-        for (Room room : rooms) {
-            if (room.getStatus() == Room.STATUS_AVAILABLE || room.getStatus() == Room.STATUS_RESERVED) {
-                // Xử lý amenities an toàn
-                String amenitiesStr = "N/A";
-                try {
-                    amenitiesStr = room.getAmenities() != null ?
-                            String.join(", ", room.getAmenities()) : "N/A";
-                } catch (Exception e) {
-                    amenitiesStr = "Lỗi khi tải tiện nghi";
-                }
-
-                // Xử lý loại phòng an toàn
-                String roomTypeStr = "N/A";
-                try {
-                    roomTypeStr = room.getRoomType() != null ?
-                            room.getRoomType().getTypeName() : "N/A";
-                } catch (Exception e) {
-                    roomTypeStr = "Lỗi khi tải loại phòng";
-                }
-
-//                Object[] rowData = {
-//                        model.getRowCount() + 1,
-//                        room.getRoomId(),
-//                        roomTypeStr,
-//                        String.format("%,.0f VND", room.getPrice()),
-//                        amenitiesStr,
-//                        convertStatus(room.getStatus())
-//                };
-//                model.addRow(rowData, null);
-            }
-        }
-    }
 
     private String convertStatus(int status) {
         String statusText;
@@ -1332,62 +1268,24 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         return statusText;
     }
 
-    /**
-     * Phân tích chuỗi khoảng giá và trả về mảng chứa giá tối thiểu và tối đa.
-     * @param priceRange Chuỗi khoảng giá.
-     * @return Mảng chứa giá tối thiểu và tối đa.
-     */
-    public double[] parsePriceRange(String priceRange) {
-        double[] result = new double[2];
-
-        if (priceRange == null || priceRange.isEmpty() || priceRange.equals("Tất cả giá")) {
-            result[0] = 0;
-            result[1] = Double.MAX_VALUE;
-            return result;
-        }
-
-        if (priceRange.startsWith("Trên")) {
-            String numberStr = priceRange.replaceAll("[^\\d.]", "");
-            result[0] = Double.parseDouble(numberStr);
-            result[1] = Double.MAX_VALUE;
-            return result;
-        }
-
-        // Xử lý chuỗi dạng "1,000,000 - 2,000,000 VND"
-        String[] parts = priceRange.split(" - ");
-        if (parts.length == 2) {
-            String minStr = parts[0].replaceAll("[^\\d.]", "");
-            String maxStr = parts[1].replaceAll("[^\\d.]", "");
-
-            result[0] = Double.parseDouble(minStr);
-            result[1] = Double.parseDouble(maxStr);
-        }
-
-        return result;
-    }
 
     /**
      * Lọc danh sách phòng theo loại phòng đã chọn.
      * @param roomType Loại phòng đã chọn.
      */
     private void filterRoomsByType(String roomType) {
-//        Date checkIn = calendar_Checkin.getSelectedDate();
-//        Date checkOut = calendar_Checout.getSelectedDate();
-//        int capacity = (int) spinner_Capacity.getValue();
-//
-//        String priceRange = (String) cbx_RangePrice.getSelectedItem();
-//        double[] prices = parsePriceRange(priceRange);
-//
-//        RoomDAO roomDAO = new RoomDAOImpl();
-//        List<Room> filteredRooms = roomDAO.findAvailableRooms(
-//                checkIn,
-//                checkOut,
-//                capacity,
-//                roomType.equals("Tất cả loại") ? null : roomType,
-//                prices[0],
-//                prices[1]
-//        );
-//        displayRoomsInTable(filteredRooms);
+        Date checkIn = calendar_Checkin.getSelectedDate();
+        Date checkOut = calendar_Checkout.getSelectedDate();
+        int capacity = (int) spinner_Capacity.getValue();
+
+        RoomDAO roomDAO = new RoomDAOImpl();
+        if (roomType.equals("Tất cả loại phòng")) {
+            List<Room> allRooms = roomDAO.findAll();
+            displayHourlyRoomsInTable(allRooms, checkIn);
+        } else {
+            List<Room> filteredRooms = roomDAO.findAvailableRoomsForHourlyBooking(checkIn, checkOut, capacity, roomType);
+            displayHourlyRoomsInTable(filteredRooms, checkIn);
+        }
     }
 
 
@@ -1407,32 +1305,6 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         return false;
     }
 
-
-    /**
-     * Cập nhật tiền cho hàng trong giỏ hàng.
-     */
-    private void updateRowTotal(int row) {
-        try {
-            CustomTableButton.CustomTableModel model = table_Cart.getTableModel();
-            Object[] rowData = model.getRowData(row);
-
-            // Lấy thông tin từ hàng
-            String roomId = (String) rowData[1];
-            int numberOfNights = (int) rowData[3];
-            double pricePerNight = Double.parseDouble(((String) rowData[2]).replaceAll("[^\\d.]", ""));
-
-            // Tính toán tổng tiền cho hàng
-            double rowTotal = pricePerNight * numberOfNights;
-
-            // Cập nhật dữ liệu hàng
-            rowData[5] = String.format("%,.0f VND", rowTotal);
-            model.fireTableRowsUpdated(row, row);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Lỗi cập nhật giá trị hàng: " + ex.getMessage(),
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-    }
 
     /**
      * Cập nhật tổng tiền trong giỏ hàng.
@@ -1496,11 +1368,11 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
      * Xóa tất cả thông tin trong form.
      */
     private void clear() {
-//        calendar_Checkin.setSelectedDate(null);
-//        calendar_Checout.setSelectedDate(null);
-//        spinner_Capacity.setValue(1);
-//        cbx_TypeRoom.setSelectedIndex(0);
-//        cbx_RangePrice.setSelectedIndex(0);
+        calendar_Checkin.setSelectedDate(null);
+        calendar_Checkout.setSelectedDate(null);
+        spinner_Capacity.setValue(1);
+        cbx_TypeRoom.setSelectedIndex(0);
+        cbx_RangePrice.setSelectedIndex(0);
 
         table_EntityRoom.getTableModel().clearData();
         table_Cart.getTableModel().clearData();
@@ -1511,7 +1383,8 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         cbx_BookingMethod.setSelectedIndex(0);
 
         List<Room> allRooms = roomDAO.findAll();
-        displayRoomsInTable(allRooms);
+        Date checkIn = calendar_Checkin.getSelectedDate();
+        displayHourlyRoomsInTable(allRooms, checkIn);
     }
 
 
@@ -1823,6 +1696,10 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
                 table_EntityRoom.getTableModel().clearData();
                 JOptionPane.showMessageDialog(this, "Không có phòng trống trong khoảng thời gian này",
                         "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+
+                List<Room> rooms = roomDAO.findAll();
+                Date checkinDate = calendar_Checkin.getSelectedDate();
+                displayHourlyRoomsInTable(rooms, checkinDate);
             } else {
                 displayHourlyRoomsInTable(availableRooms, startTime);
             }
@@ -1833,6 +1710,10 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         }
     }
 
+
+    /**
+     * Hiển thị danh sách phòng trong bảng.
+     */
     private void displayHourlyRoomsInTable(List<Room> rooms, Date checkInTime) {
         CustomTableButton.CustomTableModel model = table_EntityRoom.getTableModel();
         model.clearData();
