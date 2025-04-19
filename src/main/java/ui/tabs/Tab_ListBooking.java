@@ -40,6 +40,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         jPanel6 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -111,6 +112,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         jPanel2.setLayout(new java.awt.BorderLayout());
 
+        customTableButton2.setColumnNames(new String[] {"STT", "Mã dịch vụ", "Tên dịch vụ", "Giá", "Số lượng", "Thành tiền"});
         customTableButton2.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
         jPanel2.add(customTableButton2, java.awt.BorderLayout.CENTER);
 
@@ -142,16 +144,17 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 390, 800, 30));
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 800, Short.MAX_VALUE)
+            .addGap(0, 798, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 120, Short.MAX_VALUE)
+            .addGap(0, 118, Short.MAX_VALUE)
         );
 
         add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 420, 800, 120));
@@ -180,6 +183,21 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         );
 
         add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 540, 800, 30));
+
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 348, Short.MAX_VALUE)
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 298, Short.MAX_VALUE)
+        );
+
+        add(jPanel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 80, 350, 300));
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -196,6 +214,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private ui.components.textfield.SearchTextField searchTextField1;
     private ui.components.combobox.StyledComboBox styledComboBox1;
     // End of variables declaration//GEN-END:variables

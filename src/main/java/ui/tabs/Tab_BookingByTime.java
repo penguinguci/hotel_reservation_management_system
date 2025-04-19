@@ -24,7 +24,9 @@ import ui.dialogs.Dialog_AddCustomer;
 import ui.dialogs.Dialog_AddService;
 import ui.dialogs.Dialog_ViewRoomDetails;
 import ultilities.GenerateString;
+import ultilities.NumericDocument;
 import utils.AppUtil;
+import utils.DateUtil;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -34,6 +36,9 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
 import java.rmi.RemoteException;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,7 +67,10 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         initializePriceRangeComboBox();
         initializeRoomTypeComboBox();
         initComboboxBookingMethod();
-        initializeCartTable();
+//        initializeCartTable();
+        initButtonGroup();
+        initializeHourlyBookingComponents();
+        initDataTableEntity();
 
         initSpinner();
 
@@ -95,27 +103,51 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         setFocusCycleRoot(true);
     }
 
+    private void initButtonGroup() {
+        ButtonGroup buttonGroup = new ButtonGroup();
+        buttonGroup.add(rb_Checkin);
+        buttonGroup.add(rb_NumberOfHour);
+    }
+
+    private void initializeHourlyBookingComponents() {
+        rb_NumberOfHour.addActionListener(e -> toggleHourlyBookingMode(true));
+        rb_Checkin.addActionListener(e -> toggleHourlyBookingMode(false));
+
+        txt_NumberOfHour.setDocument(new NumericDocument(2));
+
+        // Thêm gợi ý số giờ
+        String[] hourSuggestions = {"2", "4", "6", "8", "10"};
+        JComboBox<String> hourComboBox = new JComboBox<>(hourSuggestions);
+        txt_NumberOfHour.setLayout(new BorderLayout());
+        txt_NumberOfHour.add(hourComboBox, BorderLayout.EAST);
+        hourComboBox.addActionListener(e -> {
+            String selected = (String) hourComboBox.getSelectedItem();
+            txt_NumberOfHour.setText(selected);
+        });
+    }
+
+    private void toggleHourlyBookingMode(boolean isHourly) {
+        txt_NumberOfHour.setEnabled(isHourly);
+        calendar_Checkout.setEnabled(!isHourly);
+        timePicker_Checkout.setEnabled(!isHourly);
+
+        if (isHourly) {
+            txt_NumberOfHour.requestFocus();
+        }
+    }
+
     private void initializeCartTable() {
         CustomTableButton.ColumnEditorType[] editorTypes = {
                 CustomTableButton.ColumnEditorType.DEFAULT,    // STT
                 CustomTableButton.ColumnEditorType.DEFAULT,    // Số phòng
-                CustomTableButton.ColumnEditorType.DEFAULT,    // Giá/đêm
-                CustomTableButton.ColumnEditorType.SPINNER,    // Số đêm
+                CustomTableButton.ColumnEditorType.DEFAULT,    // Giá/giờ
+                CustomTableButton.ColumnEditorType.DEFAULT,    // Số đêm
+                CustomTableButton.ColumnEditorType.DEFAULT,    // Khoảng thời gian
                 CustomTableButton.ColumnEditorType.DEFAULT,     // Dịch vụ
                 CustomTableButton.ColumnEditorType.DEFAULT     // Thành tiền
         };
 
         table_Cart.setColumnEditorTypes(editorTypes);
-
-        table_Cart.getTable().getColumnModel().getColumn(3).setCellRenderer(new CustomTableButton.SpinnerRenderer());
-        table_Cart.getTable().getColumnModel().getColumn(3).setCellEditor(new CustomTableButton.SpinnerEditor());
-
-        table_Cart.getTable().getModel().addTableModelListener(e -> {
-            if (e.getColumn() == 3) {
-                updateRowTotal(e.getFirstRow());
-                updateSummaryTotals();
-            }
-        });
     }
 
     private void initComboboxBookingMethod() {
@@ -235,8 +267,6 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         }
 
         cbx_RangePrice.setModel(model);
-
-        displayRoomsInTable(allRooms);
     }
 
     private void initializeSearchCustomer() {
@@ -392,6 +422,12 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         });
     }
 
+    private void initDataTableEntity() {
+        List<Room> rooms = roomDAO.findAll();
+        Date checkInDate = DateUtil.combineDateAndTime(calendar_Checkin.getSelectedDate(), timePicker_Checkin.getTime());
+        displayHourlyRoomsInTable(rooms, checkInDate);
+    }
+
     private void ensureFocus() {
         JTextField textField = txt_SearchCustomer.getTextField();
         if (!textField.hasFocus()) {
@@ -427,23 +463,33 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
 
         pnl_EmptyRoom = new javax.swing.JPanel();
         pnl_InforBookingRoom = new javax.swing.JPanel();
-        btn_SearchRoom = new ui.components.button.ButtonCustom();
         pnl_Left_InforBookRoom = new javax.swing.JPanel();
-        pnl_Label_Left_InforBookRoom = new javax.swing.JPanel();
-        lbl_Checkin = new javax.swing.JLabel();
-        lbl_Checkout = new javax.swing.JLabel();
-        lbl_RangePrice = new javax.swing.JLabel();
-        pnl_Input_Left_InforBookRoom = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        lbl_CheckinDateTime = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         calendar_Checkin = new ui.components.calendar.CustomCalendar();
-        calendar_Checout = new ui.components.calendar.CustomCalendar();
-        cbx_RangePrice = new ui.components.combobox.StyledComboBox();
-        pnl_Right_InforBookRoom = new javax.swing.JPanel();
-        pnl_Label_Right_InforBookRoom = new javax.swing.JPanel();
+        timePicker_Checkin = new ui.components.time.ModernTimePicker();
+        jPanel3 = new javax.swing.JPanel();
+        lbl_RangePrice = new javax.swing.JLabel();
         lbl_Capacity = new javax.swing.JLabel();
-        lbl_TypeRoom = new javax.swing.JLabel();
-        pnl_Input_Right_InforBookRoom = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        cbx_RangePrice = new ui.components.combobox.StyledComboBox();
         spinner_Capacity = new javax.swing.JSpinner();
+        pnl_Right_InforBookRoom = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        rb_NumberOfHour = new javax.swing.JRadioButton();
+        rb_Checkin = new javax.swing.JRadioButton();
+        jPanel8 = new javax.swing.JPanel();
+        txt_NumberOfHour = new javax.swing.JTextField();
+        calendar_Checkout = new ui.components.calendar.CustomCalendar();
+        timePicker_Checkout = new ui.components.time.ModernTimePicker();
+        jPanel9 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jPanel11 = new javax.swing.JPanel();
         cbx_TypeRoom = new ui.components.combobox.StyledComboBox();
+        btn_SearchRoom = new ui.components.button.ButtonCustom();
         btn_Clear = new ui.components.button.ButtonCancelCustom();
         table_EntityRoom = new ui.components.table.CustomTableButton();
         btn_AddRoom = new ui.components.button.ButtonCustom();
@@ -476,11 +522,13 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         btn_DeleteAll = new ui.components.button.ButtonCancelCustom();
         pnl_InforBooking = new javax.swing.JPanel();
         pnl_Left_InforBooking = new javax.swing.JPanel();
+        lbl_TotalTime = new javax.swing.JLabel();
         lbl_LastTotalPrice = new javax.swing.JLabel();
         lbl_BookingMethod = new javax.swing.JLabel();
         lbl_Deposit = new javax.swing.JLabel();
         lbl_RemainingAmount = new javax.swing.JLabel();
         pnl_Right_InforBooking = new javax.swing.JPanel();
+        lbl_TotalTime_Value = new javax.swing.JLabel();
         lbl_LastTotalPrice_Value = new javax.swing.JLabel();
         cbx_BookingMethod = new ui.components.combobox.StyledComboBox();
         lbl_Deposit_Value = new javax.swing.JLabel();
@@ -494,107 +542,171 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         pnl_InforBookingRoom.setBackground(new java.awt.Color(255, 255, 255));
         pnl_InforBookingRoom.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin đặt phòng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 15), new java.awt.Color(136, 130, 246))); // NOI18N
 
+        pnl_Left_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setLayout(new java.awt.GridLayout(2, 0));
+
+        lbl_CheckinDateTime.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_CheckinDateTime.setText("Ngày giờ checkin:");
+        jPanel1.add(lbl_CheckinDateTime);
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setLayout(new java.awt.GridLayout(2, 0, 0, 12));
+        jPanel2.add(calendar_Checkin);
+
+        timePicker_Checkin.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        timePicker_Checkin.setAccentColor(new java.awt.Color(153, 153, 255));
+        jPanel2.add(timePicker_Checkin);
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setLayout(new java.awt.GridLayout(2, 1, 0, 10));
+
+        lbl_RangePrice.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_RangePrice.setText("Khoảng giá:");
+        jPanel3.add(lbl_RangePrice);
+
+        lbl_Capacity.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Capacity.setText("Sức chứa:");
+        jPanel3.add(lbl_Capacity);
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setLayout(new java.awt.GridLayout(2, 1, 0, 15));
+        jPanel4.add(cbx_RangePrice);
+        jPanel4.add(spinner_Capacity);
+
+        javax.swing.GroupLayout pnl_Left_InforBookRoomLayout = new javax.swing.GroupLayout(pnl_Left_InforBookRoom);
+        pnl_Left_InforBookRoom.setLayout(pnl_Left_InforBookRoomLayout);
+        pnl_Left_InforBookRoomLayout.setHorizontalGroup(
+            pnl_Left_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_Left_InforBookRoomLayout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addGroup(pnl_Left_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnl_Left_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
+        );
+        pnl_Left_InforBookRoomLayout.setVerticalGroup(
+            pnl_Left_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_Left_InforBookRoomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnl_Left_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(pnl_Left_InforBookRoomLayout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(11, 11, 11)))
+                .addGap(10, 10, 10)
+                .addGroup(pnl_Left_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pnl_Right_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel7.setLayout(new java.awt.GridLayout(3, 1));
+
+        rb_NumberOfHour.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        rb_NumberOfHour.setText("Số giờ sử dụng");
+        jPanel7.add(rb_NumberOfHour);
+
+        rb_Checkin.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        rb_Checkin.setText("Ngày giờ checkout");
+        jPanel7.add(rb_Checkin);
+
+        jPanel8.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel8.setLayout(new java.awt.GridLayout(3, 1, 0, 12));
+
+        txt_NumberOfHour.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        txt_NumberOfHour.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        jPanel8.add(txt_NumberOfHour);
+        jPanel8.add(calendar_Checkout);
+
+        timePicker_Checkout.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        timePicker_Checkout.setAccentColor(new java.awt.Color(153, 153, 255));
+        jPanel8.add(timePicker_Checkout);
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        jPanel9.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel9.setPreferredSize(new java.awt.Dimension(355, 45));
+
+        jPanel10.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel10.setLayout(new java.awt.GridLayout(1, 1));
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        jLabel5.setText("Loại phòng:");
+        jPanel10.add(jLabel5);
+
+        jPanel11.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel11.setLayout(new java.awt.GridLayout(1, 1));
+        jPanel11.add(cbx_TypeRoom);
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel9Layout.createSequentialGroup()
+                    .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 202, Short.MAX_VALUE)))
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+            .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(jPanel10, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout pnl_Right_InforBookRoomLayout = new javax.swing.GroupLayout(pnl_Right_InforBookRoom);
+        pnl_Right_InforBookRoom.setLayout(pnl_Right_InforBookRoomLayout);
+        pnl_Right_InforBookRoomLayout.setHorizontalGroup(
+            pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        pnl_Right_InforBookRoomLayout.setVerticalGroup(
+            pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_Right_InforBookRoomLayout.createSequentialGroup()
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
         btn_SearchRoom.setText("Tìm kiếm");
         btn_SearchRoom.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btn_SearchRoomActionPerformed(evt);
             }
         });
-
-        pnl_Left_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
-
-        pnl_Label_Left_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Label_Left_InforBookRoom.setLayout(new java.awt.GridLayout(3, 1));
-
-        lbl_Checkin.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_Checkin.setText("Ngày checkin:");
-        pnl_Label_Left_InforBookRoom.add(lbl_Checkin);
-
-        lbl_Checkout.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_Checkout.setText("Ngày checkout:");
-        pnl_Label_Left_InforBookRoom.add(lbl_Checkout);
-
-        lbl_RangePrice.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_RangePrice.setText("Khoảng giá:");
-        pnl_Label_Left_InforBookRoom.add(lbl_RangePrice);
-
-        pnl_Input_Left_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Input_Left_InforBookRoom.setLayout(new java.awt.GridLayout(3, 1, 0, 10));
-
-        calendar_Checkin.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        pnl_Input_Left_InforBookRoom.add(calendar_Checkin);
-
-        calendar_Checout.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        pnl_Input_Left_InforBookRoom.add(calendar_Checout);
-
-        cbx_RangePrice.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        pnl_Input_Left_InforBookRoom.add(cbx_RangePrice);
-
-        javax.swing.GroupLayout pnl_Left_InforBookRoomLayout = new javax.swing.GroupLayout(pnl_Left_InforBookRoom);
-        pnl_Left_InforBookRoom.setLayout(pnl_Left_InforBookRoomLayout);
-        pnl_Left_InforBookRoomLayout.setHorizontalGroup(
-                pnl_Left_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnl_Left_InforBookRoomLayout.createSequentialGroup()
-                                .addComponent(pnl_Label_Left_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(pnl_Input_Left_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
-        );
-        pnl_Left_InforBookRoomLayout.setVerticalGroup(
-                pnl_Left_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(pnl_Label_Left_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pnl_Input_Left_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
-        );
-
-        pnl_Right_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
-
-        pnl_Label_Right_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Label_Right_InforBookRoom.setLayout(new java.awt.GridLayout(3, 1));
-
-        lbl_Capacity.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_Capacity.setText("Sức chứa:");
-        pnl_Label_Right_InforBookRoom.add(lbl_Capacity);
-
-        lbl_TypeRoom.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_TypeRoom.setText("Loại phòng:");
-        pnl_Label_Right_InforBookRoom.add(lbl_TypeRoom);
-
-        pnl_Input_Right_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Input_Right_InforBookRoom.setPreferredSize(new java.awt.Dimension(84, 100));
-        pnl_Input_Right_InforBookRoom.setLayout(new java.awt.GridLayout(3, 1, 0, 12));
-
-        spinner_Capacity.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        spinner_Capacity.setFocusable(false);
-        spinner_Capacity.setVerifyInputWhenFocusTarget(false);
-        pnl_Input_Right_InforBookRoom.add(spinner_Capacity);
-
-        cbx_TypeRoom.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        pnl_Input_Right_InforBookRoom.add(cbx_TypeRoom);
-
-        javax.swing.GroupLayout pnl_Right_InforBookRoomLayout = new javax.swing.GroupLayout(pnl_Right_InforBookRoom);
-        pnl_Right_InforBookRoom.setLayout(pnl_Right_InforBookRoomLayout);
-        pnl_Right_InforBookRoomLayout.setHorizontalGroup(
-                pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 312, Short.MAX_VALUE)
-                        .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(pnl_Right_InforBookRoomLayout.createSequentialGroup()
-                                        .addComponent(pnl_Label_Right_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 233, Short.MAX_VALUE)))
-                        .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_Right_InforBookRoomLayout.createSequentialGroup()
-                                        .addContainerGap(103, Short.MAX_VALUE)
-                                        .addComponent(pnl_Input_Right_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addContainerGap()))
-        );
-        pnl_Right_InforBookRoomLayout.setVerticalGroup(
-                pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 142, Short.MAX_VALUE)
-                        .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(pnl_Label_Right_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE))
-                        .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(pnl_Right_InforBookRoomLayout.createSequentialGroup()
-                                        .addComponent(pnl_Input_Right_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
-                                        .addContainerGap()))
-        );
 
         btn_Clear.setText("Xóa trắng");
         btn_Clear.addActionListener(new java.awt.event.ActionListener() {
@@ -606,33 +718,30 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl_InforBookingRoomLayout = new javax.swing.GroupLayout(pnl_InforBookingRoom);
         pnl_InforBookingRoom.setLayout(pnl_InforBookingRoomLayout);
         pnl_InforBookingRoomLayout.setHorizontalGroup(
-                pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_InforBookingRoomLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(pnl_Left_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(pnl_Right_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addGroup(pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(btn_SearchRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
-                                        .addComponent(btn_Clear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
+            pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_InforBookingRoomLayout.createSequentialGroup()
+                .addComponent(pnl_Left_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnl_Right_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btn_SearchRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_Clear, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(2, 2, 2))
         );
         pnl_InforBookingRoomLayout.setVerticalGroup(
-                pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(pnl_Right_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addGroup(pnl_InforBookingRoomLayout.createSequentialGroup()
-                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btn_SearchRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btn_Clear, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(pnl_InforBookingRoomLayout.createSequentialGroup()
-                                        .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(pnl_Left_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_InforBookingRoomLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btn_SearchRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btn_Clear, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addComponent(pnl_Left_InforBookRoom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(pnl_Right_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        table_EntityRoom.setColumnNames(new String[] {"STT", "Số phòng", "Loại phòng", "Giá/đêm", "Tiện nghi", "Trạng thái"});
+        table_EntityRoom.setColumnNames(new String[] {"STT", "Số phòng", "Loại phòng", "Giá/giờ", "Thời gian tối thiểu", "Tiện nghi", "Trạng thái"});
         table_EntityRoom.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
 
         btn_AddRoom.setText("Thêm");
@@ -652,30 +761,30 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl_EmptyRoomLayout = new javax.swing.GroupLayout(pnl_EmptyRoom);
         pnl_EmptyRoom.setLayout(pnl_EmptyRoomLayout);
         pnl_EmptyRoomLayout.setHorizontalGroup(
-                pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(pnl_InforBookingRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(table_EntityRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl_EmptyRoomLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(btn_AddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(btn_SeeDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
+            pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(table_EntityRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE)
+            .addComponent(pnl_InforBookingRoom, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl_EmptyRoomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btn_AddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btn_SeeDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         pnl_EmptyRoomLayout.setVerticalGroup(
-                pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_EmptyRoomLayout.createSequentialGroup()
-                                .addComponent(pnl_InforBookingRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(table_EntityRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(btn_AddRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
-                                        .addComponent(btn_SeeDetails, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap(22, Short.MAX_VALUE))
+            pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_EmptyRoomLayout.createSequentialGroup()
+                .addComponent(pnl_InforBookingRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(table_EntityRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_AddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_SeeDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        add(pnl_EmptyRoom, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 820, 440));
+        add(pnl_EmptyRoom, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 820, 490));
 
         pnl_InforCustomer.setBackground(new java.awt.Color(255, 255, 255));
         pnl_InforCustomer.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin khách hàng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 15), new java.awt.Color(136, 130, 246))); // NOI18N
@@ -749,12 +858,9 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
 
         btn_Booking.setText("Đặt phòng");
         btn_Booking.addActionListener(new java.awt.event.ActionListener() {
+            @SneakyThrows
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try {
-                    btn_BookingActionPerformed(evt);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                btn_BookingActionPerformed(evt);
             }
         });
 
@@ -770,26 +876,26 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl_ButtonActionsLayout = new javax.swing.GroupLayout(pnl_ButtonActions);
         pnl_ButtonActions.setLayout(pnl_ButtonActionsLayout);
         pnl_ButtonActionsLayout.setHorizontalGroup(
-                pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(btn_Booking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
-                                                .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(btn_KeyboardNumber, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btn_Booking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
+                        .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btn_KeyboardNumber, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         pnl_ButtonActionsLayout.setVerticalGroup(
-                pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(btn_Booking, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btn_KeyboardNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE))
+            pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btn_Booking, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_KeyboardNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         add(pnl_ButtonActions, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 570, 480, 130));
@@ -797,7 +903,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         pnl_Cart.setBackground(new java.awt.Color(255, 255, 255));
         pnl_Cart.setLayout(new java.awt.BorderLayout());
 
-        table_Cart.setColumnNames(new String[] {"STT", "Số phòng", "Giá/đêm", "Số đêm", "Dịch vụ", "Thành tiền"});
+        table_Cart.setColumnNames(new String[] {"STT", "Số phòng", "Giá/giờ", "Số giờ", "Khoảng TG", "Dịch vụ", "Thành tiền"});
         table_Cart.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
         pnl_Cart.add(table_Cart, java.awt.BorderLayout.CENTER);
 
@@ -821,22 +927,22 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl_BottomServiceLayout = new javax.swing.GroupLayout(pnl_BottomService);
         pnl_BottomService.setLayout(pnl_BottomServiceLayout);
         pnl_BottomServiceLayout.setHorizontalGroup(
-                pnl_BottomServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnl_BottomServiceLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(btn_AddService, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(btn_UpdateService, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(534, Short.MAX_VALUE))
+            pnl_BottomServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_BottomServiceLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btn_AddService, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btn_UpdateService, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(534, Short.MAX_VALUE))
         );
         pnl_BottomServiceLayout.setVerticalGroup(
-                pnl_BottomServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_BottomServiceLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(pnl_BottomServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(btn_AddService, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                                        .addComponent(btn_UpdateService, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
+            pnl_BottomServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_BottomServiceLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnl_BottomServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btn_AddService, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                    .addComponent(btn_UpdateService, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pnl_Cart.add(pnl_BottomService, java.awt.BorderLayout.PAGE_END);
@@ -867,40 +973,44 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl_TopCartLayout = new javax.swing.GroupLayout(pnl_TopCart);
         pnl_TopCart.setLayout(pnl_TopCartLayout);
         pnl_TopCartLayout.setHorizontalGroup(
-                pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_TopCartLayout.createSequentialGroup()
-                                .addContainerGap(624, Short.MAX_VALUE)
-                                .addComponent(btn_DeleteOne, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btn_DeleteAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
-                        .addGroup(pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(pnl_TopCartLayout.createSequentialGroup()
-                                        .addComponent(lbl_CartTittle, javax.swing.GroupLayout.PREFERRED_SIZE, 411, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 409, Short.MAX_VALUE)))
+            pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_TopCartLayout.createSequentialGroup()
+                .addContainerGap(624, Short.MAX_VALUE)
+                .addComponent(btn_DeleteOne, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btn_DeleteAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnl_TopCartLayout.createSequentialGroup()
+                    .addComponent(lbl_CartTittle, javax.swing.GroupLayout.PREFERRED_SIZE, 411, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 409, Short.MAX_VALUE)))
         );
         pnl_TopCartLayout.setVerticalGroup(
-                pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnl_TopCartLayout.createSequentialGroup()
-                                .addGroup(pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(btn_DeleteOne, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btn_DeleteAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 6, Short.MAX_VALUE))
-                        .addGroup(pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(pnl_TopCartLayout.createSequentialGroup()
-                                        .addComponent(lbl_CartTittle, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 0, Short.MAX_VALUE)))
+            pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_TopCartLayout.createSequentialGroup()
+                .addGroup(pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_DeleteOne, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_DeleteAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 6, Short.MAX_VALUE))
+            .addGroup(pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnl_TopCartLayout.createSequentialGroup()
+                    .addComponent(lbl_CartTittle, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(0, 0, Short.MAX_VALUE)))
         );
 
         pnl_Cart.add(pnl_TopCart, java.awt.BorderLayout.PAGE_START);
 
-        add(pnl_Cart, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 440, 820, 260));
+        add(pnl_Cart, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 490, 820, 210));
 
         pnl_InforBooking.setBackground(new java.awt.Color(255, 255, 255));
         pnl_InforBooking.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin đặt phòng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 16), new java.awt.Color(153, 153, 255))); // NOI18N
 
         pnl_Left_InforBooking.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Left_InforBooking.setLayout(new java.awt.GridLayout(4, 1));
+        pnl_Left_InforBooking.setLayout(new java.awt.GridLayout(5, 1));
+
+        lbl_TotalTime.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_TotalTime.setText("Tổng thời gian:");
+        pnl_Left_InforBooking.add(lbl_TotalTime);
 
         lbl_LastTotalPrice.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lbl_LastTotalPrice.setText("Tổng tiền:");
@@ -919,7 +1029,12 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         pnl_Left_InforBooking.add(lbl_RemainingAmount);
 
         pnl_Right_InforBooking.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Right_InforBooking.setLayout(new java.awt.GridLayout(4, 1, 0, 10));
+        pnl_Right_InforBooking.setLayout(new java.awt.GridLayout(5, 1, 0, 10));
+
+        lbl_TotalTime_Value.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_TotalTime_Value.setForeground(new java.awt.Color(255, 0, 51));
+        lbl_TotalTime_Value.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        pnl_Right_InforBooking.add(lbl_TotalTime_Value);
 
         lbl_LastTotalPrice_Value.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         lbl_LastTotalPrice_Value.setForeground(new java.awt.Color(255, 0, 51));
@@ -940,24 +1055,24 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         javax.swing.GroupLayout pnl_InforBookingLayout = new javax.swing.GroupLayout(pnl_InforBooking);
         pnl_InforBooking.setLayout(pnl_InforBookingLayout);
         pnl_InforBookingLayout.setHorizontalGroup(
-                pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnl_InforBookingLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(pnl_Left_InforBooking, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(pnl_Right_InforBooking, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(14, Short.MAX_VALUE))
+            pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_InforBookingLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnl_Left_InforBooking, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnl_Right_InforBooking, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(14, Short.MAX_VALUE))
         );
         pnl_InforBookingLayout.setVerticalGroup(
-                pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(pnl_InforBookingLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(pnl_Left_InforBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(pnl_Right_InforBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_InforBookingLayout.createSequentialGroup()
+                .addGroup(pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(pnl_Right_InforBooking, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
+                    .addComponent(pnl_Left_InforBooking, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
-        add(pnl_InforBooking, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 310, 480, 260));
+        add(pnl_InforBooking, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 300, 480, 270));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_CancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_CancelActionPerformed
@@ -965,11 +1080,11 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
     }//GEN-LAST:event_btn_CancelActionPerformed
 
     private void btn_SearchRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchRoomActionPerformed
-        searchEntityRoom();
+        searchHourlyAvailableRooms();
     }//GEN-LAST:event_btn_SearchRoomActionPerformed
 
     private void btn_AddRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddRoomActionPerformed
-        addEntityRoomToCart();
+        addHourlyRoomToCart();
     }//GEN-LAST:event_btn_AddRoomActionPerformed
 
     private void btn_AddCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddCustomerActionPerformed
@@ -1026,7 +1141,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
     }//GEN-LAST:event_btn_DeleteAllActionPerformed
 
     private void btn_BookingActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_BookingActionPerformed
-        bookingRoom();
+        bookingRoomHourlyReservation();
     }//GEN-LAST:event_btn_BookingActionPerformed
 
     private void btn_SeeDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SeeDetailsActionPerformed
@@ -1054,15 +1169,25 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
     private ui.components.button.ButtonCustom btn_SeeDetails;
     private ui.components.button.ButtonCustom btn_UpdateService;
     private ui.components.calendar.CustomCalendar calendar_Checkin;
-    private ui.components.calendar.CustomCalendar calendar_Checout;
+    private ui.components.calendar.CustomCalendar calendar_Checkout;
     private ui.components.combobox.StyledComboBox cbx_BookingMethod;
     private ui.components.combobox.StyledComboBox cbx_RangePrice;
     private ui.components.combobox.StyledComboBox cbx_TypeRoom;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JLabel lbl_BookingMethod;
     private javax.swing.JLabel lbl_Capacity;
     private javax.swing.JLabel lbl_CartTittle;
-    private javax.swing.JLabel lbl_Checkin;
-    private javax.swing.JLabel lbl_Checkout;
+    private javax.swing.JLabel lbl_CheckinDateTime;
     private javax.swing.JLabel lbl_CustomerCCCD;
     private javax.swing.JLabel lbl_CustomerCCCD_Value;
     private javax.swing.JLabel lbl_CustomerGender;
@@ -1078,7 +1203,8 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
     private javax.swing.JLabel lbl_RangePrice;
     private javax.swing.JLabel lbl_RemainingAmount;
     private javax.swing.JLabel lbl_RemainingAmount_Value;
-    private javax.swing.JLabel lbl_TypeRoom;
+    private javax.swing.JLabel lbl_TotalTime;
+    private javax.swing.JLabel lbl_TotalTime_Value;
     private javax.swing.JPanel pnl_BottomService;
     private javax.swing.JPanel pnl_ButtonActions;
     private javax.swing.JPanel pnl_Cart;
@@ -1088,92 +1214,21 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
     private javax.swing.JPanel pnl_InforBooking;
     private javax.swing.JPanel pnl_InforBookingRoom;
     private javax.swing.JPanel pnl_InforCustomer;
-    private javax.swing.JPanel pnl_Input_Left_InforBookRoom;
-    private javax.swing.JPanel pnl_Input_Right_InforBookRoom;
-    private javax.swing.JPanel pnl_Label_Left_InforBookRoom;
-    private javax.swing.JPanel pnl_Label_Right_InforBookRoom;
     private javax.swing.JPanel pnl_Left_InforBookRoom;
     private javax.swing.JPanel pnl_Left_InforBooking;
     private javax.swing.JPanel pnl_Right_InforBookRoom;
     private javax.swing.JPanel pnl_Right_InforBooking;
     private javax.swing.JPanel pnl_TopCart;
+    private javax.swing.JRadioButton rb_Checkin;
+    private javax.swing.JRadioButton rb_NumberOfHour;
     private javax.swing.JSpinner spinner_Capacity;
     private ui.components.table.CustomTableButton table_Cart;
     private ui.components.table.CustomTableButton table_EntityRoom;
+    private ui.components.time.ModernTimePicker timePicker_Checkin;
+    private ui.components.time.ModernTimePicker timePicker_Checkout;
+    private javax.swing.JTextField txt_NumberOfHour;
     private ui.components.textfield.SearchTextField txt_SearchCustomer;
     // End of variables declaration//GEN-END:variables
-
-    /**
-     * Tìm kiếm phòng trống dựa trên các tiêu chí đã chọn.
-     */
-    private void searchEntityRoom() {
-        try {
-            // Lấy các tham số tìm kiếm (cho phép null)
-            Date checkinDate = calendar_Checkin.getSelectedDate();
-            Date checkoutDate = calendar_Checout.getSelectedDate();
-
-            // Validate ngày nếu có chọn
-            if (checkinDate != null && checkoutDate != null && checkinDate.after(checkoutDate)) {
-                JOptionPane.showMessageDialog(this, "Ngày check-out phải sau ngày check-in", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // Lấy các tham số khác (cho phép null)
-            Integer capacity = null;
-            try {
-                capacity = (spinner_Capacity.getValue() != null) ? (int) spinner_Capacity.getValue() : null;
-            } catch (Exception e) {
-                // Bỏ qua nếu có lỗi khi lấy giá trị spinner
-            }
-
-            String typeRoom = cbx_TypeRoom.getSelectedItem() != null ?
-                    cbx_TypeRoom.getSelectedItem().toString() : null;
-            typeRoom = (typeRoom != null && "Tất cả loại phòng".equals(typeRoom)) ? null : typeRoom;
-
-            // Xử lý khoảng giá
-            Double minPrice = null;
-            Double maxPrice = null;
-            if (cbx_RangePrice.getSelectedItem() != null) {
-                String priceRange = cbx_RangePrice.getSelectedItem().toString();
-                if (!"Tất cả giá".equals(priceRange)) {
-                    if (priceRange.startsWith("Trên")) {
-                        minPrice = Double.parseDouble(priceRange.replaceAll("[^\\d.]", ""));
-                        maxPrice = Double.MAX_VALUE;
-                    } else {
-                        String[] priceParts = priceRange.split(" - ");
-                        if (priceParts.length == 2) {
-                            minPrice = Double.parseDouble(priceParts[0].replaceAll("[^\\d.]", ""));
-                            maxPrice = Double.parseDouble(priceParts[1].replaceAll("[^\\d.]", ""));
-                        }
-                    }
-                }
-            }
-
-            // Tìm kiếm phòng (có thể không có điều kiện nào)
-            List<Room> availableRooms = roomDAO.findAvailableRooms(
-                    checkinDate,
-                    checkoutDate,
-                    capacity,
-                    typeRoom,
-                    minPrice,
-                    maxPrice
-            );
-
-            // Hiển thị kết quả
-            if (availableRooms == null || availableRooms.isEmpty()) {
-                table_EntityRoom.getTableModel().clearData();
-                JOptionPane.showMessageDialog(this, "Không tìm thấy phòng phù hợp", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                displayRoomsInTable(availableRooms);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi tìm kiếm phòng: " + e.getMessage(),
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
 
     /**
      * Tạo danh sách khoảng giá thông minh dựa trên danh sách phòng đã cho.
@@ -1224,33 +1279,35 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         model.clearData();
 
         for (Room room : rooms) {
-            // Xử lý amenities an toàn
-            String amenitiesStr = "N/A";
-            try {
-                amenitiesStr = room.getAmenities() != null ?
-                        String.join(", ", room.getAmenities()) : "N/A";
-            } catch (Exception e) {
-                amenitiesStr = "Lỗi khi tải tiện nghi";
-            }
+            if (room.getStatus() == Room.STATUS_AVAILABLE || room.getStatus() == Room.STATUS_RESERVED) {
+                // Xử lý amenities an toàn
+                String amenitiesStr = "N/A";
+                try {
+                    amenitiesStr = room.getAmenities() != null ?
+                            String.join(", ", room.getAmenities()) : "N/A";
+                } catch (Exception e) {
+                    amenitiesStr = "Lỗi khi tải tiện nghi";
+                }
 
-            // Xử lý loại phòng an toàn
-            String roomTypeStr = "N/A";
-            try {
-                roomTypeStr = room.getRoomType() != null ?
-                        room.getRoomType().getTypeName() : "N/A";
-            } catch (Exception e) {
-                roomTypeStr = "Lỗi khi tải loại phòng";
-            }
+                // Xử lý loại phòng an toàn
+                String roomTypeStr = "N/A";
+                try {
+                    roomTypeStr = room.getRoomType() != null ?
+                            room.getRoomType().getTypeName() : "N/A";
+                } catch (Exception e) {
+                    roomTypeStr = "Lỗi khi tải loại phòng";
+                }
 
-            Object[] rowData = {
-                    model.getRowCount() + 1,
-                    room.getRoomId(),
-                    roomTypeStr,
-                    String.format("%,.0f VND", room.getPrice()),
-                    amenitiesStr,
-                    convertStatus(room.getStatus())
-            };
-            model.addRow(rowData, null);
+//                Object[] rowData = {
+//                        model.getRowCount() + 1,
+//                        room.getRoomId(),
+//                        roomTypeStr,
+//                        String.format("%,.0f VND", room.getPrice()),
+//                        amenitiesStr,
+//                        convertStatus(room.getStatus())
+//                };
+//                model.addRow(rowData, null);
+            }
         }
     }
 
@@ -1314,38 +1371,25 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
      * @param roomType Loại phòng đã chọn.
      */
     private void filterRoomsByType(String roomType) {
-        Date checkIn = calendar_Checkin.getSelectedDate();
-        Date checkOut = calendar_Checout.getSelectedDate();
-        int capacity = (int) spinner_Capacity.getValue();
-
-        String priceRange = (String) cbx_RangePrice.getSelectedItem();
-        double[] prices = parsePriceRange(priceRange);
-
-        RoomDAO roomDAO = new RoomDAOImpl();
-        List<Room> filteredRooms = roomDAO.findAvailableRooms(
-                checkIn,
-                checkOut,
-                capacity,
-                roomType.equals("Tất cả loại") ? null : roomType,
-                prices[0],
-                prices[1]
-        );
-        displayRoomsInTable(filteredRooms);
+//        Date checkIn = calendar_Checkin.getSelectedDate();
+//        Date checkOut = calendar_Checout.getSelectedDate();
+//        int capacity = (int) spinner_Capacity.getValue();
+//
+//        String priceRange = (String) cbx_RangePrice.getSelectedItem();
+//        double[] prices = parsePriceRange(priceRange);
+//
+//        RoomDAO roomDAO = new RoomDAOImpl();
+//        List<Room> filteredRooms = roomDAO.findAvailableRooms(
+//                checkIn,
+//                checkOut,
+//                capacity,
+//                roomType.equals("Tất cả loại") ? null : roomType,
+//                prices[0],
+//                prices[1]
+//        );
+//        displayRoomsInTable(filteredRooms);
     }
 
-    /**
-     * Tính toán số đêm dựa trên ngày check-in và check-out đã chọn.
-     * @return Số đêm đã chọn.
-     */
-    private int calculateNumberOfNights() {
-        Date checkInDate = calendar_Checkin.getSelectedDate();
-        Date checkOutDate = calendar_Checout.getSelectedDate();
-        if (checkInDate != null && checkOutDate != null) {
-            long diffInMillis = checkOutDate.getTime() - checkInDate.getTime();
-            return (int) Math.max(1, diffInMillis / (1000 * 60 * 60 * 24));
-        }
-        return 1; // Mặc định 1 đêm nếu chưa chọn ngày
-    }
 
     /**
      * Kiểm tra xem phòng đã có trong giỏ hàng chưa.
@@ -1363,72 +1407,6 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         return false;
     }
 
-    /**
-     * Thêm phòng vào giỏ hàng.
-     * @param roomId ID của phòng cần thêm.
-     * @param price Giá của phòng.
-     * @param numberOfNights Số đêm đã chọn.
-     */
-    private void addToCart(String roomId, double price, int numberOfNights) {
-        CustomTableButton.CustomTableModel cartModel = table_Cart.getTableModel();
-
-        Object[] cartRow = {
-                cartModel.getRowCount() + 1,
-                roomId,
-                String.format("%,.0f VND", price),
-                numberOfNights,
-                "",
-                String.format("%,.0f VND", numberOfNights * price)
-        };
-        cartModel.addRow(cartRow, null);
-    }
-
-    /**
-     * Thêm phòng vào giỏ hàng.
-     */
-    private void addEntityRoomToCart() {
-        try {
-            int selectedRow = table_EntityRoom.getTable().getSelectedRow();
-            if (selectedRow == -1) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn phòng cần thêm",
-                        "Thông báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            int modelRow = table_EntityRoom.getTable().convertRowIndexToModel(selectedRow);
-            Object[] rowData = table_EntityRoom.getTableModel().getRowData(modelRow);
-
-            // Kiểm tra trạng thái phòng
-            String status = (String) rowData[5];
-            if (!"Có sẵn".equals(status)) {
-                JOptionPane.showMessageDialog(this, "Chỉ có thể thêm phòng có trạng thái Có sẵn",
-                        "Thông báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            String roomId = (String) rowData[1];
-            double price = Double.parseDouble(((String) rowData[3]).replaceAll("[^\\d.]", ""));
-
-            // Tính số đêm
-            int numberOfNights = calculateNumberOfNights();
-
-            // Kiểm tra phòng đã có trong giỏ chưa
-            if (isRoomAlreadyInCart(roomId)) {
-                JOptionPane.showMessageDialog(this, "Phòng này đã có trong giỏ hàng",
-                        "Thông báo", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            // Thêm vào giỏ hàng
-            addToCart(roomId, price, numberOfNights);
-            updateSummaryTotals();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi thêm phòng: " + e.getMessage(),
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
-        }
-    }
 
     /**
      * Cập nhật tiền cho hàng trong giỏ hàng.
@@ -1466,7 +1444,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
 
             for (int i = 0; i < cartModel.getRowCount(); i++) {
                 Object[] rowData = cartModel.getRowData(i);
-                double rowTotal = Double.parseDouble(((String) rowData[5]).replaceAll("[^\\d.]", ""));
+                double rowTotal = Double.parseDouble(((String) rowData[6]).replaceAll("[^\\d.]", ""));
                 totalPrice += rowTotal;
             }
 
@@ -1518,11 +1496,11 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
      * Xóa tất cả thông tin trong form.
      */
     private void clear() {
-        calendar_Checkin.setSelectedDate(null);
-        calendar_Checout.setSelectedDate(null);
-        spinner_Capacity.setValue(1);
-        cbx_TypeRoom.setSelectedIndex(0);
-        cbx_RangePrice.setSelectedIndex(0);
+//        calendar_Checkin.setSelectedDate(null);
+//        calendar_Checout.setSelectedDate(null);
+//        spinner_Capacity.setValue(1);
+//        cbx_TypeRoom.setSelectedIndex(0);
+//        cbx_RangePrice.setSelectedIndex(0);
 
         table_EntityRoom.getTableModel().clearData();
         table_Cart.getTableModel().clearData();
@@ -1643,142 +1621,16 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
             reservationDetailsList.add(detail);
         }
 
-        rowData[4] = servicesText.toString();
+        rowData[5] = servicesText.toString();
 
-        rowData[5] = String.format("%,.0f VND",
+        rowData[6] = String.format("%,.0f VND",
                 (Double.parseDouble(((String) rowData[2]).replaceAll("[^\\d.]", "")) * (int) rowData[3]) + servicesTotal);
 
         model.fireTableRowsUpdated(row, row);
         updateSummaryTotals();
     }
 
-    /**
-     * Đặt phòng.
-     * @throws RemoteException
-     * @throws IllegalStateException
-     *
-     */
-    private void bookingRoom() throws RemoteException {
-        // Validate input
-        int numOfCartRows = table_Cart.getTableModel().getRowCount();
-        if (numOfCartRows == 0) {
-            JOptionPane.showMessageDialog(this, "Vui lòng thêm phòng vào giỏ hàng trước khi đặt phòng",
-                    "Thông báo", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
 
-        String bookingMethod = (String) cbx_BookingMethod.getSelectedItem();
-        if (bookingMethod == null || bookingMethod.equals("Chọn hình thức đặt phòng")) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn hình thức đặt phòng",
-                    "Thông báo", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        String customerName = lbl_CustomerName_Value.getText();
-        String customerPhone = lbl_CustomerPhone_Value.getText();
-        if (customerName == null || customerName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn khách hàng",
-                    "Thông báo", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        Customer customer = customerDAO.getCustomerByPhone(customerPhone);
-        if (customer == null) {
-            JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin khách hàng",
-                    "Thông báo", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        Date checkInDate = calendar_Checkin.getSelectedDate();
-        Date checkOutDate = calendar_Checout.getSelectedDate();
-        if (checkInDate == null || checkOutDate == null) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-in và check-out",
-                    "Thông báo", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        // Start transaction
-        EntityManager em = AppUtil.getEntityManager();
-        EntityTransaction transaction = em.getTransaction();
-
-        try {
-            transaction.begin();
-
-            CustomTableButton.CustomTableModel model = table_Cart.getTableModel();
-            int countBooking = 0;
-
-            for (int row = 0; row < numOfCartRows; row++) {
-                Object[] rowData = model.getRowData(row);
-                String roomID = (String) rowData[1];
-                int numberOfNights = (int) rowData[3];
-
-                String reservationId = GenerateString.generateReservationId();
-                if (reservationId == null || reservationId.isEmpty()) {
-                    throw new IllegalStateException("Không thể tạo ID đặt phòng");
-                }
-
-                Reservation reservation = new Reservation();
-                reservation.setReservationId(reservationId);
-
-                Room room = em.find(Room.class, roomID);
-                if (room == null) {
-                    throw new IllegalStateException("Không tìm thấy phòng với ID: " + roomID);
-                }
-                reservation.setRoom(room);
-
-                reservation.setCustomer(customer);
-                reservation.setNumberOfNights(numberOfNights);
-                reservation.setBookingDate(new Date());
-                reservation.setCheckInDate(checkInDate);
-                reservation.setCheckOutDate(checkOutDate);
-
-                reservation.setBookingMethod(bookingMethod.equals("Tại quầy") ?
-                        BookingMethod.AT_THE_COUNTER : BookingMethod.CONTACT);
-
-                reservation.setStatus(false);
-
-                if (listMapReservationDetails.containsKey(roomID)) {
-                    List<ReservationDetails> details = listMapReservationDetails.get(roomID);
-                    for (ReservationDetails detail : details) {
-                        detail.setReservation(reservation);
-                    }
-                    reservation.setReservationDetails(details);
-                }
-
-                reservation.calculateTotalPrice();
-                reservation.calculateDepositAmount();
-                reservation.calculateRemainingAmount();
-                em.persist(reservation);
-
-                room.setStatus(Room.STATUS_RESERVED);
-                em.merge(room);
-
-                countBooking++;
-            }
-
-            transaction.commit();
-
-            if (countBooking == numOfCartRows) {
-                JOptionPane.showMessageDialog(this, "Đặt phòng thành công",
-                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                clear();
-            } else {
-                JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi đặt phòng",
-                        "Thông báo", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (Exception e) {
-            if (transaction != null && transaction.isActive()) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Đã xảy ra lỗi khi đặt phòng: " + e.getMessage(),
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            if (em != null && em.isOpen()) {
-                em.close();
-            }
-        }
-    }
 
     private void showFormAddCustomer() {
         JDialog dialog = new JDialog();
@@ -1832,16 +1684,16 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
             public void windowClosed(WindowEvent e) {
                 Room room = viewDetailsRoomDialog.getRoom();
                 if (room != null) {
-                    int numberOfNights = calculateNumberOfNights();
-                    String roomID = room.getRoomId();
-                    double price = room.getPrice();
-                    if (isRoomAlreadyInCart(roomID)) {
-                        JOptionPane.showMessageDialog(dialog, "Phòng này đã có trong giỏ hàng",
-                                "Thông báo", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
-                    addToCart(roomID, price, numberOfNights);
-                    updateSummaryTotals();
+//                    int numberOfNights = calculateNumberOfNights();
+//                    String roomID = room.getRoomId();
+//                    double price = room.getPrice();
+//                    if (isRoomAlreadyInCart(roomID)) {
+//                        JOptionPane.showMessageDialog(dialog, "Phòng này đã có trong giỏ hàng",
+//                                "Thông báo", JOptionPane.WARNING_MESSAGE);
+//                        return;
+//                    }
+//                    addToCart(roomID, price, numberOfNights);
+//                    updateSummaryTotals();
                 }
             }
         });
@@ -1861,6 +1713,431 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
             lbl_CustomerCCCD_Value.setText("");
             lbl_CustomerGender_Value.setText("");
             clear();
+        }
+    }
+
+    private void searchHourlyAvailableRooms() {
+        try {
+            // Lấy thời gian check-in
+            Date checkInDate = calendar_Checkin.getSelectedDate();
+            Date checkInTime = timePicker_Checkin.getTime();
+
+            if (checkInDate == null || checkInTime == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày và giờ check-in",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Date startTime = DateUtil.combineDateAndTime(checkInDate, checkInTime);
+            Date currentTime = new Date();
+
+            // Kiểm tra thời gian check-in có hợp lệ không
+            if (startTime.before(currentTime)) {
+                JOptionPane.showMessageDialog(this, "Thời gian check-in phải từ hiện tại trở đi",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Date endTime;
+            int hours = 0;
+
+            if (rb_NumberOfHour.isSelected()) {
+                // Tính theo số giờ
+                try {
+                    hours = Integer.parseInt(txt_NumberOfHour.getText());
+                    String roomID = table_EntityRoom.getTableModel().getValueAt(
+                            table_EntityRoom.getTable().getRowCount() - 1, 1).toString();
+                    Room room = roomDAO.findById(roomID);
+                    if (room == null) {
+                        JOptionPane.showMessageDialog(this, "Phòng không hợp lệ",
+                                "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+
+                    if (hours < room.getMinHours() || hours > room.getMaxHours()) {
+                        JOptionPane.showMessageDialog(this,
+                                String.format("Số giờ phải từ %d đến %d", room.getMinHours(), room.getMaxHours()),
+                                "Thông báo", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(startTime);
+                    cal.add(Calendar.HOUR, hours);
+                    endTime = cal.getTime();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Số giờ không hợp lệ",
+                            "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            } else {
+                // Tính theo thời gian check-out
+                Date checkOutDate = calendar_Checkout.getSelectedDate();
+                Date checkOutTime = timePicker_Checkout.getTime();
+
+                if (checkOutDate == null || checkOutTime == null) {
+                    JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày và giờ check-out",
+                            "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                endTime = DateUtil.combineDateAndTime(checkOutDate, checkOutTime);
+
+                if (endTime.before(startTime)) {
+                    JOptionPane.showMessageDialog(this, "Thời gian check-out phải sau check-in",
+                            "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                long diffInMillis = endTime.getTime() - startTime.getTime();
+                hours = (int) Math.ceil(diffInMillis / (60.0 * 60 * 1000));
+
+                CustomTableButton.CustomTableModel model = table_EntityRoom.getTableModel();
+                String roomID = (String) model.getValueAt(model.getRowCount() - 1, 1);
+
+                Room room = roomDAO.findById(roomID);
+                if (room == null) {
+                    JOptionPane.showMessageDialog(this, "Phòng không hợp lệ",
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (hours < room.getMinHours() || hours > room.getMaxHours()) {
+                    JOptionPane.showMessageDialog(this,
+                            String.format("Thời gian đặt phải từ %d đến %d giờ", room.getMinHours(), room.getMaxHours()),
+                            "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            }
+
+            // Lấy các tiêu chí tìm kiếm khác
+            Integer capacity = (Integer) spinner_Capacity.getValue();
+            String roomType = cbx_TypeRoom.getSelectedItem().toString();
+            roomType = "Tất cả loại phòng".equals(roomType) ? null : roomType;
+
+            // Tìm phòng trống
+            List<Room> availableRooms = roomDAO.findAvailableRoomsForHourlyBooking(
+                    startTime, endTime, capacity, roomType);
+
+            if (availableRooms.isEmpty()) {
+                table_EntityRoom.getTableModel().clearData();
+                JOptionPane.showMessageDialog(this, "Không có phòng trống trong khoảng thời gian này",
+                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                displayHourlyRoomsInTable(availableRooms, startTime);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi tìm phòng: " + e.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void displayHourlyRoomsInTable(List<Room> rooms, Date checkInTime) {
+        CustomTableButton.CustomTableModel model = table_EntityRoom.getTableModel();
+        model.clearData();
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+        for (Room room : rooms) {
+            if (room.getStatus() == Room.STATUS_AVAILABLE || room.getStatus() == Room.STATUS_RESERVED) {
+                // Tính giá theo giờ dựa trên thời gian check-in
+                double hourlyRate = room.calculateHourlyRate(checkInTime);
+
+                // Lấy thời gian check-in sớm nhất của đặt phòng theo đêm
+                Date earliestCheckIn = room.getEarliestNightReservationCheckIn(new Date());
+                String maxBookingTime = earliestCheckIn != null ?
+                        timeFormat.format(earliestCheckIn) : "Không giới hạn";
+
+                Object[] rowData = {
+                        model.getRowCount() + 1,
+                        room.getRoomId(),
+                        room.getRoomType() != null ? room.getRoomType().getTypeName() : "N/A",
+                        String.format("%,.0f VND/giờ", hourlyRate),
+                        room.getMinHours() + " giờ",
+                        room.getAmenities() != null ? String.join(", ", room.getAmenities()) : "N/A",
+                        convertStatus(room.getStatus()),
+                        maxBookingTime // Cột mới hiển thị thời gian tối đa có thể đặt
+                };
+
+                model.addRow(rowData, null);
+            }
+        }
+    }
+
+    private void addHourlyRoomToCart() {
+        try {
+            int selectedRow = table_EntityRoom.getTable().getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn phòng cần thêm",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int modelRow = table_EntityRoom.getTable().convertRowIndexToModel(selectedRow);
+            Object[] rowData = table_EntityRoom.getTableModel().getRowData(modelRow);
+
+            String roomId = (String) rowData[1];
+            double pricePerHour = Double.parseDouble(((String) rowData[3]).replaceAll("[^\\d.]", ""));
+
+            // Lấy thời gian check-in
+            Date checkInDate = calendar_Checkin.getSelectedDate();
+            Date checkInTime = timePicker_Checkin.getTime();
+            Date startTime = DateUtil.combineDateAndTime(checkInDate, checkInTime);
+
+            // Kiểm tra thời gian check-in có hợp lệ không
+            Date currentTime = new Date();
+            if (startTime.before(currentTime)) {
+                JOptionPane.showMessageDialog(this, "Thời gian check-in phải từ hiện tại trở đi",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Tính thời gian check-out và số giờ
+            int hours;
+            Date endTime;
+
+            Room room = roomDAO.findById(roomId);
+            if (room == null) {
+                JOptionPane.showMessageDialog(this, "Phòng không tồn tại",
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (rb_NumberOfHour.isSelected()) {
+                try {
+                    hours = Integer.parseInt(txt_NumberOfHour.getText());
+                    if (hours < room.getMinHours() || hours > room.getMaxHours()) {
+                        JOptionPane.showMessageDialog(this,
+                                String.format("Số giờ phải từ %d đến %d", room.getMinHours(), room.getMaxHours()),
+                                "Thông báo", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(startTime);
+                    cal.add(Calendar.HOUR, hours);
+                    endTime = cal.getTime();
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(this, "Số giờ không hợp lệ",
+                            "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            } else {
+                Date checkOutDate = calendar_Checkout.getSelectedDate();
+                Date checkOutTime = timePicker_Checkout.getTime();
+                if (checkOutDate == null || checkOutTime == null) {
+                    JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày và giờ check-out",
+                            "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                endTime = DateUtil.combineDateAndTime(checkOutDate, checkOutTime);
+
+                if (endTime.before(startTime)) {
+                    JOptionPane.showMessageDialog(this, "Thời gian check-out phải sau check-in",
+                            "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                long diffInMillis = endTime.getTime() - startTime.getTime();
+                hours = (int) Math.ceil(diffInMillis / (60.0 * 60 * 1000));
+                if (hours < room.getMinHours() || hours > room.getMaxHours()) {
+                    JOptionPane.showMessageDialog(this,
+                            String.format("Thời gian đặt phải từ %d đến %d giờ", room.getMinHours(), room.getMaxHours()),
+                            "Thông báo", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            }
+
+            // Kiểm tra phòng có còn trống không
+            if (!roomDAO.isRoomAvailableForHourlyBooking(roomId, startTime, endTime)) {
+                JOptionPane.showMessageDialog(this, "Phòng đã được đặt trong khoảng thời gian này",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Kiểm tra phòng đã có trong giỏ chưa
+            if (isRoomAlreadyInCart(roomId)) {
+                JOptionPane.showMessageDialog(this, "Phòng này đã có trong giỏ hàng",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Thêm vào giỏ hàng
+            addHourlyToCart(roomId, pricePerHour, hours, startTime, endTime);
+            updateSummaryTotals();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi thêm phòng: " + e.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Thêm phòng vào giỏ hàng.
+     * @param roomId ID của phòng.
+     * @param pricePerHour Giá theo giờ.
+     * @param hours Số giờ đã chọn.
+     * @param startTime Thời gian bắt đầu.
+     * @param endTime Thời gian kết thúc.
+     */
+    private void addHourlyToCart(String roomId, double pricePerHour, int hours,
+                                 Date startTime, Date endTime) {
+        CustomTableButton.CustomTableModel cartModel = table_Cart.getTableModel();
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        String timeRange = String.format("%s %s - %s %s",
+                dateFormat.format(startTime), timeFormat.format(startTime),
+                dateFormat.format(endTime), timeFormat.format(endTime));
+
+        Object[] cartRow = {
+                cartModel.getRowCount() + 1,
+                roomId,
+                String.format("%,.0f VND/giờ", pricePerHour),
+                hours,
+                timeRange,
+                "",
+                String.format("%,.0f VND", hours * pricePerHour)
+        };
+
+        cartModel.addRow(cartRow, null);
+    }
+
+    /**
+     * Đặt phòng.
+     * @throws RemoteException
+     * @throws IllegalStateException
+     *
+     */
+    private void bookingRoomHourlyReservation() throws RemoteException {
+        // Validate input
+        int numOfCartRows = table_Cart.getTableModel().getRowCount();
+        if (numOfCartRows == 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng thêm phòng vào giỏ hàng",
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Validate customer
+        String customerName = lbl_CustomerName_Value.getText();
+        String customerPhone = lbl_CustomerPhone_Value.getText();
+        String customerCCCD = lbl_CustomerCCCD_Value.getText();
+        if (customerName.isEmpty() || customerPhone.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin khách hàng",
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Validate booking method
+        String bookingMethodStr = (String) cbx_BookingMethod.getSelectedItem();
+        if ("Chọn hình thức đặt phòng".equals(bookingMethodStr)) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn hình thức đặt phòng",
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Get customer
+        Customer customer = customerDAO.getCustomerByPhone(customerPhone);
+        if (customer == null) {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin khách hàng",
+                    "Thông báo", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Start transaction
+        EntityManager em = AppUtil.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+
+        try {
+            transaction.begin();
+
+            CustomTableButton.CustomTableModel model = table_Cart.getTableModel();
+            int countBooking = 0;
+
+            for (int row = 0; row < numOfCartRows; row++) {
+                Object[] rowData = model.getRowData(row);
+                String roomID = (String) rowData[1];
+                int hours = (int) rowData[3];
+
+                // Parse time range (format: "dd/MM/yyyy HH:mm - dd/MM/yyyy HH:mm")
+                String timeRange = (String) rowData[4];
+                String[] parts = timeRange.split(" - ");
+                Date checkInTime = DateUtil.parseDateTime(parts[0]);
+                Date checkOutTime = DateUtil.parseDateTime(parts[1]);
+
+                // Kiểm tra phòng còn trống không
+                if (!roomDAO.isRoomAvailableForHourlyBooking(roomID, checkInTime, checkOutTime)) {
+                    throw new IllegalStateException("Phòng " + roomID + " đã được đặt trong khoảng thời gian này");
+                }
+
+                // Create reservation
+                String reservationId = GenerateString.generateReservationId();
+                Reservation reservation = new Reservation();
+                reservation.setReservationId(reservationId);
+                reservation.setBookingType(Reservation.BookingType.HOUR);
+                reservation.setCheckInTime(checkInTime);
+                reservation.setCheckOutTime(checkOutTime);
+                reservation.setDurationHours(hours);
+
+                Room room = em.find(Room.class, roomID);
+                if (room == null) {
+                    throw new IllegalStateException("Phòng " + roomID + " không tồn tại");
+                }
+                reservation.setRoom(room);
+                reservation.setHourlyRate(room.calculateHourlyRate(checkInTime));
+
+                reservation.setCustomer(customer);
+                reservation.setBookingDate(new Date());
+                reservation.setBookingMethod(bookingMethodStr.equals("Tại quầy") ?
+                        BookingMethod.AT_THE_COUNTER : BookingMethod.CONTACT);
+                reservation.setStatus(true); // Đặt thành true để biểu thị đặt phòng đang hoạt động
+
+                // Add services if any
+                if (listMapReservationDetails.containsKey(roomID)) {
+                    List<ReservationDetails> details = listMapReservationDetails.get(roomID);
+                    for (ReservationDetails detail : details) {
+                        detail.setReservation(reservation);
+                    }
+                    reservation.setReservationDetails(details);
+                }
+
+                // Calculate prices
+                reservation.calculateTotalPrice();
+                reservation.calculateDepositAmount();
+                reservation.calculateRemainingAmount();
+
+                // Persist
+                em.persist(reservation);
+
+                // Update room status
+                room.setStatus(Room.STATUS_RESERVED);
+                em.merge(room);
+
+                countBooking++;
+            }
+
+            transaction.commit();
+
+            if (countBooking == numOfCartRows) {
+                JOptionPane.showMessageDialog(this, "Đặt phòng theo giờ thành công",
+                        "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                clear();
+            } else {
+                JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi đặt phòng",
+                        "Thông báo", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive()) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi đặt phòng: " + e.getMessage(),
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            em.close();
         }
     }
 }

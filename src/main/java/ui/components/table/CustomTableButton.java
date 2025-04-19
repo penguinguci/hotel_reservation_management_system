@@ -48,7 +48,6 @@ public class CustomTableButton extends JPanel implements Serializable {
                     comp.setFont(new Font("SansSerif", Font.PLAIN, 12));
                 }
 
-                // Add better padding for text cells
                 if (comp instanceof JLabel) {
                     ((JLabel) comp).setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
                     ((JLabel) comp).setHorizontalAlignment(JLabel.LEFT);
@@ -64,8 +63,8 @@ public class CustomTableButton extends JPanel implements Serializable {
         table.setGridColor(new Color(220, 220, 220));
         table.setIntercellSpacing(new Dimension(1, 1));
         table.setFillsViewportHeight(true);
+        table.setCellSelectionEnabled(true); // Cho phép chọn từng ô
 
-        // Set default renderer for cells
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
@@ -80,6 +79,9 @@ public class CustomTableButton extends JPanel implements Serializable {
                 return label;
             }
         });
+
+        TextAreaCellEditor textEditor = new TextAreaCellEditor();
+        table.setDefaultEditor(Object.class, textEditor);
 
         applyHeaderProperties();
 
@@ -206,13 +208,11 @@ public class CustomTableButton extends JPanel implements Serializable {
     }
 
     private void updateTableRenderers() {
-        // Reset all columns to use default renderer first
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(null);
             table.getColumnModel().getColumn(i).setCellEditor(null);
         }
 
-        // Then apply specific renderers for columns that need them
         if (columnEditorTypes != null) {
             for (int i = 0; i < Math.min(table.getColumnCount(), columnEditorTypes.length); i++) {
                 switch (columnEditorTypes[i]) {
@@ -224,10 +224,19 @@ public class CustomTableButton extends JPanel implements Serializable {
                         table.getColumnModel().getColumn(i).setCellRenderer(new ButtonRenderer());
                         table.getColumnModel().getColumn(i).setCellEditor(new ButtonEditor(null));
                         break;
-                    default:
-                        // Use default renderer
+                    case TEXT_AREA:
+                        table.getColumnModel().getColumn(i).setCellEditor(new TextAreaCellEditor());
+                        break;
+                    case DEFAULT:
+                        DefaultCellEditor textFieldEditor = new DefaultCellEditor(new JTextField());
+                        textFieldEditor.setClickCountToStart(1);
+                        table.getColumnModel().getColumn(i).setCellEditor(textFieldEditor);
                         break;
                 }
+            }
+        } else {
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                table.getColumnModel().getColumn(i).setCellEditor(new TextAreaCellEditor());
             }
         }
     }
@@ -261,9 +270,8 @@ public class CustomTableButton extends JPanel implements Serializable {
         }
     }
 
-
     public enum ColumnEditorType {
-        DEFAULT, SPINNER, BUTTON
+        DEFAULT, SPINNER, BUTTON, TEXT_AREA
     }
 
     public void setColumnEditorTypes(ColumnEditorType[] editorTypes) {
@@ -284,13 +292,79 @@ public class CustomTableButton extends JPanel implements Serializable {
                 case BUTTON:
                     table.getColumnModel().getColumn(i).setCellEditor(new ButtonEditor(null));
                     break;
-                default:
-                    // Use default editor
+                case TEXT_AREA:
+                    table.getColumnModel().getColumn(i).setCellEditor(new TextAreaCellEditor());
+                    break;
+                case DEFAULT:
+                    DefaultCellEditor textFieldEditor = new DefaultCellEditor(new JTextField());
+                    textFieldEditor.setClickCountToStart(1);
+                    table.getColumnModel().getColumn(i).setCellEditor(textFieldEditor);
                     break;
             }
         }
     }
 
+    public class TextAreaCellEditor extends DefaultCellEditor {
+        private JTextArea textArea;
+        private JScrollPane scrollPane;
+
+        public TextAreaCellEditor() {
+            super(new JTextField());
+            textArea = new JTextArea();
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+            textArea.setFont(new Font("SansSerif", Font.PLAIN, 12));
+
+            scrollPane = new JScrollPane(textArea);
+            scrollPane.setBorder(BorderFactory.createLineBorder(Color.BLUE, 1));
+
+            textArea.getInputMap().put(KeyStroke.getKeyStroke("ENTER"), "text-submit");
+            textArea.getActionMap().put("text-submit", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    fireEditingStopped();
+                }
+            });
+
+            textArea.getInputMap().put(KeyStroke.getKeyStroke("TAB"), "tab-to-next");
+            textArea.getActionMap().put("tab-to-next", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    fireEditingStopped();
+                    KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent();
+                }
+            });
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                                                     boolean isSelected, int row, int column) {
+            textArea.setText(value != null ? value.toString() : "");
+            textArea.selectAll();
+
+            int height = Math.min(200, Math.max(table.getRowHeight(),
+                    textArea.getPreferredSize().height + 20));
+            scrollPane.setPreferredSize(new Dimension(table.getColumnModel().getColumn(column).getWidth(),
+                    height));
+
+            return scrollPane;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return textArea.getText();
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            String value = (String) getCellEditorValue();
+            if (value != null) {
+                super.stopCellEditing();
+                return true;
+            }
+            return false;
+        }
+    }
 
     public class CustomTableModel extends AbstractTableModel {
         private String[] columnNames;
@@ -328,13 +402,7 @@ public class CustomTableButton extends JPanel implements Serializable {
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            if (columnEditorTypes != null && columnIndex < columnEditorTypes.length) {
-                return columnEditorTypes[columnIndex] != ColumnEditorType.DEFAULT;
-            }
-            return buttonTypes.size() > rowIndex &&
-                    buttonTypes.get(rowIndex) != null &&
-                    buttonTypes.get(rowIndex).length > columnIndex &&
-                    buttonTypes.get(rowIndex)[columnIndex] != null;
+            return true; // Cho phép chỉnh sửa tất cả các ô
         }
 
         public ButtonType getButtonTypeAt(int rowIndex, int columnIndex) {
@@ -492,13 +560,11 @@ public class CustomTableButton extends JPanel implements Serializable {
         }
     }
 
-    // Renderer cho Spinner
     public static class SpinnerRenderer implements TableCellRenderer {
         private JSpinner spinner;
 
         public SpinnerRenderer() {
             spinner = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
-            // Improve spinner styling
             spinner.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
                     BorderFactory.createEmptyBorder(2, 2, 2, 2)
@@ -525,7 +591,6 @@ public class CustomTableButton extends JPanel implements Serializable {
         public SpinnerEditor() {
             super(new JTextField());
             spinner = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
-            // Improve spinner styling
             spinner.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
                     BorderFactory.createEmptyBorder(2, 2, 2, 2)
