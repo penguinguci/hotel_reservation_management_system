@@ -1557,16 +1557,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
             public void windowClosed(WindowEvent e) {
                 Room room = viewDetailsRoomDialog.getRoom();
                 if (room != null) {
-//                    int numberOfNights = calculateNumberOfNights();
-//                    String roomID = room.getRoomId();
-//                    double price = room.getPrice();
-//                    if (isRoomAlreadyInCart(roomID)) {
-//                        JOptionPane.showMessageDialog(dialog, "Phòng này đã có trong giỏ hàng",
-//                                "Thông báo", JOptionPane.WARNING_MESSAGE);
-//                        return;
-//                    }
-//                    addToCart(roomID, price, numberOfNights);
-//                    updateSummaryTotals();
+                    addHourlyRoomToCart();
                 }
             }
         });
