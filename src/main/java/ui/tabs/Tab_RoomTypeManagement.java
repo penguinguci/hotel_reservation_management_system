@@ -4,8 +4,16 @@
  */
 package ui.tabs;
 
+import dao.RoomTypeDAOImpl;
+import entities.RoomType;
+import interfaces.RoomTypesDAO;
+import jakarta.xml.bind.annotation.XmlType;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.util.List;
 
 /**
  *
@@ -16,10 +24,22 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
     /**
      * Creates new form Tab_ServicesManagement
      */
+    private RoomTypesDAO roomTypeDAO;
+    private RoomType selectedRoomType;
+    private DefaultTableModel tableModel;
+
     public Tab_RoomTypeManagement() {
+        roomTypeDAO = new RoomTypeDAOImpl();
         initComponents();
-        //setShape(new RoundRectangle2D.Double(0, 0, 850, 500, 30, 30));
+
+        // Đặt DefaultTableModel cho customTableButton1
+        String[] columnNames = {"Mã loại phòng", "Loại phòng", "Mô tả"};
+        tableModel = new DefaultTableModel(columnNames, 0);
+        customTableButton1.getTable().setModel(tableModel);
         setBackground(new Color(255, 255, 255));
+        setLocationRelativeTo(null);
+        loadRoomTypes();
+        setupListeners();
     }
 
     /**
@@ -61,10 +81,10 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(149, 145, 239), 2));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jPanel2.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(149, 145, 239)));
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -234,7 +254,7 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
         customTableButton1.setHeaderBackgroundColor(new java.awt.Color(149, 145, 239));
 
         jLabel4.setBackground(new java.awt.Color(149, 145, 239));
-        jLabel4.setFont(new java.awt.Font("Segoe UI Black", 0, 14)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(149, 145, 239));
         jLabel4.setText("QUẢN LÝ LOẠI PHÒNG");
 
@@ -265,7 +285,7 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
                         .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, 450));
@@ -283,20 +303,142 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
 
     private void btnAddTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddTypeActionPerformed
         // TODO add your handling code here:
+        String typeId = generateNewTypeId();
+        customRoundedTextField1.setText(typeId); // Hiển thị mã loại mới trên giao diện
+
+        String typeName = customRoundedTextField2.getText().trim();
+        String description = jTextArea1.getText().trim();
+
+        if (typeName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Tên loại không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (roomTypeDAO.findById(typeId) != null) {
+            JOptionPane.showMessageDialog(this, "Mã loại đã tồn tại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        RoomType newRoomType = new RoomType();
+        newRoomType.setTypeID(typeId);
+        newRoomType.setTypeName(typeName);
+        newRoomType.setDescription(description);
+
+        try {
+            roomTypeDAO.create(newRoomType);
+            JOptionPane.showMessageDialog(this, "Thêm loại phòng thành công!");
+            loadRoomTypes();
+            clearFields();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi thêm loại phòng: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnAddTypeActionPerformed
 
     private void btnUpdateTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateTypeActionPerformed
         // TODO add your handling code here:
+        if (selectedRoomType == null) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một loại phòng để cập nhật!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String typeId = customRoundedTextField1.getText().trim();
+        String typeName = customRoundedTextField2.getText().trim();
+        String description = jTextArea1.getText().trim();
+
+        if (typeId.isEmpty() || typeName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Mã loại và tên loại không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (!typeId.equals(selectedRoomType.getTypeID())) {
+            JOptionPane.showMessageDialog(this, "Không thể thay đổi mã loại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        selectedRoomType.setTypeName(typeName);
+        selectedRoomType.setDescription(description);
+
+        try {
+            roomTypeDAO.update(selectedRoomType);
+            JOptionPane.showMessageDialog(this, "Cập nhật loại phòng thành công!");
+            loadRoomTypes();
+            clearFields();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật loại phòng: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnUpdateTypeActionPerformed
 
     private void btnResetTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetTypeActionPerformed
         // TODO add your handling code here:
+        clearFields();
+        loadRoomTypes();
     }//GEN-LAST:event_btnResetTypeActionPerformed
 
     private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
         // TODO add your handling code here:
+        dispose();
     }//GEN-LAST:event_btnExitActionPerformed
 
+    private void loadRoomTypes() {
+        List<RoomType> roomTypes = roomTypeDAO.findAll();
+        tableModel.setRowCount(0); // Xóa dữ liệu cũ
+        for (RoomType roomType : roomTypes) {
+            tableModel.addRow(new Object[]{
+                    roomType.getTypeID(),
+                    roomType.getTypeName(),
+                    roomType.getDescription()
+            });
+        }
+        tableModel.fireTableDataChanged();
+        customTableButton1.repaint();
+        customTableButton1.revalidate();
+    }
+    private void setupListeners() {
+        customTableButton1.getTable().getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = customTableButton1.getTable().getSelectedRow();
+                if (selectedRow >= 0) {
+                    String typeId = (String) customTableButton1.getTable().getValueAt(selectedRow, 0);
+                    selectedRoomType = roomTypeDAO.findById(typeId);
+                    if (selectedRoomType != null) {
+                        customRoundedTextField1.setText(selectedRoomType.getTypeID());
+                        customRoundedTextField2.setText(selectedRoomType.getTypeName());
+                        jTextArea1.setText(selectedRoomType.getDescription());
+                    }
+                } else {
+                    clearFields();
+                }
+            }
+        });
+    }
+    private void clearFields() {
+        customRoundedTextField1.setText("");
+        customRoundedTextField2.setText("");
+        jTextArea1.setText("");
+        selectedRoomType = null;
+        customTableButton1.getTable().clearSelection();
+    }
+    private String generateNewTypeId() {
+        List<RoomType> roomTypes = roomTypeDAO.findAll();
+        int maxNumber = 0;
+
+        // Tìm số lớn nhất từ các mã loại hiện có
+        for (RoomType roomType : roomTypes) {
+            String typeId = roomType.getTypeID();
+            if (typeId != null && typeId.startsWith("RT")) {
+                try {
+                    int number = Integer.parseInt(typeId.substring(2));
+                    maxNumber = Math.max(maxNumber, number);
+                } catch (NumberFormatException e) {
+                    // Bỏ qua nếu không parse được
+                }
+            }
+        }
+
+        // Tăng số lên 1 và định dạng lại thành RTXXX
+        maxNumber++;
+        return String.format("RT%03d", maxNumber);
+    }
     /**
      * @param args the command line arguments
      */
