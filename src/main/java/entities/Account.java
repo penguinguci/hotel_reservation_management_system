@@ -14,7 +14,7 @@
         @Column(columnDefinition = "varchar(50)", nullable = false, unique = true)
         private String username;
 
-        @Column(columnDefinition = "varchar(50)", nullable = false)
+        @Column(columnDefinition = "varchar(250)", nullable = false)
         private String password;
 
         //@OneToOne

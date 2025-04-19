@@ -26,6 +26,7 @@ public class GUI_Main extends javax.swing.JFrame {
         Form_HomePage homePageForm = new Form_HomePage();
         Form_StaffManagement staffManagementForm = new Form_StaffManagement();
         Form_RoomManagement roomManagement = new Form_RoomManagement();
+        Form_Statistics statisticsForm = new Form_Statistics();
         showForm(homePageForm);
         formCustomerManagement = new Form_CustomerManagement();
         menu3.setEvent(new MenuEvent() {
@@ -46,6 +47,9 @@ public class GUI_Main extends javax.swing.JFrame {
                 }
                 else if (index == 4) {
                     showForm(staffManagementForm);
+                }
+                else if (index == 5) {
+                    showForm(statisticsForm);
                 }
                 else{
                     showForm(new Form_HomePage());

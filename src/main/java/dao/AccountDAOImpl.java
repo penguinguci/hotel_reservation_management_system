@@ -88,5 +88,18 @@ public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements A
                 .getSingleResult();
         return count > 0;
     }
+    @Override
+    public Account getAccountByEmail(String email) {
+        TypedQuery<Account> query = em.createQuery(
+                "SELECT a FROM Account a JOIN a.staff s WHERE s.email = :email",
+                Account.class
+        );
+        query.setParameter("email", email);
+        try {
+            return query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
 }
