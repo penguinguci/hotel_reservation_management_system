@@ -14,4 +14,5 @@ public interface AccountDAO extends GenericDAO<Account, String>, Remote {
     void createAccount(Account account) throws RemoteException;
     Account findAccoutByStaffID(String staffID) throws RemoteException;
     boolean isUsernameExists(String username);
+    public Account getAccountByEmail(String email);
 }
