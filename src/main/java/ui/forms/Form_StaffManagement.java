@@ -17,6 +17,7 @@ import interfaces.StaffDAO;
 import jakarta.persistence.EntityTransaction;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.poi.ss.usermodel.Cell;
+import org.mindrot.jbcrypt.BCrypt;
 import ui.components.table.CustomTableButton;
 import ultilities.GenerateString;
 import ultilities.ImageConverter;
@@ -694,7 +695,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ListSele
             StaffDAO staffDAO = new StaffDAOImpl();
             AccountDAO accountDAO = new AccountDAOImpl();
             GenericDAO<Staff, String> staffDAOGeneric = new GenericDAOImpl<>(Staff.class);
-            GenericDAO<Account, String> accountDAOGeneric= new GenericDAOImpl<>(Account.class);
+            GenericDAO<Account, String> accountDAOGeneric = new GenericDAOImpl<>(Account.class);
 
             String phone = txt_Phone.getText().trim();
             if (staffDAO.isPhoneExists(phone)) {
@@ -738,10 +739,12 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ListSele
                 newStaff.setStaffImage(imageBase64);
             }
 
-            // Tạo đối tượng Account
+            // Tạo đối tượng Account và băm mật khẩu
             Account newAccount = new Account();
             newAccount.setUsername(username);
-            newAccount.setPassword(txt_Password.getText().trim());
+            String plainPassword = txt_Password.getText().trim();
+            String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+            newAccount.setPassword(hashedPassword);
             newAccount.setRole(Role.STAFF); // Mặc định là nhân viên lễ tân
             newAccount.setStaff(newStaff);
 

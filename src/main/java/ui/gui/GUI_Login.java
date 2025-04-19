@@ -258,41 +258,83 @@ public class GUI_Login extends javax.swing.JFrame {
         }
     }
 
+
     private void btn_ForgotPasswordActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
-        // Hiển thị dialog nhập email
-        JTextField emailField = new JTextField();
-        Object[] message = {
-                "Nhập email của bạn:", emailField
-        };
-        int option = JOptionPane.showConfirmDialog(this, message, "Quên mật khẩu", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            String email = emailField.getText().trim();
-            if (email.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập email.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        final boolean[] continueTrying = {true};
 
-            AccountDAO accountDAO = new AccountDAOImpl();
-            Account account = accountDAO.getAccountByEmail(email);
+        while (continueTrying[0]) {
+            // Hiển thị dialog nhập email
+            JTextField emailField = new JTextField();
+            Object[] message = {
+                    "Nhập email của bạn:", emailField
+            };
+            int option = JOptionPane.showConfirmDialog(this, message, "Quên mật khẩu", JOptionPane.OK_CANCEL_OPTION);
 
-            if (account != null) {
-                // Tạo mã xác thực ngẫu nhiên
-                verificationCode = generateVerificationCode();
-                verifiedEmail = email;
+            if (option == JOptionPane.OK_OPTION) {
+                String email = emailField.getText().trim();
+                if (email.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Vui lòng nhập email.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    continue; // Hiện lại dialog
+                }
 
-                // Gửi mã xác thực qua email
-                boolean sent = sendVerificationEmail(email, verificationCode);
-                if (sent) {
-                    // Hiển thị dialog nhập mã xác thực và mật khẩu mới
-                    showVerificationDialog(account);
+                AccountDAO accountDAO = new AccountDAOImpl();
+                Account account = accountDAO.getAccountByEmail(email);
+
+                if (account != null) {
+                    // Tạo mã xác thực ngẫu nhiên
+                    verificationCode = generateVerificationCode();
+                    verifiedEmail = email;
+
+                    // Tạo dialog tiến trình
+                    JDialog progressDialog = new JDialog(this, "Đang xử lý", true);
+                    progressDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+                    progressDialog.setLayout(new BorderLayout());
+                    JLabel progressLabel = new JLabel("Đang gửi mã xác thực...", SwingConstants.CENTER);
+                    progressLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+                    progressDialog.add(progressLabel, BorderLayout.CENTER);
+                    progressDialog.setSize(300, 100);
+                    progressDialog.setLocationRelativeTo(this);
+
+                    // Gửi email trong luồng riêng
+                    SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
+                        @Override
+                        protected Boolean doInBackground() {
+                            return sendVerificationEmail(email, verificationCode);
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                boolean sent = get();
+                                progressDialog.dispose(); // Đóng dialog tiến trình
+                                if (sent) {
+                                    // Hiển thị dialog nhập mã xác thực và mật khẩu mới
+                                    showVerificationDialog(account);
+                                    continueTrying[0] = false; // Thoát vòng lặp
+                                } else {
+                                    JOptionPane.showMessageDialog(GUI_Login.this, "Lỗi khi gửi email. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                                    // Tiếp tục vòng lặp để hiện lại dialog
+                                }
+                            } catch (Exception e) {
+                                progressDialog.dispose();
+                                JOptionPane.showMessageDialog(GUI_Login.this, "Lỗi hệ thống: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    };
+
+                    // Hiển thị dialog tiến trình và chạy worker
+                    worker.execute();
+                    progressDialog.setVisible(true);
                 } else {
-                    JOptionPane.showMessageDialog(this, "Lỗi khi gửi email. Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Email không tồn tại trong hệ thống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    // Tiếp tục vòng lặp để hiện lại dialog
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Email không tồn tại trong hệ thống.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                continueTrying[0] = false;
             }
         }
     }
+
 
     private void roundedPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
         if (evt.getSource() == roundedPasswordField1) {
