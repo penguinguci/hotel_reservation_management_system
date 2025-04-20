@@ -27,6 +27,7 @@ import ui.dialogs.Dialog_ViewRoomDetails;
 import ultilities.GenerateString;
 import ultilities.NumericDocument;
 import utils.AppUtil;
+import utils.CurrentAccount;
 import utils.DateUtil;
 
 import javax.swing.*;
@@ -1966,6 +1967,14 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
                 reservation.setBookingMethod(bookingMethodStr.equals("Tại quầy") ?
                         BookingMethod.AT_THE_COUNTER : BookingMethod.CONTACT);
                 reservation.setStatus(true); // Đặt thành true để biểu thị đặt phòng đang hoạt động
+
+                Account account = CurrentAccount.getCurrentAccount();
+                Staff staff = em.find(Staff.class, account.getStaff().getStaffId());
+                if (staff == null) {
+                    throw new IllegalStateException("Không tìm thấy nhân viên với ID: " + account.getStaff().getStaffId());
+                }
+
+                reservation.setStaff(staff);
 
                 // Add services if any
                 if (listMapReservationDetails.containsKey(roomID)) {

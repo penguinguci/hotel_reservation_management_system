@@ -25,6 +25,7 @@ import ui.dialogs.Dialog_AddService;
 import ui.dialogs.Dialog_ViewRoomDetails;
 import ultilities.GenerateString;
 import utils.AppUtil;
+import utils.CurrentAccount;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -1744,6 +1745,14 @@ public class Tab_Booking extends javax.swing.JPanel {
                 reservation.setBookingDate(new Date());
                 reservation.setCheckInDate(checkInDate);
                 reservation.setCheckOutDate(checkOutDate);
+
+                Account account = CurrentAccount.getCurrentAccount();
+                Staff staff = em.find(Staff.class, account.getStaff().getStaffId());
+                if (staff == null) {
+                    throw new IllegalStateException("Không tìm thấy nhân viên với ID: " + account.getStaff().getStaffId());
+                }
+
+                reservation.setStaff(staff);
 
                 reservation.setBookingMethod(bookingMethod.equals("Tại quầy") ?
                         BookingMethod.AT_THE_COUNTER : BookingMethod.CONTACT);
