@@ -20,7 +20,7 @@ public class Header extends javax.swing.JPanel {
 
     public Header() {
         initComponents();
-//        initInfoStaff();
+        initInfoStaff();
         setOpaque(false);
         setFont(new Font("Segoe UI", Font.BOLD, 16));
     }

@@ -79,17 +79,27 @@ public class Room {
         return status == STATUS_AVAILABLE;
     }
 
-    // Cập nhật trạng thái phòng
-    public void checkIn() {
-        if (status == STATUS_RESERVED) {
+    @Column(name = "standard_checkout_hour")
+    private int standardCheckoutHour = 12; // Giờ check-out tiêu chuẩn (mặc định 12h)
+
+    public boolean isHourlyBooking() {
+        return hourlyBaseRate > 0;
+    }
+
+    public void checkIn(Reservation reservation) {
+        if (reservation.getBookingType() == Reservation.BookingType.NIGHT) {
+            status = STATUS_OCCUPIED;
+        } else {
             status = STATUS_OCCUPIED;
         }
     }
 
-    public void checkOut() {
-        if (status == STATUS_OCCUPIED) {
-            status = STATUS_AVAILABLE;
-        }
+    public void checkOut(Reservation reservation) {
+        status = STATUS_AVAILABLE;
+    }
+
+    public int getStandardCheckoutHour() {
+        return standardCheckoutHour;
     }
 
     public void cancelReservation() {

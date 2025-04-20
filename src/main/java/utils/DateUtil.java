@@ -82,4 +82,12 @@ public class DateUtil {
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         return format.parse(dateTimeStr);
     }
+
+    public static String formatDate(Date date) {
+        return date != null ? new SimpleDateFormat("dd-MM-yyyy").format(date) : "";
+    }
+
+    public static String formatDateTime(Date date) {
+        return date != null ? new SimpleDateFormat("dd-MM-yyyy HH:mm").format(date) : "";
+    }
 }
