@@ -138,4 +138,29 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements
 
         return query.getResultList();
     }
+
+    @Override
+    public List<String> getAllCustomerIds() {
+        EntityManager em = AppUtil.getEntityManager();
+        try {
+            String jpql = "SELECT c.customerId FROM Customer c";
+            return em.createQuery(jpql, String.class).getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Customer> searchCustomers(String keyword) {
+        EntityManager em = AppUtil.getEntityManager();
+        try {
+            String jpql = "SELECT c FROM Customer c WHERE c.phoneNumber LIKE :keyword " +
+                    "OR c.CCCD LIKE :keyword OR c.firstName LIKE :keyword OR c.lastName LIKE :keyword";
+            TypedQuery<Customer> query = em.createQuery(jpql, Customer.class)
+                    .setParameter("keyword", "%" + keyword + "%");
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
 }

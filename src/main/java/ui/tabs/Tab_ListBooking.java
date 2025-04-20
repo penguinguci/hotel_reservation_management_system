@@ -4,17 +4,271 @@
  */
 package ui.tabs;
 
+import dao.CustomerDAOImpl;
+import dao.ReservationDAOImpl;
+import entities.Reservation;
+import entities.ReservationDetails;
+import interfaces.CustomerDAO;
+import interfaces.ReservationDAO;
+import ui.components.table.CustomTableButton;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author TRAN LONG VU
  */
 public class Tab_ListBooking extends javax.swing.JPanel {
+    private CustomerDAO customerDAO;
+    private ReservationDAO reservationDAO;
+    private List<Reservation> currentReservations;
+    private Reservation selectedReservation;
+    private double floatingFee = 0.0;
+    private double serviceFee = 0.0;
+    private double taxAmount = 0.0;
 
     /**
      * Creates new form Tab_ListBooking
      */
     public Tab_ListBooking() {
         initComponents();
+        initComboboxCustomerID();
+        currentReservations = new ArrayList<>();
+        loadReservations();
+        setupListeners();
+    }
+
+    private void initComboboxCustomerID() {
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("Chọn mã khách hàng");
+        customerDAO = new CustomerDAOImpl();
+        List<String> customerids = customerDAO.getAllCustomerIds();
+        for (String customerID : customerids) {
+            model.addElement(customerID);
+        }
+        cbx_CustomerID.setModel(model);
+    }
+
+    private void loadReservations() {
+        reservationDAO = new ReservationDAOImpl();
+        currentReservations = reservationDAO.getAllReservations();
+        updateReservationTable(currentReservations);
+    }
+
+    private void updateReservationTable(List<Reservation> listReservations) {
+        CustomTableButton.CustomTableModel model = table_ListReservation.getTableModel();
+        model.clearData();
+        for (Reservation r : listReservations) {
+            Object[] dataRow = new Object[]{
+                    r.getReservationId(),
+                    r.getCustomer().getFirstName() + " " + r.getCustomer().getLastName(),
+                    r.getRoom().getRoomId(),
+                    r.getBookingDate(),
+                    String.format("%.0f VND", r.getTotalPrice()),
+                    String.format("%.0f VND", r.getDepositAmount()),
+                    String.format("%.0f VND", r.getRemainingAmount())
+            };
+            model.addRow(dataRow, null);
+        }
+    }
+
+    private void updateServiceTable(Reservation reservation) {
+        CustomTableButton.CustomTableModel model = table_ListService.getTableModel();
+        model.clearData();
+        if (reservation != null && reservation.getReservationDetails() != null) {
+            for (ReservationDetails details : reservation.getReservationDetails()) {
+                Object[] dataRow = new Object[]{
+                        model.getRowCount() + 1,
+                        details.getService().getServiceId(),
+                        details.getService().getName(),
+                        String.format("%.0f VND", details.getService().getPrice()),
+                        details.getQuantity(),
+                        String.format("%.0f VND", details.getLineTotalAmount())
+                };
+                model.addRow(dataRow, null);
+            }
+        }
+    }
+
+    private void updateReservationsDetails(Reservation reservation) {
+        if (reservation == null) {
+            clearReservationDetails();
+            return;
+        }
+
+        lbl_RoomID_Value.setText(reservation.getRoom().getRoomId());
+        lbl_Floor_Value.setText(String.valueOf(reservation.getRoom().getFloor()));
+        lbl_TypeRoom_Value.setText(reservation.getRoom().getRoomType().getTypeName());
+        lbl_Capacity_Value.setText(String.valueOf(reservation.getRoom().getCapacity()));
+        lbl_CustomerName_Value.setText(reservation.getCustomer().getFirstName() + " " + reservation.getCustomer().getLastName());
+        lbl_BookingDate_Value.setText(new SimpleDateFormat("dd-MM-yyyy").format(reservation.getBookingDate()));
+
+        if (reservation.getBookingType() == Reservation.BookingType.NIGHT) {
+            if (reservation.getCheckInDate() != null && reservation.getCheckOutDate() != null &&
+                    reservation.getCheckInDate().before(reservation.getCheckOutDate())) {
+                lbl_CheckInDateOrTime_Value.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(reservation.getCheckInDate()));
+                lbl_CheckoutDateOrTime_Value.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(reservation.getCheckOutDate()));
+                lbl_NumOfNightOrHour_Value.setText(String.valueOf(reservation.getNumberOfNights()));
+                lbl_PriceOfNightOrHour_Value.setText(String.format("%.0f VND", reservation.getRoom().getPrice()));
+            }
+        } else {
+            if (reservation.getCheckInDate() != null && reservation.getCheckOutDate() != null &&
+                    reservation.getCheckInDate().getTime() < reservation.getCheckOutDate().getTime()) {
+                lbl_CheckInDateOrTime_Value.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(reservation.getCheckInDate()));
+                lbl_CheckoutDateOrTime_Value.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(reservation.getCheckOutDate()));
+                lbl_NumOfNightOrHour_Value.setText(String.valueOf(reservation.getDurationHours()));
+                lbl_PriceOfNightOrHour_Value.setText(String.format("%.0f VND", reservation.getHourlyRate()));
+            }
+        }
+        lbl_NumOfFloating_Value.setText(String.valueOf(0));
+    }
+
+    private void clearReservationDetails() {
+        lbl_RoomID_Value.setText("");
+        lbl_Floor_Value.setText("");
+        lbl_TypeRoom_Value.setText("");
+        lbl_Capacity_Value.setText("");
+        lbl_CustomerName_Value.setText("");
+        lbl_BookingDate_Value.setText("");
+        lbl_CheckInDateOrTime_Value.setText("");
+        lbl_CheckoutDateOrTime_Value.setText("");
+        lbl_NumOfNightOrHour_Value.setText("");
+        lbl_PriceOfNightOrHour_Value.setText("");
+        lbl_NumOfFloating_Value.setText("");
+    }
+
+    private void updateBookingInfo() {
+        List<Reservation> selectedReservations = getSelectedReservations();
+        double totalPrice = selectedReservations.stream().mapToDouble(Reservation::getTotalPrice).sum();
+        double deposit = selectedReservations.stream().mapToDouble(Reservation::getDepositAmount).sum();
+        double remaining = selectedReservations.stream().mapToDouble(Reservation::getRemainingAmount).sum();
+
+        lbl_LastTotalPrice_Value.setText(String.format("%.0f VND", totalPrice));
+        lbl_BookingMethod_Value.setText(selectedReservations.isEmpty() ? "" :
+                selectedReservations.get(0).getBookingMethod().toString());
+        lbl_Deposit_Value.setText(String.format("%.0f VND", deposit));
+        lbl_RemainingAmount_Value.setText(String.format("%.0f VND", remaining));
+
+        // Cập nhật thông tin thanh toán
+        serviceFee = selectedReservations.stream().mapToDouble(Reservation::calculateTotalServicePrice).sum();
+        taxAmount = totalPrice * 0.1; // Thuế 10%
+        double finalTotal = totalPrice + serviceFee + taxAmount + floatingFee;
+
+        lbl_FloatingFee_Value.setText(String.format("%.0f VND", floatingFee));
+        lbl_ServiceFee_Value.setText(String.format("%.0f VND", serviceFee));
+        lbl_Tax_Value.setText(String.format("%.0f VND", taxAmount));
+        lbl_TotalPrice_Value.setText(String.format("%.0f VND", finalTotal));
+    }
+
+    private List<Reservation> getSelectedReservations() {
+       int[] selectedRows = table_ListReservation.getTable().getSelectedRows();
+       List<Reservation> selectedReservations = new ArrayList<>();
+       for (int row : selectedRows) {
+           int modelRow = table_ListReservation.getTable().convertRowIndexToModel(row);
+           Object[] rowData = table_ListReservation.getTableModel().getRowData(modelRow);
+           String reservationId = (String) rowData[0];
+           currentReservations.stream()
+                   .filter(r -> r.getReservationId().equals(reservationId))
+                   .findFirst()
+                   .ifPresent(selectedReservations::add);
+       }
+       return selectedReservations;
+    }
+
+    private void updateButtonStates() {
+        btn_ChooseAll.setEnabled(!currentReservations.isEmpty() &&
+                currentReservations.stream().anyMatch(r -> r.getReservationStatus() != Reservation.STATUS_CANCELLED));
+        btn_Checkin.setEnabled(selectedReservation != null && selectedReservation.canCheckIn());
+        btn_Checkout.setEnabled(selectedReservation != null && selectedReservation.canCheckOut());
+        btn_CacelBooking.setEnabled(selectedReservation != null && selectedReservation.canCancel());
+        btn_Pay.setEnabled(!getSelectedReservations().isEmpty() &&
+                getSelectedReservations().stream().allMatch(r -> r.getReservationStatus() == Reservation.STATUS_CHECKED_OUT));
+    }
+
+    private void searchReservations() {
+        String keyword = txt_Search.getText().trim();
+        if (!keyword.isEmpty()) {
+            currentReservations = reservationDAO.searchReservations(keyword);
+            updateReservationTable(currentReservations);
+            updateButtonStates();
+        } else {
+            loadReservations();
+            currentReservations.clear();
+            updateButtonStates();
+        }
+    }
+
+    private void setupListeners() {
+        txt_Search.getTextField().getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                searchReservations();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                searchReservations();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                searchReservations();
+            }
+        });
+
+        cbx_CustomerID.addActionListener(e -> {
+            String selectedCustomerId = (String) cbx_CustomerID.getSelectedItem();
+            if (selectedCustomerId != null && !selectedCustomerId.equals("Chọn mã khách hàng")) {
+                currentReservations = reservationDAO.getReservationsByCustomerId(selectedCustomerId);
+                updateReservationTable(currentReservations);
+                updateButtonStates();
+            } else {
+                loadReservations();
+                currentReservations.clear();
+                updateButtonStates();
+            }
+        });
+
+        table_ListReservation.getTable().getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = table_ListReservation.getTable().getSelectedRow();
+                if (selectedRow >= 0) {
+                    int modelRow = table_ListReservation.getTable().convertRowIndexToModel(selectedRow);
+                    Object[] rowData = table_ListReservation.getTableModel().getRowData(modelRow);
+                    String reservationId = (String) rowData[0];
+                    selectedReservation = currentReservations.stream()
+                            .filter(r -> r.getReservationId().equals(reservationId))
+                            .findFirst()
+                            .orElse(null);
+                    updateReservationsDetails(selectedReservation);
+                    updateServiceTable(selectedReservation);
+                    updateBookingInfo();
+                    updateButtonStates();
+                }
+            }
+        });
+
+        btn_Clear.addActionListener(e -> {
+            txt_Search.setText("");
+            cbx_CustomerID.setSelectedIndex(0);
+            loadReservations();
+            clearReservationDetails();
+            updateBookingInfo();
+            updateButtonStates();
+        });
+
+        btn_ChooseAll.addActionListener(e -> {
+            if (!currentReservations.isEmpty() && btn_ChooseAll.isEnabled()) {
+                if (!currentReservations.isEmpty() && btn_ChooseAll.isEnabled()) {
+                    table_ListReservation.getTable().selectAll();
+                }
+            }
+        });
     }
 
     /**
@@ -113,9 +367,9 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(txt_Search, javax.swing.GroupLayout.PREFERRED_SIZE, 630, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_Search, javax.swing.GroupLayout.PREFERRED_SIZE, 604, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(cbx_CustomerID, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+                .addComponent(cbx_CustomerID, javax.swing.GroupLayout.DEFAULT_SIZE, 172, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(

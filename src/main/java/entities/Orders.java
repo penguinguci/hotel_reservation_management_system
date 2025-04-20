@@ -61,6 +61,12 @@ public class Orders {
     @Column(name = "total_price")
     private double totalPrice;
 
+    @Column(name = "tax_amount")
+    private double taxAmount;
+
+    @Column(name = "service_fee")
+    private double serviceFee;
+
 //    public double calculateTaxPrice() {
 //        double line_total_amount= 0;
 //        for (OrderDetails orderDetail : orderDetails) {
@@ -92,5 +98,21 @@ public class Orders {
 
         this.totalPrice = total;
         return total;
+    }
+
+    public double calculateTaxAmount() {
+        this.taxAmount = totalPrice * 0.1;
+        return taxAmount;
+    }
+
+    // Tính phí dịch vụ (ví dụ: 5% tổng tiền)
+    public double calculateServiceFee() {
+        this.serviceFee = totalPrice * 0.05;
+        return serviceFee;
+    }
+
+    // Tính tổng tiền thanh toán (bao gồm thuế và phí)
+    public double calculateFinalTotalPrice() {
+        return totalPrice + taxAmount + serviceFee;
     }
 }
