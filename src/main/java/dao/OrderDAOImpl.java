@@ -20,9 +20,6 @@ public class OrderDAOImpl extends GenericDAOImpl<Orders, String> implements Orde
         EntityTransaction transaction = em.getTransaction();
         try {
             transaction.begin();
-            order.calculateTaxAmount();
-            order.calculateServiceFee();
-            order.calculateFinalTotalPrice();
             em.persist(order);
             transaction.commit();
             return true;

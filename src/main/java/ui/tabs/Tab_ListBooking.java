@@ -13,6 +13,7 @@ import entities.ReservationDetails;
 import interfaces.CustomerDAO;
 import interfaces.ReservationDAO;
 import ui.components.table.CustomTableButton;
+import ui.dialogs.Dialog_PaymentInfo;
 import utils.DateUtil;
 import utils.MoneyUtil;
 
@@ -159,36 +160,34 @@ public class Tab_ListBooking extends javax.swing.JPanel {
             return;
         }
 
-        // Tính tổng các khoản
         double roomTotal = selectedReservations.stream()
-                .mapToDouble(Reservation::getTotalPrice)
+                .mapToDouble(Reservation::calculateTotalPrice)
                 .sum();
 
         double deposit = selectedReservations.stream()
-                .mapToDouble(Reservation::getDepositAmount)
+                .mapToDouble(Reservation::calculateDepositAmount)
+                .sum();
+
+        double remaining = selectedReservations.stream()
+                .mapToDouble(Reservation::calculateRemainingAmount)
                 .sum();
 
         double overstayFee = selectedReservations.stream()
                 .mapToDouble(Reservation::getOverstayFee)
                 .sum();
 
-        double serviceFee = selectedReservations.stream()
-                .mapToDouble(r -> r.calculateTotalServicePrice())
+        double serviceTotal = selectedReservations.stream()
+                .mapToDouble(Reservation::calculateTotalServicePrice)
                 .sum();
 
-        // Thuế 10% trên tổng tiền phòng và dịch vụ
-        double tax = (roomTotal + serviceFee) * 0.1;
+        double serviceFee = serviceTotal * 0.05;
+        double tax = roomTotal * 0.1;
+        double finalTotal = remaining + serviceFee + tax + overstayFee;
 
-        // Tổng thanh toán
-        double finalTotal = roomTotal + serviceFee + tax + overstayFee;
-        double remaining = finalTotal - deposit;
-
-        // Cập nhật UI
         lbl_LastTotalPrice_Value.setText(MoneyUtil.formatCurrency(roomTotal));
         lbl_BookingMethod_Value.setText(selectedReservations.get(0).getBookingMethod() == BookingMethod.AT_THE_COUNTER ? "Tại quầy" : "Trực tuyến");
         lbl_Deposit_Value.setText(MoneyUtil.formatCurrency(deposit));
         lbl_RemainingAmount_Value.setText(MoneyUtil.formatCurrency(remaining));
-
         lbl_FloatingFee_Value.setText(MoneyUtil.formatCurrency(overstayFee));
         lbl_ServiceFee_Value.setText(MoneyUtil.formatCurrency(serviceFee));
         lbl_Tax_Value.setText(MoneyUtil.formatCurrency(tax));
@@ -500,137 +499,49 @@ public class Tab_ListBooking extends javax.swing.JPanel {
 
     private void showPaymentDialog() {
         List<Reservation> selectedReservations = getSelectedReservations();
-        if (selectedReservations.isEmpty()) return;
-
-        JDialog paymentDialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Thanh toán", true);
-        paymentDialog.setSize(500, 400);
-        paymentDialog.setLayout(new java.awt.GridLayout(10, 2, 10, 10));
-        paymentDialog.setLocationRelativeTo(this);
-
-        // Thông tin thanh toán
-        double totalPrice = selectedReservations.stream().mapToDouble(Reservation::getTotalPrice).sum();
-        double tax = totalPrice * 0.1;
-        double service = selectedReservations.stream().mapToDouble(Reservation::calculateTotalServicePrice).sum();
-        double finalTotal = totalPrice + tax + service + floatingFee;
-
-        JLabel lblTotal = new JLabel("Tổng tiền:");
-        JLabel lblTotalValue = new JLabel(String.format("%.0f VND", totalPrice));
-        JLabel lblTax = new JLabel("Thuế (10%):");
-        JLabel lblTaxValue = new JLabel(String.format("%.0f VND", tax));
-        JLabel lblService = new JLabel("Phí dịch vụ:");
-        JLabel lblServiceValue = new JLabel(String.format("%.0f VND", service));
-        JLabel lblFinalTotal = new JLabel("Tổng cộng:");
-        JLabel lblFinalTotalValue = new JLabel(String.format("%.0f VND", finalTotal));
-        JLabel lblPaymentMethod = new JLabel("Phương thức thanh toán:");
-        JComboBox<String> cbxPaymentMethod = new JComboBox<>(new String[]{"Tiền mặt", "Thẻ ngân hàng", "Chuyển khoản"});
-        JLabel lblCashReceived = new JLabel("Tiền khách đưa:");
-        JTextField txtCashReceived = new JTextField();
-        JLabel lblChange = new JLabel("Tiền trả lại:");
-        JLabel lblChangeValue = new JLabel(String.format("%.0f VND", 0.0));
-
-        // Các nút tiền mặt cố định
-        JPanel presetPanel = new JPanel(new java.awt.GridLayout(2, 5));
-        int[] presets = {1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, (int) finalTotal};
-        String[] presetLabels = {"1K", "2K", "5K", "10K", "20K", "50K", "100K", "200K", "500K", "Vừa đủ"};
-        for (int i = 0; i < presets.length; i++) {
-            JButton btn = new JButton(presetLabels[i]);
-            int amount = presets[i];
-            btn.addActionListener(e -> {
-                txtCashReceived.setText(String.valueOf(amount));
-                double change = amount - finalTotal;
-                lblChangeValue.setText(String.format("%.0f VND", change >= 0.0 ? change : 0.0));
-            });
-            presetPanel.add(btn);
+        if (selectedReservations.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn ít nhất một đơn đặt phòng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
-        // Cập nhật tiền trả lại khi nhập số tiền khách đưa
-        txtCashReceived.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            @Override
-            public void insertUpdate(javax.swing.event.DocumentEvent e) { updateChange(); }
-            @Override
-            public void removeUpdate(javax.swing.event.DocumentEvent e) { updateChange(); }
-            @Override
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { updateChange(); }
+        // Kiểm tra cùng khách hàng
+        String customerId = selectedReservations.get(0).getCustomer().getCustomerId();
+        boolean sameCustomer = selectedReservations.stream()
+                .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
+        if (!sameCustomer) {
+            JOptionPane.showMessageDialog(this, "Chỉ có thể thanh toán các đơn đặt phòng của cùng một khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-            private void updateChange() {
-                try {
-                    double cash = Double.parseDouble(txtCashReceived.getText());
-                    double change = cash - finalTotal;
-                    lblChangeValue.setText(String.format("%.0f VND", change >= 0 ? change : 0));
-                } catch (NumberFormatException ex) {
-                    lblChangeValue.setText(String.format("%.0f VND", 0.0));
-                }
-            }
-        });
+        // Kiểm tra trạng thái CHECKED_OUT
+        boolean allCheckedOut = selectedReservations.stream()
+                .allMatch(r -> r.getReservationStatus() == Reservation.STATUS_CHECKED_OUT);
+        if (!allCheckedOut) {
+            JOptionPane.showMessageDialog(this, "Tất cả đơn đặt phòng phải ở trạng thái CHECKED_OUT để thanh toán!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        // Nút hành động
-        JButton btnComplete = new JButton("Hoàn tất");
-        JButton btnCancel = new JButton("Quay lại");
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Thanh toán");
+        dialog.setSize(650, 550);
+        dialog.setModal(true);
+        dialog.setLayout(new BorderLayout());
 
-        btnComplete.addActionListener(e -> {
-            if (cbxPaymentMethod.getSelectedItem().equals("Tiền mặt")) {
-                try {
-                    double cash = Double.parseDouble(txtCashReceived.getText());
-                    if (cash < finalTotal) {
-                        JOptionPane.showMessageDialog(paymentDialog, "Số tiền không đủ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(paymentDialog, "Vui lòng nhập số tiền hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            }
+        Dialog_PaymentInfo paymentInfo = new Dialog_PaymentInfo(selectedReservations);
+        dialog.add(paymentInfo, BorderLayout.CENTER);
 
-            // Tạo đơn thanh toán
-            Orders order = new Orders();
-            order.setOrderId("ORD" + System.currentTimeMillis());
-            order.setCustomer(selectedReservations.get(0).getCustomer());
-            order.setStaff(selectedReservations.get(0).getStaff());
-            order.setOrderDate(new Date());
-            order.setStatus(1); // Đã thanh toán
-//            order.setPaymentMethod(Orders.PaymentMethod.valueOf(
-//                    cbxPaymentMethod.getSelectedItem().toString().replace(" ", "_").toUpperCase()));
-            order.setRoom(selectedReservations.get(0).getRoom());
-            order.setTotalPrice(totalPrice);
-            order.setTaxAmount(tax);
-            order.setServiceFee(service);
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
 
-//            if (orderDAO.createOrder(order)) {
-//                JOptionPane.showMessageDialog(paymentDialog, "Thanh toán thành công!");
-//                paymentDialog.dispose();
-//                loadReservations();
-//                clearReservationDetails();
-//                updateBookingInfo();
-//                updateButtonStates();
-//            } else {
-//                JOptionPane.showMessageDialog(paymentDialog, "Thanh toán thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-//            }
-        });
-
-        btnCancel.addActionListener(e -> paymentDialog.dispose());
-
-        // Thêm các thành phần vào dialog
-        paymentDialog.add(lblTotal);
-        paymentDialog.add(lblTotalValue);
-        paymentDialog.add(lblTax);
-        paymentDialog.add(lblTaxValue);
-        paymentDialog.add(lblService);
-        paymentDialog.add(lblServiceValue);
-        paymentDialog.add(lblFinalTotal);
-        paymentDialog.add(lblFinalTotalValue);
-        paymentDialog.add(lblPaymentMethod);
-        paymentDialog.add(cbxPaymentMethod);
-        paymentDialog.add(lblCashReceived);
-        paymentDialog.add(txtCashReceived);
-        paymentDialog.add(lblChange);
-        paymentDialog.add(lblChangeValue);
-        paymentDialog.add(new JLabel("Chọn số tiền:"));
-        paymentDialog.add(presetPanel);
-        paymentDialog.add(btnCancel);
-        paymentDialog.add(btnComplete);
-
-        paymentDialog.setVisible(true);
+        // Sau khi dialog đóng, làm mới dữ liệu
+        if (paymentInfo.isPaymentSuccessful()) {
+            loadReservations();
+            updateBookingInfo();
+            updateButtonStates();
+        }
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

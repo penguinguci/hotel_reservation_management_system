@@ -47,4 +47,10 @@ public class GenerateString {
         userName.append(System.currentTimeMillis() % 10000);
         return userName.toString();
     }
+
+    public static String generateOrderID() {
+        String timestamp = dateFormat.format(new Date());
+        int seq = sequence.incrementAndGet() % 1000;
+        return String.format("HD%s%03d", timestamp, seq);
+    }
 }
