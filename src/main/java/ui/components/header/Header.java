@@ -20,8 +20,14 @@ public class Header extends javax.swing.JPanel {
 
     public Header() {
         initComponents();
+        initInfoStaff();
         setOpaque(false);
         setFont(new Font("Segoe UI", Font.BOLD, 16));
+    }
+
+    void initInfoStaff(){
+        String infoStaff = CurrentAccount.getCurrentAccount().getStaff().getFirstName()+" "+CurrentAccount.getCurrentAccount().getStaff().getLastName();
+        btnUser.setText("Chào, " + infoStaff);
     }
 
     @Override
@@ -32,7 +38,6 @@ public class Header extends javax.swing.JPanel {
         g2.dispose();
         super.paintComponent(g);
     }
-
 
 
     @SuppressWarnings("unchecked")

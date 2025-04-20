@@ -98,7 +98,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 800, 30));
+        add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 800, 30));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -107,7 +107,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         customTableButton1.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
         jPanel1.add(customTableButton1, java.awt.BorderLayout.CENTER);
 
-        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 800, -1));
+        add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 800, 280));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         jPanel2.setLayout(new java.awt.BorderLayout());
@@ -116,7 +116,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         customTableButton2.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
         jPanel2.add(customTableButton2, java.awt.BorderLayout.CENTER);
 
-        add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 570, 800, 140));
+        add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 560, 800, 150));
 
         jPanel5.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -141,7 +141,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
-        add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 390, 800, 30));
+        add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 360, 800, 30));
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -154,10 +154,10 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 118, Short.MAX_VALUE)
+            .addGap(0, 138, Short.MAX_VALUE)
         );
 
-        add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 420, 800, 120));
+        add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 390, 800, 140));
 
         jPanel7.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -182,7 +182,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
-        add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 540, 800, 30));
+        add(jPanel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 530, 800, 30));
 
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
