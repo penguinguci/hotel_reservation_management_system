@@ -59,6 +59,7 @@ public class Tab_Booking extends javax.swing.JPanel {
         customerDAO = new CustomerDAOImpl();
         roomDAO = new RoomDAOImpl();
         initComponents();
+        initTableData();
         initializeSearchCustomer();
         initializePriceRangeComboBox();
         initializeRoomTypeComboBox();
@@ -94,6 +95,12 @@ public class Tab_Booking extends javax.swing.JPanel {
             }
         });
         setFocusCycleRoot(true);
+    }
+
+    private void initTableData() {
+        RoomDAO roomDAO = new RoomDAOImpl();
+        List<Room> allRooms = roomDAO.findAll();
+        displayRoomsInTable(allRooms);
     }
 
     private void initializeCartTable() {
@@ -236,8 +243,6 @@ public class Tab_Booking extends javax.swing.JPanel {
         }
 
         cbx_RangePrice.setModel(model);
-
-        displayRoomsInTable(allRooms);
     }
 
     private void initializeSearchCustomer() {
@@ -1175,6 +1180,10 @@ public class Tab_Booking extends javax.swing.JPanel {
             if (availableRooms == null || availableRooms.isEmpty()) {
                 table_EntityRoom.getTableModel().clearData();
                 JOptionPane.showMessageDialog(this, "Không tìm thấy phòng phù hợp", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+
+                List<Room> rooms = roomDAO.getAllRooms();
+                displayRoomsInTable(rooms);
+                clear();
             } else {
                 displayRoomsInTable(availableRooms);
             }
@@ -1405,6 +1414,21 @@ public class Tab_Booking extends javax.swing.JPanel {
             int selectedRow = table_EntityRoom.getTable().getSelectedRow();
             if (selectedRow == -1) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn phòng cần thêm",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Date checkinDate = calendar_Checkin.getSelectedDate();
+            Date checkoutDate = calendar_Checout.getSelectedDate();
+
+            if (checkinDate == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-in",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (checkoutDate == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-out",
                         "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
