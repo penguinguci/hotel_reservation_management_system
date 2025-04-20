@@ -470,7 +470,6 @@ public class Tab_Booking extends javax.swing.JPanel {
         pnl_ButtonActions = new javax.swing.JPanel();
         btn_Booking = new ui.components.button.ButtonCustom();
         btn_Cancel = new ui.components.button.ButtonCancelCustom();
-        btn_KeyboardNumber = new ui.components.button.ButtonCustom();
         pnl_Cart = new javax.swing.JPanel();
         table_Cart = new ui.components.table.CustomTableButton();
         pnl_BottomService = new javax.swing.JPanel();
@@ -755,12 +754,9 @@ public class Tab_Booking extends javax.swing.JPanel {
 
         btn_Booking.setText("Đặt phòng");
         btn_Booking.addActionListener(new java.awt.event.ActionListener() {
+            @SneakyThrows
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try {
-                    btn_BookingActionPerformed(evt);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                btn_BookingActionPerformed(evt);
             }
         });
 
@@ -771,8 +767,6 @@ public class Tab_Booking extends javax.swing.JPanel {
             }
         });
 
-        btn_KeyboardNumber.setText("Bàn phím số");
-
         javax.swing.GroupLayout pnl_ButtonActionsLayout = new javax.swing.GroupLayout(pnl_ButtonActions);
         pnl_ButtonActions.setLayout(pnl_ButtonActionsLayout);
         pnl_ButtonActionsLayout.setHorizontalGroup(
@@ -780,11 +774,8 @@ public class Tab_Booking extends javax.swing.JPanel {
             .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btn_Booking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
-                        .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btn_KeyboardNumber, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addComponent(btn_Booking, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
+                    .addComponent(btn_Cancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         pnl_ButtonActionsLayout.setVerticalGroup(
             pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -792,10 +783,8 @@ public class Tab_Booking extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(btn_Booking, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_KeyboardNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 13, Short.MAX_VALUE))
         );
 
         add(pnl_ButtonActions, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 570, 480, 130));
@@ -1055,7 +1044,6 @@ public class Tab_Booking extends javax.swing.JPanel {
     private ui.components.button.ButtonCancelCustom btn_Clear;
     private ui.components.button.ButtonCancelCustom btn_DeleteAll;
     private ui.components.button.ButtonCancelCustom btn_DeleteOne;
-    private ui.components.button.ButtonCustom btn_KeyboardNumber;
     private ui.components.button.ButtonCustom btn_SearchRoom;
     private ui.components.button.ButtonCustom btn_SeeDetails;
     private ui.components.button.ButtonCustom btn_UpdateService;
