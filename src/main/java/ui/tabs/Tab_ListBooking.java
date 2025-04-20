@@ -6,18 +6,25 @@ package ui.tabs;
 
 import dao.CustomerDAOImpl;
 import dao.ReservationDAOImpl;
+import entities.BookingMethod;
+import entities.Orders;
 import entities.Reservation;
 import entities.ReservationDetails;
 import interfaces.CustomerDAO;
 import interfaces.ReservationDAO;
 import ui.components.table.CustomTableButton;
+import utils.DateUtil;
+import utils.MoneyUtil;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -101,31 +108,34 @@ public class Tab_ListBooking extends javax.swing.JPanel {
             return;
         }
 
+        // Cập nhật thông tin cơ bản
         lbl_RoomID_Value.setText(reservation.getRoom().getRoomId());
         lbl_Floor_Value.setText(String.valueOf(reservation.getRoom().getFloor()));
         lbl_TypeRoom_Value.setText(reservation.getRoom().getRoomType().getTypeName());
         lbl_Capacity_Value.setText(String.valueOf(reservation.getRoom().getCapacity()));
         lbl_CustomerName_Value.setText(reservation.getCustomer().getFirstName() + " " + reservation.getCustomer().getLastName());
-        lbl_BookingDate_Value.setText(new SimpleDateFormat("dd-MM-yyyy").format(reservation.getBookingDate()));
+        lbl_BookingDate_Value.setText(DateUtil.formatDate(reservation.getBookingDate()));
 
+        // Cập nhật thông tin thời gian tùy theo loại đặt phòng
         if (reservation.getBookingType() == Reservation.BookingType.NIGHT) {
-            if (reservation.getCheckInDate() != null && reservation.getCheckOutDate() != null &&
-                    reservation.getCheckInDate().before(reservation.getCheckOutDate())) {
-                lbl_CheckInDateOrTime_Value.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(reservation.getCheckInDate()));
-                lbl_CheckoutDateOrTime_Value.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(reservation.getCheckOutDate()));
-                lbl_NumOfNightOrHour_Value.setText(String.valueOf(reservation.getNumberOfNights()));
-                lbl_PriceOfNightOrHour_Value.setText(String.format("%.0f VND", reservation.getRoom().getPrice()));
-            }
+            lbl_CheckInDateOrTime_Value.setText(DateUtil.formatDate(reservation.getCheckInDate()));
+            lbl_CheckoutDateOrTime_Value.setText(DateUtil.formatDate(reservation.getCheckOutDate()));
+            lbl_NumOfNightOrHour_Value.setText(reservation.getNumberOfNights() + " đêm");
+            lbl_PriceOfNightOrHour_Value.setText(MoneyUtil.formatCurrency(reservation.getRoom().getPrice()) + "/đêm");
         } else {
-            if (reservation.getCheckInDate() != null && reservation.getCheckOutDate() != null &&
-                    reservation.getCheckInDate().getTime() < reservation.getCheckOutDate().getTime()) {
-                lbl_CheckInDateOrTime_Value.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(reservation.getCheckInDate()));
-                lbl_CheckoutDateOrTime_Value.setText(new SimpleDateFormat("dd-MM-yyyy HH:mm").format(reservation.getCheckOutDate()));
-                lbl_NumOfNightOrHour_Value.setText(String.valueOf(reservation.getDurationHours()));
-                lbl_PriceOfNightOrHour_Value.setText(String.format("%.0f VND", reservation.getHourlyRate()));
-            }
+            lbl_CheckInDateOrTime_Value.setText(DateUtil.formatDateTime(reservation.getCheckInTime()));
+            lbl_CheckoutDateOrTime_Value.setText(DateUtil.formatDateTime(reservation.getCheckOutTime()));
+            lbl_NumOfNightOrHour_Value.setText(reservation.getDurationHours() + " giờ");
+            lbl_PriceOfNightOrHour_Value.setText(MoneyUtil.formatCurrency(reservation.getHourlyRate()) + "/giờ");
         }
-        lbl_NumOfFloating_Value.setText(String.valueOf(0));
+
+        // Hiển thị thông tin phụ trội nếu có
+        if (reservation.getOverstayUnits() > 0) {
+            lbl_NumOfFloating_Value.setText(reservation.getOverstayUnits() +
+                    (reservation.getBookingType() == Reservation.BookingType.NIGHT ? " ngày" : " giờ"));
+        } else {
+            lbl_NumOfFloating_Value.setText("0");
+        }
     }
 
     private void clearReservationDetails() {
@@ -144,25 +154,57 @@ public class Tab_ListBooking extends javax.swing.JPanel {
 
     private void updateBookingInfo() {
         List<Reservation> selectedReservations = getSelectedReservations();
-        double totalPrice = selectedReservations.stream().mapToDouble(Reservation::getTotalPrice).sum();
-        double deposit = selectedReservations.stream().mapToDouble(Reservation::getDepositAmount).sum();
-        double remaining = selectedReservations.stream().mapToDouble(Reservation::getRemainingAmount).sum();
+        if (selectedReservations.isEmpty()) {
+            clearPaymentInfo();
+            return;
+        }
 
-        lbl_LastTotalPrice_Value.setText(String.format("%.0f VND", totalPrice));
-        lbl_BookingMethod_Value.setText(selectedReservations.isEmpty() ? "" :
-                selectedReservations.get(0).getBookingMethod().toString());
-        lbl_Deposit_Value.setText(String.format("%.0f VND", deposit));
-        lbl_RemainingAmount_Value.setText(String.format("%.0f VND", remaining));
+        // Tính tổng các khoản
+        double roomTotal = selectedReservations.stream()
+                .mapToDouble(Reservation::getTotalPrice)
+                .sum();
 
-        // Cập nhật thông tin thanh toán
-        serviceFee = selectedReservations.stream().mapToDouble(Reservation::calculateTotalServicePrice).sum();
-        taxAmount = totalPrice * 0.1; // Thuế 10%
-        double finalTotal = totalPrice + serviceFee + taxAmount + floatingFee;
+        double deposit = selectedReservations.stream()
+                .mapToDouble(Reservation::getDepositAmount)
+                .sum();
 
-        lbl_FloatingFee_Value.setText(String.format("%.0f VND", floatingFee));
-        lbl_ServiceFee_Value.setText(String.format("%.0f VND", serviceFee));
-        lbl_Tax_Value.setText(String.format("%.0f VND", taxAmount));
-        lbl_TotalPrice_Value.setText(String.format("%.0f VND", finalTotal));
+        double overstayFee = selectedReservations.stream()
+                .mapToDouble(Reservation::getOverstayFee)
+                .sum();
+
+        double serviceFee = selectedReservations.stream()
+                .mapToDouble(r -> r.calculateTotalServicePrice())
+                .sum();
+
+        // Thuế 10% trên tổng tiền phòng và dịch vụ
+        double tax = (roomTotal + serviceFee) * 0.1;
+
+        // Tổng thanh toán
+        double finalTotal = roomTotal + serviceFee + tax + overstayFee;
+        double remaining = finalTotal - deposit;
+
+        // Cập nhật UI
+        lbl_LastTotalPrice_Value.setText(MoneyUtil.formatCurrency(roomTotal));
+        lbl_BookingMethod_Value.setText(selectedReservations.get(0).getBookingMethod() == BookingMethod.AT_THE_COUNTER ? "Tại quầy" : "Trực tuyến");
+        lbl_Deposit_Value.setText(MoneyUtil.formatCurrency(deposit));
+        lbl_RemainingAmount_Value.setText(MoneyUtil.formatCurrency(remaining));
+
+        lbl_FloatingFee_Value.setText(MoneyUtil.formatCurrency(overstayFee));
+        lbl_ServiceFee_Value.setText(MoneyUtil.formatCurrency(serviceFee));
+        lbl_Tax_Value.setText(MoneyUtil.formatCurrency(tax));
+        lbl_TotalPrice_Value.setText(MoneyUtil.formatCurrency(finalTotal));
+    }
+
+    private void clearPaymentInfo() {
+        lbl_LastTotalPrice_Value.setText("");
+        lbl_BookingMethod_Value.setText("");
+        lbl_Deposit_Value.setText("");
+        lbl_RemainingAmount_Value.setText("");
+
+        lbl_FloatingFee_Value.setText("");
+        lbl_ServiceFee_Value.setText("");
+        lbl_Tax_Value.setText("");
+        lbl_TotalPrice_Value.setText("");
     }
 
     private List<Reservation> getSelectedReservations() {
@@ -181,13 +223,15 @@ public class Tab_ListBooking extends javax.swing.JPanel {
     }
 
     private void updateButtonStates() {
+        List<Reservation> selectedReservations = getSelectedReservations();
         btn_ChooseAll.setEnabled(!currentReservations.isEmpty() &&
                 currentReservations.stream().anyMatch(r -> r.getReservationStatus() != Reservation.STATUS_CANCELLED));
         btn_Checkin.setEnabled(selectedReservation != null && selectedReservation.canCheckIn());
         btn_Checkout.setEnabled(selectedReservation != null && selectedReservation.canCheckOut());
-        btn_CacelBooking.setEnabled(selectedReservation != null && selectedReservation.canCancel());
-        btn_Pay.setEnabled(!getSelectedReservations().isEmpty() &&
-                getSelectedReservations().stream().allMatch(r -> r.getReservationStatus() == Reservation.STATUS_CHECKED_OUT));
+        btn_CacelBooking.setEnabled(!selectedReservations.isEmpty() &&
+                selectedReservations.stream().allMatch(r -> r.canCancel()));
+        btn_Pay.setEnabled(!selectedReservations.isEmpty() &&
+                selectedReservations.stream().allMatch(r -> r.getReservationStatus() == Reservation.STATUS_CHECKED_OUT));
     }
 
     private void searchReservations() {
@@ -260,16 +304,332 @@ public class Tab_ListBooking extends javax.swing.JPanel {
             clearReservationDetails();
             updateBookingInfo();
             updateButtonStates();
+            initComboboxCustomerID();
+
             table_ListService.getTableModel().clearData();
+            table_ListReservation.getTable().clearSelection();
+            lbl_FloatingFee_Value.setText("");
+            lbl_ServiceFee_Value.setText("");
+            lbl_Tax_Value.setText("");
+            lbl_TotalPrice_Value.setText("");
         });
 
         btn_ChooseAll.addActionListener(e -> {
             if (!currentReservations.isEmpty() && btn_ChooseAll.isEnabled()) {
-                if (!currentReservations.isEmpty() && btn_ChooseAll.isEnabled()) {
-                    table_ListReservation.getTable().selectAll();
+                table_ListReservation.getTable().selectAll();
+                updateBookingInfo();
+                updateButtonStates();
+            }
+        });
+
+        btn_Checkin.addActionListener(e -> {
+            List<Reservation> selectedReservations = getSelectedReservations();
+            if (selectedReservations.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ít nhất một đơn đặt phòng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Kiểm tra cùng khách hàng
+            String customerId = selectedReservations.get(0).getCustomer().getCustomerId();
+            boolean sameCustomer = selectedReservations.stream()
+                    .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
+
+            if (!sameCustomer) {
+                JOptionPane.showMessageDialog(this, "Chỉ có thể check-in các đơn đặt phòng của cùng một khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Kiểm tra có thể check-in
+            boolean allCanCheckIn = selectedReservations.stream()
+                    .allMatch(Reservation::canCheckIn);
+
+            if (!allCanCheckIn) {
+                JOptionPane.showMessageDialog(this, "Một số đơn đặt phòng không thể check-in!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Xác nhận check-in
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Bạn có chắc chắn muốn check-in " + selectedReservations.size() + " phòng?",
+                    "Xác nhận check-in", JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    List<String> reservationIds = selectedReservations.stream()
+                            .map(Reservation::getReservationId)
+                            .collect(Collectors.toList());
+
+                    if (reservationDAO.batchCheckIn(reservationIds)) {
+                        JOptionPane.showMessageDialog(this,
+                                "Check-in thành công " + selectedReservations.size() + " phòng!",
+                                "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        loadReservations();
+                        updateButtonStates();
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                                "Check-in thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this,
+                            "Lỗi khi check-in: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
+
+        btn_Checkout.addActionListener(e -> {
+            List<Reservation> selectedReservations = getSelectedReservations();
+            if (selectedReservations.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ít nhất một đơn đặt phòng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Kiểm tra cùng khách hàng
+            String customerId = selectedReservations.get(0).getCustomer().getCustomerId();
+            boolean sameCustomer = selectedReservations.stream()
+                    .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
+
+            if (!sameCustomer) {
+                JOptionPane.showMessageDialog(this, "Chỉ có thể check-out các đơn đặt phòng của cùng một khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Kiểm tra có thể check-out
+            boolean allCanCheckOut = selectedReservations.stream()
+                    .allMatch(Reservation::canCheckOut);
+
+            if (!allCanCheckOut) {
+                JOptionPane.showMessageDialog(this, "Một số đơn đặt phòng không thể check-out!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Xác nhận check-out
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Bạn có chắc chắn muốn check-out " + selectedReservations.size() + " phòng?",
+                    "Xác nhận check-out", JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    List<String> reservationIds = selectedReservations.stream()
+                            .map(Reservation::getReservationId)
+                            .collect(Collectors.toList());
+
+                    Date actualCheckOutTime = new Date(); // Thời gian check-out thực tế
+
+                    if (reservationDAO.batchCheckOut(reservationIds, actualCheckOutTime)) {
+                        // Tính tổng phụ phí
+                        double totalOverstayFee = selectedReservations.stream()
+                                .mapToDouble(Reservation::getOverstayFee)
+                                .sum();
+
+                        String message = "Check-out thành công " + selectedReservations.size() + " phòng!";
+                        if (totalOverstayFee > 0) {
+                            message += "\nTổng phụ phí: " + String.format("%,.0f VND", totalOverstayFee);
+                        }
+
+                        JOptionPane.showMessageDialog(this, message,
+                                "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        loadReservations();
+                        updateBookingInfo();
+                        updateButtonStates();
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                                "Check-out thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this,
+                            "Lỗi khi check-out: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        btn_CacelBooking.addActionListener(e -> {
+            List<Reservation> selectedReservations = getSelectedReservations();
+            if (selectedReservations.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ít nhất một đơn đặt phòng để hủy!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Kiểm tra xem tất cả đơn đặt phòng có thuộc về cùng một khách hàng không
+            String customerId = selectedReservations.get(0).getCustomer().getCustomerId();
+            boolean sameCustomer = selectedReservations.stream()
+                    .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
+            if (!sameCustomer) {
+                JOptionPane.showMessageDialog(this, "Chỉ có thể hủy các đơn đặt phòng của cùng một khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Kiểm tra xem tất cả đơn đặt phòng có thể hủy không
+            boolean allCanCancel = selectedReservations.stream().allMatch(Reservation::canCancel);
+            if (!allCanCancel) {
+                JOptionPane.showMessageDialog(this, "Một số đơn đặt phòng không thể hủy!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Xác nhận hủy
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Bạn có chắc chắn muốn hủy " + selectedReservations.size() + " đơn đặt phòng?",
+                    "Xác nhận hủy", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    boolean success = reservationDAO.cancelMultipleReservations(selectedReservations);
+                    if (success) {
+                        JOptionPane.showMessageDialog(this, "Hủy thành công " + selectedReservations.size() + " đơn đặt phòng!",
+                                "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        loadReservations(); // Làm mới bảng
+                        clearReservationDetails();
+                        updateBookingInfo();
+                        updateButtonStates();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Hủy thất bại. Vui lòng thử lại!",
+                                "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Lỗi khi hủy đơn đặt phòng: " + ex.getMessage(),
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        btn_Pay.addActionListener(e -> {
+            showPaymentDialog();
+        });
+    }
+
+    private void showPaymentDialog() {
+        List<Reservation> selectedReservations = getSelectedReservations();
+        if (selectedReservations.isEmpty()) return;
+
+        JDialog paymentDialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Thanh toán", true);
+        paymentDialog.setSize(500, 400);
+        paymentDialog.setLayout(new java.awt.GridLayout(10, 2, 10, 10));
+        paymentDialog.setLocationRelativeTo(this);
+
+        // Thông tin thanh toán
+        double totalPrice = selectedReservations.stream().mapToDouble(Reservation::getTotalPrice).sum();
+        double tax = totalPrice * 0.1;
+        double service = selectedReservations.stream().mapToDouble(Reservation::calculateTotalServicePrice).sum();
+        double finalTotal = totalPrice + tax + service + floatingFee;
+
+        JLabel lblTotal = new JLabel("Tổng tiền:");
+        JLabel lblTotalValue = new JLabel(String.format("%.0f VND", totalPrice));
+        JLabel lblTax = new JLabel("Thuế (10%):");
+        JLabel lblTaxValue = new JLabel(String.format("%.0f VND", tax));
+        JLabel lblService = new JLabel("Phí dịch vụ:");
+        JLabel lblServiceValue = new JLabel(String.format("%.0f VND", service));
+        JLabel lblFinalTotal = new JLabel("Tổng cộng:");
+        JLabel lblFinalTotalValue = new JLabel(String.format("%.0f VND", finalTotal));
+        JLabel lblPaymentMethod = new JLabel("Phương thức thanh toán:");
+        JComboBox<String> cbxPaymentMethod = new JComboBox<>(new String[]{"Tiền mặt", "Thẻ ngân hàng", "Chuyển khoản"});
+        JLabel lblCashReceived = new JLabel("Tiền khách đưa:");
+        JTextField txtCashReceived = new JTextField();
+        JLabel lblChange = new JLabel("Tiền trả lại:");
+        JLabel lblChangeValue = new JLabel(String.format("%.0f VND", 0.0));
+
+        // Các nút tiền mặt cố định
+        JPanel presetPanel = new JPanel(new java.awt.GridLayout(2, 5));
+        int[] presets = {1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000, (int) finalTotal};
+        String[] presetLabels = {"1K", "2K", "5K", "10K", "20K", "50K", "100K", "200K", "500K", "Vừa đủ"};
+        for (int i = 0; i < presets.length; i++) {
+            JButton btn = new JButton(presetLabels[i]);
+            int amount = presets[i];
+            btn.addActionListener(e -> {
+                txtCashReceived.setText(String.valueOf(amount));
+                double change = amount - finalTotal;
+                lblChangeValue.setText(String.format("%.0f VND", change >= 0.0 ? change : 0.0));
+            });
+            presetPanel.add(btn);
+        }
+
+        // Cập nhật tiền trả lại khi nhập số tiền khách đưa
+        txtCashReceived.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { updateChange(); }
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { updateChange(); }
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { updateChange(); }
+
+            private void updateChange() {
+                try {
+                    double cash = Double.parseDouble(txtCashReceived.getText());
+                    double change = cash - finalTotal;
+                    lblChangeValue.setText(String.format("%.0f VND", change >= 0 ? change : 0));
+                } catch (NumberFormatException ex) {
+                    lblChangeValue.setText(String.format("%.0f VND", 0.0));
+                }
+            }
+        });
+
+        // Nút hành động
+        JButton btnComplete = new JButton("Hoàn tất");
+        JButton btnCancel = new JButton("Quay lại");
+
+        btnComplete.addActionListener(e -> {
+            if (cbxPaymentMethod.getSelectedItem().equals("Tiền mặt")) {
+                try {
+                    double cash = Double.parseDouble(txtCashReceived.getText());
+                    if (cash < finalTotal) {
+                        JOptionPane.showMessageDialog(paymentDialog, "Số tiền không đủ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(paymentDialog, "Vui lòng nhập số tiền hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+
+            // Tạo đơn thanh toán
+            Orders order = new Orders();
+            order.setOrderId("ORD" + System.currentTimeMillis());
+            order.setCustomer(selectedReservations.get(0).getCustomer());
+            order.setStaff(selectedReservations.get(0).getStaff());
+            order.setOrderDate(new Date());
+            order.setStatus(1); // Đã thanh toán
+//            order.setPaymentMethod(Orders.PaymentMethod.valueOf(
+//                    cbxPaymentMethod.getSelectedItem().toString().replace(" ", "_").toUpperCase()));
+            order.setRoom(selectedReservations.get(0).getRoom());
+            order.setTotalPrice(totalPrice);
+            order.setTaxAmount(tax);
+            order.setServiceFee(service);
+
+//            if (orderDAO.createOrder(order)) {
+//                JOptionPane.showMessageDialog(paymentDialog, "Thanh toán thành công!");
+//                paymentDialog.dispose();
+//                loadReservations();
+//                clearReservationDetails();
+//                updateBookingInfo();
+//                updateButtonStates();
+//            } else {
+//                JOptionPane.showMessageDialog(paymentDialog, "Thanh toán thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+//            }
+        });
+
+        btnCancel.addActionListener(e -> paymentDialog.dispose());
+
+        // Thêm các thành phần vào dialog
+        paymentDialog.add(lblTotal);
+        paymentDialog.add(lblTotalValue);
+        paymentDialog.add(lblTax);
+        paymentDialog.add(lblTaxValue);
+        paymentDialog.add(lblService);
+        paymentDialog.add(lblServiceValue);
+        paymentDialog.add(lblFinalTotal);
+        paymentDialog.add(lblFinalTotalValue);
+        paymentDialog.add(lblPaymentMethod);
+        paymentDialog.add(cbxPaymentMethod);
+        paymentDialog.add(lblCashReceived);
+        paymentDialog.add(txtCashReceived);
+        paymentDialog.add(lblChange);
+        paymentDialog.add(lblChangeValue);
+        paymentDialog.add(new JLabel("Chọn số tiền:"));
+        paymentDialog.add(presetPanel);
+        paymentDialog.add(btnCancel);
+        paymentDialog.add(btnComplete);
+
+        paymentDialog.setVisible(true);
     }
 
     /**
@@ -577,16 +937,17 @@ public class Tab_ListBooking extends javax.swing.JPanel {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(33, 33, 33)
-                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel19, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

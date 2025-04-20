@@ -11,6 +11,9 @@ public interface ReservationDAO extends GenericDAO<Reservation, String> {
     List<Reservation> getReservationsByCustomerId(String customerId);
     boolean checkIn(String reservationId);
     boolean checkOut(String reservationId, Date actualCheckOutTime);
+    boolean batchCheckIn(List<String> reservationIds);
+    boolean batchCheckOut(List<String> reservationIds, Date actualCheckOutTime);
     boolean cancelReservation(String reservationId);
+    boolean cancelMultipleReservations(List<Reservation> reservations);
     List<Reservation> getAllReservations();
 }

@@ -12,6 +12,7 @@ import java.awt.geom.RoundRectangle2D;
 public class ButtonCancelCustom extends JButton {
     private Color startColor = new Color(246, 71, 71);
     private Color endColor = new Color(251, 36, 54);
+    private Color disabledColor = new Color(239, 78, 90);
     private boolean isHovered = false;
     private int round = 10;
     private final RippleEffect rippleEffect;
@@ -31,53 +32,81 @@ public class ButtonCancelCustom extends JButton {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                isHovered = true;
-                repaint();
+                if (isEnabled()) { // Chỉ hover nếu nút được bật
+                    isHovered = true;
+                    repaint();
+                }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                isHovered = false;
-                repaint();
+                if (isEnabled()) { // Chỉ cập nhật nếu nút được bật
+                    isHovered = false;
+                    repaint();
+                }
             }
         });
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2d = (Graphics2D) g.create(); // Tạo bản sao Graphics
         // Bật khử răng cưa
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // tạo hiệu ứng gradient
-        GradientPaint gradient = new GradientPaint(
-                0, 0, isHovered ? endColor : startColor, // Màu bắt đầu khi hover
-                0, getHeight(), isHovered ? startColor : endColor // Màu kết thúc khi hover
-        );
+        // Tạo hiệu ứng gradient hoặc màu đơn tùy theo trạng thái
+        if (isEnabled()) {
+            // Nút được bật: Sử dụng gradient
+            GradientPaint gradient = new GradientPaint(
+                    0, 0, isHovered ? endColor : startColor, // Màu bắt đầu khi hover
+                    0, getHeight(), isHovered ? startColor : endColor // Màu kết thúc khi hover
+            );
+            g2d.setPaint(gradient);
+        } else {
+            // Nút bị vô hiệu hóa: Sử dụng màu xám
+            g2d.setPaint(disabledColor);
+        }
 
-        g2d.setPaint(gradient);
-        g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20); // Vẽ nút với góc bo tròn
-
+        // Vẽ hình chữ nhật bo tròn
         Area area = new Area(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20));
         g2d.fill(area);
 
-        // Vẽ gợn sóng
-        rippleEffect.reder(g2d, area);
+        // Vẽ gợn sóng (chỉ khi nút được bật)
+        if (isEnabled()) {
+            rippleEffect.reder(g2d, area);
+        }
 
-        // vẽ chữ
+        // Vẽ chữ
         super.paintComponent(g);
+
+        g2d.dispose(); // Giải phóng tài nguyên
     }
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("ButtonCancelCustom Example");
-        ButtonCancelCustom button = new ButtonCancelCustom();
-        button.setText("Cancel");
-        button.setPreferredSize(new Dimension(100, 40));
+    // Getter và Setter cho các thuộc tính màu (nếu cần tùy chỉnh)
+    public Color getStartColor() {
+        return startColor;
+    }
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new FlowLayout());
-        frame.add(button);
-        frame.pack();
-        frame.setVisible(true);
+    public void setStartColor(Color startColor) {
+        this.startColor = startColor;
+        repaint();
+    }
+
+    public Color getEndColor() {
+        return endColor;
+    }
+
+    public void setEndColor(Color endColor) {
+        this.endColor = endColor;
+        repaint();
+    }
+
+    public Color getDisabledColor() {
+        return disabledColor;
+    }
+
+    public void setDisabledColor(Color disabledColor) {
+        this.disabledColor = disabledColor;
+        repaint();
     }
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 import utils.AppUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,26 +28,20 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
         try {
             transaction.begin();
 
-            // Kiểm tra hợp lệ
             if (!reservation.isValidHourlyBooking()) {
                 throw new IllegalArgumentException("Đặt phòng theo giờ không hợp lệ");
             }
 
-            // Kiểm tra phòng có khả dụng không
             Room room = reservation.getRoom();
             if (room == null || !room.isAvailableForHourlyBooking(reservation.getCheckInTime(), reservation.getCheckOutTime())) {
                 throw new IllegalStateException("Phòng không khả dụng trong khoảng thời gian này");
             }
 
-            // Tính toán giá
             reservation.calculateTotalPrice();
             reservation.calculateDepositAmount();
             reservation.calculateRemainingAmount();
 
-            // Lưu reservation
             em.persist(reservation);
-
-            // Cập nhật trạng thái phòng
             room.setStatus(Room.STATUS_RESERVED);
             em.merge(room);
 
@@ -62,7 +57,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
         }
     }
 
-    // Tìm kiếm đặt phòng theo SĐT, CCCD, hoặc tên khách hàng
     @Override
     public List<Reservation> searchReservations(String keyword) {
         EntityManager em = AppUtil.getEntityManager();
@@ -80,13 +74,11 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
         }
     }
 
-    // Tìm kiếm đặt phòng theo mã khách hàng
     @Override
     public List<Reservation> getReservationsByCustomerId(String customerId) {
         EntityManager em = AppUtil.getEntityManager();
         try {
-            String jpql = "SELECT r " +
-                    "FROM Reservation r " +
+            String jpql = "SELECT r FROM Reservation r " +
                     "JOIN FETCH r.room room " +
                     "JOIN FETCH r.reservationDetails rd " +
                     "JOIN FETCH rd.service s " +
@@ -99,7 +91,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
         }
     }
 
-    // Check-in đặt phòng
     @Override
     public boolean checkIn(String reservationId) {
         EntityManager em = AppUtil.getEntityManager();
@@ -109,7 +100,7 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             Reservation reservation = em.find(Reservation.class, reservationId);
             if (reservation != null && reservation.canCheckIn()) {
                 reservation.updateStatus(Reservation.STATUS_CHECKED_IN);
-                reservation.getRoom().checkIn();
+                reservation.getRoom().checkIn(reservation);
                 em.merge(reservation);
                 em.merge(reservation.getRoom());
                 transaction.commit();
@@ -126,7 +117,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
         }
     }
 
-    // Check-out đặt phòng
     @Override
     public boolean checkOut(String reservationId, Date actualCheckOutTime) {
         EntityManager em = AppUtil.getEntityManager();
@@ -135,12 +125,21 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             transaction.begin();
             Reservation reservation = em.find(Reservation.class, reservationId);
             if (reservation != null && reservation.canCheckOut()) {
-                double overstayFee = reservation.calculateOverstayFee(actualCheckOutTime);
-                reservation.setTotalPrice(reservation.getTotalPrice() + overstayFee);
+                // Tính toán phụ phí
+                reservation.calculateOverstayDetails(actualCheckOutTime);
+
+                // Cập nhật tổng tiền
+                double newTotal = reservation.getTotalPrice() + reservation.getOverstayFee();
+                reservation.setTotalPrice(newTotal);
+
+                // Cập nhật trạng thái
                 reservation.updateStatus(Reservation.STATUS_CHECKED_OUT);
-                reservation.getRoom().checkOut();
+                reservation.getRoom().checkOut(reservation);
+
+                // Lưu vào DB
                 em.merge(reservation);
                 em.merge(reservation.getRoom());
+
                 transaction.commit();
                 return true;
             }
@@ -155,7 +154,116 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
         }
     }
 
-    // Hủy đặt phòng
+    @Override
+    public boolean batchCheckIn(List<String> reservationIds) {
+        EntityManager em = AppUtil.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+
+            // Lấy danh sách reservation và kiểm tra
+            List<Reservation> reservations = em.createQuery(
+                            "SELECT r FROM Reservation r WHERE r.reservationId IN :ids", Reservation.class)
+                    .setParameter("ids", reservationIds)
+                    .getResultList();
+
+            if (reservations.isEmpty()) {
+                return false;
+            }
+
+            // Kiểm tra tất cả reservation có cùng customer không
+            String customerId = reservations.get(0).getCustomer().getCustomerId();
+            boolean sameCustomer = reservations.stream()
+                    .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
+
+            if (!sameCustomer) {
+                throw new IllegalArgumentException("Các đơn đặt phòng không thuộc cùng một khách hàng");
+            }
+
+            // Kiểm tra tất cả có thể check-in không
+            boolean allCanCheckIn = reservations.stream()
+                    .allMatch(Reservation::canCheckIn);
+
+            if (!allCanCheckIn) {
+                throw new IllegalStateException("Một số đơn đặt phòng không thể check-in");
+            }
+
+            // Thực hiện check-in
+            for (Reservation reservation : reservations) {
+                reservation.updateStatus(Reservation.STATUS_CHECKED_IN);
+                reservation.getRoom().checkIn(reservation);
+                em.merge(reservation);
+                em.merge(reservation.getRoom());
+            }
+
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public boolean batchCheckOut(List<String> reservationIds, Date actualCheckOutTime) {
+        EntityManager em = AppUtil.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+
+            // Lấy danh sách reservation và kiểm tra
+            List<Reservation> reservations = em.createQuery(
+                            "SELECT r FROM Reservation r WHERE r.reservationId IN :ids", Reservation.class)
+                    .setParameter("ids", reservationIds)
+                    .getResultList();
+
+            if (reservations.isEmpty()) {
+                return false;
+            }
+
+            // Kiểm tra tất cả reservation có cùng customer không
+            String customerId = reservations.get(0).getCustomer().getCustomerId();
+            boolean sameCustomer = reservations.stream()
+                    .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
+
+            if (!sameCustomer) {
+                throw new IllegalArgumentException("Các đơn đặt phòng không thuộc cùng một khách hàng");
+            }
+
+            // Kiểm tra tất cả có thể check-out không
+            boolean allCanCheckOut = reservations.stream()
+                    .allMatch(Reservation::canCheckOut);
+
+            if (!allCanCheckOut) {
+                throw new IllegalStateException("Một số đơn đặt phòng không thể check-out");
+            }
+
+            // Thực hiện check-out và tính phụ phí
+            for (Reservation reservation : reservations) {
+                reservation.calculateOverstayDetails(actualCheckOutTime);
+                reservation.setTotalPrice(reservation.getTotalPrice() + reservation.getOverstayFee());
+                reservation.updateStatus(Reservation.STATUS_CHECKED_OUT);
+                reservation.getRoom().checkOut(reservation);
+                em.merge(reservation);
+                em.merge(reservation.getRoom());
+            }
+
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
     @Override
     public boolean cancelReservation(String reservationId) {
         EntityManager em = AppUtil.getEntityManager();
@@ -183,17 +291,49 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
     }
 
     @Override
+    public boolean cancelMultipleReservations(List<Reservation> reservations) {
+        EntityManager em = AppUtil.getEntityManager();
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+            boolean allSuccess = true;
+            for (Reservation reservation : reservations) {
+                if (reservation.canCancel()) {
+                    reservation.updateStatus(Reservation.STATUS_CANCELLED);
+                    reservation.getRoom().cancelReservation();
+                    em.merge(reservation);
+                    em.merge(reservation.getRoom());
+                } else {
+                    allSuccess = false;
+                }
+            }
+            transaction.commit();
+            return allSuccess;
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw e;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public List<Reservation> getAllReservations() {
         EntityManager em = AppUtil.getEntityManager();
         try {
-            String jpql = "SELECT r " +
-                    "FROM Reservation r " +
-                    "JOIN FETCH r.room room " +
-                    "JOIN FETCH r.customer c " +
-                    "JOIN FETCH r.reservationDetails rd " +
-                    "JOIN FETCH rd.service s";
+            String jpql = "SELECT r FROM Reservation r " +
+                    "LEFT JOIN FETCH r.customer " +
+                    "LEFT JOIN FETCH r.room rt " +
+                    "LEFT JOIN FETCH rt.roomType " +
+                    "LEFT JOIN FETCH r.reservationDetails rd " +
+                    "LEFT JOIN FETCH rd.service";
             TypedQuery<Reservation> query = em.createQuery(jpql, Reservation.class);
             return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         } finally {
             em.close();
         }
