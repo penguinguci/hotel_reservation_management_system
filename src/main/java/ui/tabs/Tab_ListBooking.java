@@ -260,6 +260,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
             clearReservationDetails();
             updateBookingInfo();
             updateButtonStates();
+            table_ListService.getTableModel().clearData();
         });
 
         btn_ChooseAll.addActionListener(e -> {
