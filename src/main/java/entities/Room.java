@@ -79,6 +79,25 @@ public class Room {
         return status == STATUS_AVAILABLE;
     }
 
+    // Cập nhật trạng thái phòng
+    public void checkIn() {
+        if (status == STATUS_RESERVED) {
+            status = STATUS_OCCUPIED;
+        }
+    }
+
+    public void checkOut() {
+        if (status == STATUS_OCCUPIED) {
+            status = STATUS_AVAILABLE;
+        }
+    }
+
+    public void cancelReservation() {
+        if (status == STATUS_RESERVED) {
+            status = STATUS_AVAILABLE;
+        }
+    }
+
     // Phương thức tính giá mặc định theo giờ nếu chưa có giá cụ thể
     public double getDefaultHourlyRate() {
         // Nếu hourlyBaseRate chưa được thiết lập, tính dựa trên giá theo đêm

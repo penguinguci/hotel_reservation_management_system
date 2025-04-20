@@ -16,4 +16,6 @@ public interface CustomerDAO extends GenericDAO<Customer, String>, Remote {
     boolean isEmailExists(String email);
     boolean isPhoneExists(String phone);
     List<Customer> searchCustomerAdvanced(String id, String name, String phone, Boolean gender, String cccd);
+    List<String> getAllCustomerIds();
+    List<Customer> searchCustomers(String keyword);
 }

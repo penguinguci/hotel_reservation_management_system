@@ -39,9 +39,9 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="txt_Search" min="-2" pref="630" max="-2" attributes="0"/>
+                  <Component id="txt_Search" min="-2" pref="604" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="cbx_CustomerID" pref="146" max="32767" attributes="0"/>
+                  <Component id="cbx_CustomerID" pref="172" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>

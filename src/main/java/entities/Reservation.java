@@ -63,7 +63,7 @@ public class Reservation {
     private Room room;
 
     @Column(name = "number_of_nights")
-    private int numberOfNights = 1;
+    private Integer numberOfNights = 1;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "booking_type")
@@ -76,7 +76,7 @@ public class Reservation {
     private Date checkOutTime; // Thời gian check-out chi tiết đến giờ phút
 
     @Column(name = "duration_hours")
-    private int durationHours = 1; // Số giờ đặt (chỉ dùng cho đặt theo giờ)
+    private Integer durationHours = 1; // Số giờ đặt (chỉ dùng cho đặt theo giờ)
 
     @Column(name = "hourly_rate")
     private double hourlyRate; // Giá theo giờ
@@ -87,12 +87,66 @@ public class Reservation {
         HOUR   // Đặt theo giờ
     }
 
+    // Hằng số trạng thái đặt phòng
+    public static final int STATUS_PENDING = 0; // Chờ xử lý
+    public static final int STATUS_CHECKED_IN = 1; // Đã check-in
+    public static final int STATUS_CHECKED_OUT = 2; // Đã check-out
+    public static final int STATUS_CANCELLED = 3; // Đã hủy
+
+    @Column(name = "reservation_status")
+    private int reservationStatus = STATUS_PENDING;
+
+    // Phương thức kiểm tra xem có thể check-in không
+    public boolean canCheckIn() {
+        return reservationStatus == STATUS_PENDING && room.getStatus() == Room.STATUS_RESERVED;
+    }
+
+    // Phương thức kiểm tra xem có thể check-out không
+    public boolean canCheckOut() {
+        return reservationStatus == STATUS_CHECKED_IN && room.getStatus() == Room.STATUS_OCCUPIED;
+    }
+
+    // Phương thức kiểm tra xem có thể hủy không
+    public boolean canCancel() {
+        return reservationStatus == STATUS_PENDING || reservationStatus == STATUS_CHECKED_IN;
+    }
+
+    // Tính phí phụ trội khi check-out muộn
+    public double calculateOverstayFee(Date actualCheckOutTime) {
+        if (actualCheckOutTime == null || checkOutTime == null) return 0.0;
+
+        if (bookingType == BookingType.HOUR) {
+            long actualDurationMs = actualCheckOutTime.getTime() - checkInTime.getTime();
+            int actualHours = (int) Math.ceil(actualDurationMs / (60.0 * 60 * 1000));
+            if (actualHours > durationHours) {
+                int extraHours = actualHours - durationHours;
+                return extraHours * hourlyRate * 1.2; // Phí phụ trội 120% giá giờ
+            }
+        } else if (bookingType == BookingType.NIGHT) {
+            long actualCheckOutMs = actualCheckOutTime.getTime();
+            long expectedCheckOutMs = checkOutDate.getTime();
+            if (actualCheckOutMs > expectedCheckOutMs) {
+                long extraMs = actualCheckOutMs - expectedCheckOutMs;
+                int extraHours = (int) Math.ceil(extraMs / (60.0 * 60 * 1000));
+                return extraHours * (room.getPrice() / 24 * 1.2); // Phí phụ trội dựa trên giá đêm
+            }
+        }
+        return 0.0;
+    }
+
+    // Cập nhật trạng thái đặt phòng
+    public void updateStatus(int newStatus) {
+        this.reservationStatus = newStatus;
+    }
+
 
     // Phương thức mới để tính toán thời gian sử dụng theo giờ
     public void calculateDurationHours() {
         if (checkInTime != null && checkOutTime != null) {
             long diffInMillis = checkOutTime.getTime() - checkInTime.getTime();
             durationHours = (int) Math.ceil(diffInMillis / (60.0 * 60 * 1000));
+        } else {
+            durationHours = 1;
         }
     }
 
@@ -102,7 +156,7 @@ public class Reservation {
 
         // Kiểm tra thời gian tối thiểu và tối đa
         if (room != null) {
-            if (durationHours < room.getMinHours() || durationHours > room.getMaxHours()) {
+            if (durationHours == null || durationHours < room.getMinHours() || durationHours > room.getMaxHours()) {
                 return false;
             }
         }
@@ -111,20 +165,6 @@ public class Reservation {
                 checkInTime.before(checkOutTime) && durationHours > 0;
     }
 
-    // Phương thức mới để tính phí phụ trội nếu khách check-out trễ
-    public double calculateOverstayFee(Date actualCheckOutTime) {
-        if (bookingType == BookingType.HOUR && actualCheckOutTime != null) {
-            long actualDurationMs = actualCheckOutTime.getTime() - checkInTime.getTime();
-            int actualHours = (int) Math.ceil(actualDurationMs / (60.0 * 60 * 1000));
-
-            if (actualHours > durationHours) {
-                int extraHours = actualHours - durationHours;
-                // Tính phí phụ trội (ví dụ: 120% giá theo giờ)
-                return extraHours * hourlyRate * 1.2;
-            }
-        }
-        return 0.0;
-    }
 
     // Tính toán tổng tiền từ chi tiết đặt phòng
     public double calculateTotalPrice() {
