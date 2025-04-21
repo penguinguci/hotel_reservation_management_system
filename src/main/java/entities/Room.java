@@ -52,7 +52,7 @@ public class Room {
     @OneToMany(mappedBy = "room")
     protected List<Orders> orders;
 
-    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "room")
     protected List<Reservation> reservations;
 
     @Column(name = "hourly_base_rate", columnDefinition = "float")

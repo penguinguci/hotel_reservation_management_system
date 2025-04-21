@@ -157,6 +157,7 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
                 order.setCheckOutTime(reservation.getCheckOutDate());
             }
             order.setNumberOfNights(reservation.getNumberOfNights());
+            order.setDurationHours(reservation.getDurationHours());
 
             // Lưu thông tin nhân viên
             Account account = CurrentAccount.getCurrentAccount();
@@ -298,6 +299,8 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
             }
         });
     }
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.

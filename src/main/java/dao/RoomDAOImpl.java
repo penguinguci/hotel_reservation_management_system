@@ -190,11 +190,11 @@
         @Override
         public List<Room> findAvailableRooms(Date checkInDate, Date checkOutDate, Integer capacity,
                                              String roomType, Double minPrice, Double maxPrice) {
+            EntityManager em = AppUtil.getEntityManager();
             try {
                 // Xây dựng câu truy vấn cơ bản
                 String jpql = "SELECT DISTINCT r FROM Room r " +
-                        "LEFT JOIN FETCH r.amenities " +
-                        "LEFT JOIN FETCH r.roomType " +
+                        "LEFT JOIN FETCH r.roomType " +  // Chỉ fetch roomType
                         "WHERE r.status = :availableStatus";
 
                 // Thêm điều kiện cho ngày nếu có
@@ -248,7 +248,18 @@
                     query.setParameter("maxPrice", maxPrice);
                 }
 
-                return query.getResultList();
+                List<Room> rooms = query.getResultList();
+
+                // Nếu cần amenities, có thể fetch riêng trong một query khác
+                if (!rooms.isEmpty()) {
+                    // Fetch amenities cho các phòng đã tìm được
+                    String amenitiesQuery = "SELECT r FROM Room r LEFT JOIN FETCH r.amenities WHERE r IN :rooms";
+                    rooms = em.createQuery(amenitiesQuery, Room.class)
+                            .setParameter("rooms", rooms)
+                            .getResultList();
+                }
+
+                return rooms;
             } finally {
                 em.close();
             }
