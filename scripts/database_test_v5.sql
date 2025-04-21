@@ -22,6 +22,13 @@ INSERT INTO rooms (room_id, capacity, floor, hourly_base_rate, max_hours, min_ho
                                                                                                                                                                 ('R004', 4, 4, 180000, 8, 3, 1000000, '/images/room004.jpg', 30.0, 12, 1, 'RT004'),
                                                                                                                                                                 ('R005', 1, 5, 80000, 5, 2, 400000, '/images/room005.jpg', 15.0, 12, 1, 'RT005');
 
+INSERT INTO rooms (room_id, capacity, floor, hourly_base_rate, max_hours, min_hours, price, room_image, room_size, standard_checkout_hour, status, type_id) VALUES
+                                                                                                                                                                ('R011', 2, 1, 100000, 6, 2, 500000, '/images/room001.jpg', 20.5, 12, 0, 'RT001'),
+                                                                                                                                                                ('R012', 2, 2, 120000, 6, 2, 600000, '/images/room002.jpg', 22.0, 12, 0, 'RT002'),
+                                                                                                                                                                ('R013', 2, 3, 150000, 6, 2, 800000, '/images/room003.jpg', 25.0, 12, 0, 'RT003'),
+                                                                                                                                                                ('R014', 4, 4, 180000, 8, 3, 1000000, '/images/room004.jpg', 30.0, 12, 0, 'RT004'),
+                                                                                                                                                                ('R015', 1, 5, 80000, 5, 2, 400000, '/images/room005.jpg', 15.0, 12, 0, 'RT005');
+
 -- 4. Thêm dữ liệu vào amentities
 INSERT INTO amentities (room_id, amentities) VALUES
                                                  ('R001', 'Wi-Fi miễn phí'), ('R001', 'Điều hòa'), ('R001', 'TV màn hình phẳng'),

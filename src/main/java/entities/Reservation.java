@@ -102,6 +102,10 @@ public class Reservation {
     @Column(name = "overstay_units")
     private int overstayUnits;
 
+    public boolean isCheckedOut() {
+        return reservationStatus == STATUS_CHECKED_OUT;
+    }
+
     public boolean canCheckIn() {
         return reservationStatus == STATUS_PENDING
                 && room != null
@@ -214,15 +218,25 @@ public class Reservation {
         double roomPrice = 0;
 
         if (bookingType == BookingType.NIGHT) {
-            roomPrice = room.getPrice() * numberOfNights;
+            // Tính theo số đêm, tối thiểu 1 đêm
+            int nights = (numberOfNights != null && numberOfNights > 0) ? numberOfNights : 1;
+            roomPrice = room.getPrice() * nights;
         } else if (bookingType == BookingType.HOUR) {
-            roomPrice = hourlyRate * durationHours;
+            // Tính theo giờ
+            if (checkInTime != null && checkOutTime != null) {
+                long diffInMillis = checkOutTime.getTime() - checkInTime.getTime();
+                int hours = (int) Math.ceil(diffInMillis / (60.0 * 60 * 1000));
+                hours = Math.max(hours, 1); // Tối thiểu 1 giờ
+                roomPrice = room.calculateHourlyRate(checkInTime) * hours;
+            } else {
+                roomPrice = room.getSafeHourlyBaseRate() * durationHours;
+            }
         }
 
         double servicePrice = (reservationDetails == null || reservationDetails.isEmpty()) ? 0 :
                 reservationDetails.stream().mapToDouble(ReservationDetails::calculateLineTotal).sum();
 
-        this.totalPrice = roomPrice + servicePrice;
+        this.totalPrice = roomPrice + servicePrice + overstayFee;
         return this.totalPrice;
     }
 
