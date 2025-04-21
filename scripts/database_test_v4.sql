@@ -122,13 +122,13 @@ VALUES
     ('R005', 1, 2, 300000, 'Bữa sáng cho 2 người'),
     ('R005', 6, 1, 1000000, 'Thuê phòng họp');
 
-INSERT INTO orders (order_id, customer_id, room_id, staff_id, order_date, number_of_nights, paymentMethod, service_fee, tax_amount, total_price, status)
+INSERT INTO orders (order_id, customer_id, room_id, staff_id, order_date, number_of_nights, paymentMethod, service_fee, tax_amount, total_price, status, overstay_fee)
 VALUES
-    ('ORD001', 'C001', 'P101', 'ST001', '2023-05-12 12:30:00', 2, 'CASH', 400000, 200000, 2200000, 1),
-    ('ORD002', 'C002', 'P201', 'ST002', '2023-05-15 17:15:00', NULL, 'E_WALLET', 150000, 95000, 1045000, 1),
-    ('ORD003', 'C003', 'P301', 'ST003', '2023-05-22 12:45:00', 2, 'CASH', 800000, 480000, 5280000, 1),
-    ('ORD004', 'C004', 'P401', 'ST004', '2023-05-19 08:30:00', NULL, 'E_WALLET', 600000, 360000, 3960000, 1),
-    ('ORD005', 'C005', 'P501', 'ST005', '2023-05-27 14:20:00', 2, 'CASH', 1300000, 630000, 6930000, 1);
+    ('ORD001', 'C001', 'P101', 'ST001', '2023-05-12 12:30:00', 2, 'CASH', 400000, 200000, 2200000, 1, 0.0),
+    ('ORD002', 'C002', 'P201', 'ST002', '2023-05-15 17:15:00', NULL, 'E_WALLET', 150000, 95000, 1045000, 1, 0.0),
+    ('ORD003', 'C003', 'P301', 'ST003', '2023-05-22 12:45:00', 2, 'CASH', 800000, 480000, 5280000, 1, 0.0),
+    ('ORD004', 'C004', 'P401', 'ST004', '2023-05-19 08:30:00', NULL, 'E_WALLET', 600000, 360000, 3960000, 1, 0.0),
+    ('ORD005', 'C005', 'P501', 'ST005', '2023-05-27 14:20:00', 2, 'CASH', 1300000, 630000, 6930000, 1, 0.0);
 
 INSERT INTO order_details (order_id, service_id, quantity, line_total_amount)
 VALUES
@@ -140,3 +140,6 @@ VALUES
     ('ORD004', 1, 4, 600000),
     ('ORD005', 1, 2, 300000),
     ('ORD005', 6, 1, 1000000);
+
+ALTER TABLE orders
+    MODIFY COLUMN overstay_fee DOUBLE DEFAULT 0.0 NOT NULL;

@@ -155,7 +155,7 @@
                         "WHERE res.room.roomId = :roomId " +
                         "AND res.bookingType = 'HOUR' " +
                         "AND ((res.checkInTime < :endTime) " +
-                        "AND (res.checkOutTime > :startTime))";
+                        "AND (res.checkOutTime > :startTime)) ";
 
                 Long count = em.createQuery(jpql, Long.class)
                         .setParameter("roomId", roomId)
