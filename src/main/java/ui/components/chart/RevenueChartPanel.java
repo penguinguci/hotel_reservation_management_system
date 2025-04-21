@@ -142,7 +142,11 @@ public class RevenueChartPanel extends JPanel {
         styler.setLegendPosition(Styler.LegendPosition.InsideNW);
         styler.setChartBackgroundColor(Color.WHITE);
         styler.setSeriesColors(new Color[]{seriesColor});
-        styler.setPlotBorderVisible(false);
+        styler.setPlotBorderVisible(true);
+        styler.setToolTipsEnabled(true);
+        styler.setYAxisLeftWidthHint(50);
+
+
         ((org.knowm.xchart.style.CategoryStyler) styler).setDefaultSeriesRenderStyle(org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Bar);
 
         // Đặt giá trị trục Y cố định để hiển thị đẹp mắt ngay cả khi dữ liệu toàn 0
@@ -222,7 +226,7 @@ public class RevenueChartPanel extends JPanel {
 
             // Tạm thời không tạo biểu đồ đường trống để tránh lỗi
             JLabel placeholder = new JLabel("Biểu đồ đường không khả dụng", SwingConstants.CENTER);
-            placeholder.setForeground(Color.GRAY);
+            placeholder.setForeground(Color.white);
             chartContainer.add(placeholder, LINE_CHART);
         } catch (Exception e) {
             System.err.println("Error creating empty Bar Chart: " + e.getMessage());

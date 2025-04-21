@@ -76,6 +76,7 @@ public class CustomLineChartPanel extends JPanel {
         styler.setLegendPosition(Styler.LegendPosition.InsideNW);
         styler.setChartBackgroundColor(Color.WHITE);
         styler.setPlotBorderVisible(true);
+        styler.setToolTipsEnabled(true);
         ((org.knowm.xchart.style.CategoryStyler) styler).setDefaultSeriesRenderStyle(org.knowm.xchart.CategorySeries.CategorySeriesRenderStyle.Line);
 
         // Tùy chỉnh định dạng trục Y
