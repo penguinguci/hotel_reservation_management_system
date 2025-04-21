@@ -1,13 +1,22 @@
 package ui.tabs;
 
 import dao.RevenueDAOImpl;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ui.components.chart.RevenueChartPanel;
 import ui.components.combobox.StyledComboBox;
+import utils.CurrentAccount;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Font;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -20,7 +29,14 @@ public class Tab_StatisticsRevenue extends javax.swing.JPanel {
     private RevenueDAOImpl revenueDAO;
     private StyledComboBox yearComboBox;
     private JLabel yearLabel;
-
+        private List<String> currentLabels;
+    private List<Double> currentTotalRevenueData;
+    private List<Double> currentRoomRevenueData;
+    private List<Double> currentServiceRevenueData;
+    private double currentTotalRevenue;
+    private double currentTotalServiceRevenue;
+    private double currentTotalRoomRevenue;
+    private String currentChartTitle;
     public Tab_StatisticsRevenue() {
         revenueDAO = new RevenueDAOImpl();
         initComponents();
@@ -121,7 +137,7 @@ public class Tab_StatisticsRevenue extends javax.swing.JPanel {
         styledComboBox1.addActionListener(e -> toggleDateRangePanel());
         buttonCustom2.addActionListener(e -> updateStatistics());
         buttonCustom3.addActionListener(e -> toggleChartType());
-
+        buttonCustom1.addActionListener(e -> exportToExcel());
         // Không gọi updateStatistics() ở đây để hiển thị biểu đồ trống ban đầu
         updateRevenuePanels(0.0, 0.0, 0.0); // Đặt các panel doanh thu về 0 VND
     }
@@ -219,6 +235,16 @@ public class Tab_StatisticsRevenue extends javax.swing.JPanel {
                 totalServiceRevenue = revenueDAO.getServiceRevenueByDateRange1(startDate, endDate);
                 totalRoomRevenue = revenueDAO.getRoomRevenueByDateRange1(startDate, endDate);
 
+                // Lưu trữ dữ liệu hiện tại để xuất Excel
+                currentLabels = labels;
+                currentTotalRevenueData = totalRevenueData;
+                currentRoomRevenueData = roomRevenueData;
+                currentServiceRevenueData = serviceRevenueData;
+                currentTotalRevenue = totalRevenue;
+                currentTotalServiceRevenue = totalServiceRevenue;
+                currentTotalRoomRevenue = totalRoomRevenue;
+                currentChartTitle = chartTitle;
+
                 revenueChartPanel1.setChartTitle(chartTitle);
                 if (shouldUpdateChart) {
                     System.out.println("Cập nhật biểu đồ với dữ liệu: " + totalRevenueData);
@@ -258,6 +284,15 @@ public class Tab_StatisticsRevenue extends javax.swing.JPanel {
                         serviceRevenueData.stream().allMatch(d -> d == 0.0);
 
                 String chartTitle = "Doanh thu khách sạn Melody theo từng năm";
+                // Lưu trữ dữ liệu hiện tại để xuất Excel
+                currentLabels = labels;
+                currentTotalRevenueData = totalRevenueData;
+                currentRoomRevenueData = roomRevenueData;
+                currentServiceRevenueData = serviceRevenueData;
+                currentTotalRevenue = totalRevenue;
+                currentTotalServiceRevenue = totalServiceRevenue;
+                currentTotalRoomRevenue = totalRoomRevenue;
+                currentChartTitle = chartTitle;
                 if (totalRevenueData == null || totalRevenueData.isEmpty() || allZero) {
                     chartTitle += " (Không có dữ liệu)";
                     revenueChartPanel1.setChartTitle(chartTitle);
@@ -319,7 +354,15 @@ public class Tab_StatisticsRevenue extends javax.swing.JPanel {
                 boolean allZero = totalRevenueData.stream().allMatch(d -> d == 0.0) &&
                         roomRevenueData.stream().allMatch(d -> d == 0.0) &&
                         serviceRevenueData.stream().allMatch(d -> d == 0.0);
-
+                // Lưu trữ dữ liệu hiện tại để xuất Excel
+                currentLabels = labels;
+                currentTotalRevenueData = totalRevenueData;
+                currentRoomRevenueData = roomRevenueData;
+                currentServiceRevenueData = serviceRevenueData;
+                currentTotalRevenue = totalRevenue;
+                currentTotalServiceRevenue = totalServiceRevenue;
+                currentTotalRoomRevenue = totalRoomRevenue;
+                currentChartTitle = chartTitle;
                 if (totalRevenueData == null || totalRevenueData.isEmpty() || allZero) {
                     chartTitle += " (Không có doanh thu)";
                     revenueChartPanel1.setChartTitle(chartTitle);
@@ -344,6 +387,150 @@ public class Tab_StatisticsRevenue extends javax.swing.JPanel {
         jLabel8.setText(df.format(totalRevenue));
         jLabel10.setText(df.format(serviceRevenue));
         jLabel12.setText(df.format(roomRevenue));
+    }
+    private void exportToExcel() {
+        if (currentLabels == null || currentTotalRevenueData == null || currentLabels.isEmpty() || currentTotalRevenueData.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không có dữ liệu để xuất báo cáo. Vui lòng thực hiện thống kê trước!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Lấy ngày xuất báo cáo
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        String exportDate = now.format(formatter);
+
+        // Tạo Workbook mới
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Revenue Report");
+
+        // Tạo style cho tiêu đề
+        CellStyle titleStyle = workbook.createCellStyle();
+        org.apache.poi.ss.usermodel.Font titleFont = workbook.createFont();
+        titleFont.setBold(true);
+        titleFont.setFontHeightInPoints((short) 14);
+        titleStyle.setFont(titleFont);
+        titleStyle.setAlignment(HorizontalAlignment.CENTER);
+
+        // Tạo style cho thông tin (Ngày xuất, Nhân viên)
+        CellStyle infoStyle = workbook.createCellStyle();
+        org.apache.poi.ss.usermodel.Font infoFont = workbook.createFont();
+        infoFont.setFontHeightInPoints((short) 12);
+        infoStyle.setFont(infoFont);
+        infoStyle.setAlignment(HorizontalAlignment.LEFT);
+
+        // Tạo style cho header
+        CellStyle headerStyle = workbook.createCellStyle();
+        org.apache.poi.ss.usermodel.Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerStyle.setFont(headerFont);
+        headerStyle.setFillForegroundColor(IndexedColors.WHITE.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerStyle.setBorderTop(BorderStyle.THIN);
+        headerStyle.setBorderBottom(BorderStyle.THIN);
+        headerStyle.setBorderLeft(BorderStyle.THIN);
+        headerStyle.setBorderRight(BorderStyle.THIN);
+
+        // Tạo style cho dữ liệu
+        CellStyle dataStyle = workbook.createCellStyle();
+        dataStyle.setBorderTop(BorderStyle.THIN);
+        dataStyle.setBorderBottom(BorderStyle.THIN);
+        dataStyle.setBorderLeft(BorderStyle.THIN);
+        dataStyle.setBorderRight(BorderStyle.THIN);
+
+        // Tạo style cho tổng cộng
+        CellStyle totalStyle = workbook.createCellStyle();
+        org.apache.poi.ss.usermodel.Font totalFont = workbook.createFont();
+        totalFont.setBold(true);
+        totalStyle.setFont(totalFont);
+        totalStyle.setBorderTop(BorderStyle.THIN);
+        totalStyle.setBorderBottom(BorderStyle.THIN);
+        totalStyle.setBorderLeft(BorderStyle.THIN);
+        totalStyle.setBorderRight(BorderStyle.THIN);
+
+        // Dòng tiêu đề
+        Row titleRow = sheet.createRow(0);
+        Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue(currentChartTitle);
+        titleCell.setCellStyle(titleStyle);
+        sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(0, 0, 0, 3));
+
+        // Dòng thông tin: Ngày xuất báo cáo
+        Row dateRow = sheet.createRow(1);
+        Cell dateCell = dateRow.createCell(0);
+        dateCell.setCellValue("Ngày xuất báo cáo: " + exportDate);
+        dateCell.setCellStyle(infoStyle);
+        sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(1, 1, 0, 3));
+
+        // Dòng thông tin: Nhân viên xuất báo cáo
+        Row employeeRow = sheet.createRow(2);
+        Cell employeeCell = employeeRow.createCell(0);
+        employeeCell.setCellValue("Nhân viên xuất báo cáo: " + CurrentAccount.getCurrentAccount().getStaff().getFirstName() + " " + CurrentAccount.getCurrentAccount().getStaff().getLastName());
+        employeeCell.setCellStyle(infoStyle);
+        sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(2, 2, 0, 3));
+
+        // Dòng header
+        Row headerRow = sheet.createRow(4);
+        String[] headers = {"Thời gian", "Tổng doanh thu (VND)", "Doanh thu phòng (VND)", "Doanh thu dịch vụ (VND)"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+            sheet.autoSizeColumn(i);
+        }
+
+        // Ghi dữ liệu
+        DecimalFormat df = new DecimalFormat("#,###");
+        for (int i = 0; i < currentLabels.size(); i++) {
+            Row dataRow = sheet.createRow(i + 5);
+            dataRow.createCell(0).setCellValue(currentLabels.get(i));
+            dataRow.createCell(1).setCellValue(df.format(currentTotalRevenueData.get(i)));
+            dataRow.createCell(2).setCellValue(df.format(currentRoomRevenueData.get(i)));
+            dataRow.createCell(3).setCellValue(df.format(currentServiceRevenueData.get(i)));
+
+            for (int j = 0; j < 4; j++) {
+                dataRow.getCell(j).setCellStyle(dataStyle);
+            }
+        }
+
+        // Dòng tổng cộng
+        Row totalRow = sheet.createRow(currentLabels.size() + 6);
+        totalRow.createCell(0).setCellValue("Tổng cộng");
+        totalRow.createCell(1).setCellValue(df.format(currentTotalRevenue));
+        totalRow.createCell(2).setCellValue(df.format(currentTotalRoomRevenue));
+        totalRow.createCell(3).setCellValue(df.format(currentTotalServiceRevenue));
+
+        for (int j = 0; j < 4; j++) {
+            totalRow.getCell(j).setCellStyle(totalStyle);
+        }
+
+        // Tự động điều chỉnh kích thước cột
+        for (int i = 0; i < 4; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Lưu file Excel
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn vị trí lưu file Excel");
+        fileChooser.setSelectedFile(new File("Revenue_Report.xlsx"));
+        int userSelection = fileChooser.showSaveDialog(this);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            try (FileOutputStream fileOut = new FileOutputStream(fileToSave)) {
+                workbook.write(fileOut);
+                JOptionPane.showMessageDialog(this, "Xuất báo cáo thành công tại: " + fileToSave.getAbsolutePath(), "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Lỗi khi xuất báo cáo: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        try {
+            workbook.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
