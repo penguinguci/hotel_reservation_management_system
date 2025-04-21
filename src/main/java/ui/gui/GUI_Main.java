@@ -4,10 +4,12 @@
  */
 package ui.gui;
 
+import entities.Role;
 import ui.components.menu.MenuEvent;
 import ui.forms.*;
 import ui.forms.Form_HomePage;
 import ui.forms.Form_StaffManagement;
+import utils.CurrentAccount;
 
 import javax.swing.*;
 import java.rmi.RemoteException;
@@ -32,27 +34,52 @@ public class GUI_Main extends javax.swing.JFrame {
         menu3.setEvent(new MenuEvent() {
             @Override
             public void selected(int index, int subIndex) throws RemoteException {
-                if(index == -1){
-                    logout();
-                } else if (index == 1) {
-                    showForm(new Form_Booking());
-                }
-                else if(index == 2){
-                    showForm(roomManagement);
-                    roomManagement.loadRoomData();
-                }else if(index == 3){
-                    showForm(formCustomerManagement);
+                if(CurrentAccount.getCurrentAccount().getRole() ==  Role.MANAGER){
+                    if(index == -1){
+                        logout();
+                    } else if (index == 1) {
+                        showForm(new Form_Booking());
+                    }
+                    else if(index == 2){
+                        showForm(roomManagement);
+                        roomManagement.loadRoomData();
+                    }else if(index == 3){
+                        showForm(formCustomerManagement);
 //                    formCustomerManagement.loadCustomerData();
 //                    formCustomerManagement.clearSearchFields();
-                }
-                else if (index == 4) {
-                    showForm(staffManagementForm);
-                }
-                else if (index == 5) {
-                    showForm(statisticsForm);
-                }
-                else{
-                    showForm(new Form_HomePage());
+                    }
+                    else if (index == 4) {
+                        showForm(staffManagementForm);
+                    }
+                    else if (index == 5) {
+                        showForm(statisticsForm);
+                    }
+                    else{
+                        showForm(new Form_HomePage());
+                    }
+                }else {
+                    if(index == -1){
+                        logout();
+                    } else if (index == 1) {
+                        showForm(new Form_Booking());
+                    }
+                    else if(index == 2){
+                        showForm(roomManagement);
+                        roomManagement.loadRoomData();
+                    }else if(index == 3){
+                        showForm(formCustomerManagement);
+//                    formCustomerManagement.loadCustomerData();
+//                    formCustomerManagement.clearSearchFields();
+                    }
+                    else if (index == 4) {
+                        showForm(homePageForm);
+                    }
+                    else if (index == 5) {
+                        showForm(homePageForm);
+                    }
+                    else{
+                        showForm(new Form_HomePage());
+                    }
                 }
             }
         });
