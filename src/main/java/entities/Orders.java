@@ -72,7 +72,7 @@ public class Orders {
         return serviceFee;
     }
 
-    public double calculateFinalTotalPrice() {
+    public double calculateTotalPrice() {
         return totalPrice + taxAmount + serviceFee + overstayFee;
     }
 }
