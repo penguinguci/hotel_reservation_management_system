@@ -46,7 +46,7 @@ public class Orders {
     private Room room;
 
     @Column(name = "number_of_nights")
-    private int numberOfNights = 1;
+    private Integer numberOfNights;
 
     @Column(name = "total_price")
     private double totalPrice;
@@ -57,9 +57,8 @@ public class Orders {
     @Column(name = "service_fee")
     private double serviceFee;
 
-    @Column(name = "overstay_fee")
+    @Column(name = "overstay_fee", nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
     private double overstayFee;
-
 
     public double calculateTaxAmount() {
         this.taxAmount = totalPrice * 0.1;
@@ -67,7 +66,9 @@ public class Orders {
     }
 
     public double calculateServiceFee() {
-        this.serviceFee = orderDetails.stream().mapToDouble(OrderDetails::calculateLineTotal).sum() * 0.05;
+        this.serviceFee = orderDetails.stream()
+                .mapToDouble(OrderDetails::calculateLineTotal)
+                .sum() * 0.05;
         return serviceFee;
     }
 
