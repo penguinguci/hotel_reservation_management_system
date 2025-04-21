@@ -24,6 +24,7 @@ public class Room {
     @Column(name = "price", columnDefinition = "float")
     protected double price;
 
+    @Column(name = "capacity")
     protected int capacity;
 
     protected int status;
@@ -51,7 +52,7 @@ public class Room {
     @OneToMany(mappedBy = "room")
     protected List<Orders> orders;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     protected List<Reservation> reservations;
 
     @Column(name = "hourly_base_rate", columnDefinition = "float")

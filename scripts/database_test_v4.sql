@@ -78,11 +78,11 @@ VALUES
 
 INSERT INTO staffs (staff_id, first_name, last_name, email, date_of_birth, gender, date_of_join, address, status, staff_image)
 VALUES
-    ('ST001', 'Nguyễn Thị', 'Nhân viên 1', 'nhanvien1@hotel.com', '1990-05-15', 0, '2020-01-10', '111 Đường A, Quận 1, TP.HCM', 1, NULL),
-    ('ST002', 'Trần Văn', 'Nhân viên 2', 'nhanvien2@hotel.com', '1985-08-20', 1, '2019-06-15', '222 Đường B, Quận 2, TP.HCM', 1, NULL),
-    ('ST003', 'Lê Thị', 'Quản lý', 'quanly@hotel.com', '1980-03-25', 0, '2018-01-05', '333 Đường C, Quận 3, TP.HCM', 1, NULL),
-    ('ST004', 'Phạm Văn', 'Nhân viên 3', 'nhanvien3@hotel.com', '1992-11-10', 1, '2021-02-20', '444 Đường D, Quận 4, TP.HCM', 1, NULL),
-    ('ST005', 'Hoàng Thị', 'Nhân viên 4', 'nhanvien4@hotel.com', '1995-07-30', 0, '2022-03-01', '555 Đường E, Quận 5, TP.HCM', 1, NULL);
+    ('ST001', 'Nguyễn Thị', 'Hằng', 'nhanvien1@hotel.com', '1990-05-15', 0, '2020-01-10', '111 Đường A, Quận 1, TP.HCM', 1, NULL),
+    ('ST002', 'Trần Văn', 'Vinh', 'nhanvien2@hotel.com', '1985-08-20', 1, '2019-06-15', '222 Đường B, Quận 2, TP.HCM', 1, NULL),
+    ('ST003', 'Lê Thị', 'Huyền', 'quanly@hotel.com', '1980-03-25', 0, '2018-01-05', '333 Đường C, Quận 3, TP.HCM', 1, NULL),
+    ('ST004', 'Phạm Văn', 'Trường', 'nhanvien3@hotel.com', '1992-11-10', 1, '2021-02-20', '444 Đường D, Quận 4, TP.HCM', 1, NULL),
+    ('ST005', 'Hoàng Thị', 'Thùy Linh', 'nhanvien4@hotel.com', '1995-07-30', 0, '2022-03-01', '555 Đường E, Quận 5, TP.HCM', 1, NULL);
 
 INSERT INTO accounts (username, password, role, staff_id)
 VALUES

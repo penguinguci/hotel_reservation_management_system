@@ -133,6 +133,14 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
             order.setTaxAmount(taxPrice);
             order.setServiceFee(serviceFee);
             order.setOverstayFee(overstayFee);
+            if (reservations.get(0).getCheckInDate() != null && reservations.get(0).getCheckOutDate() != null) {
+                order.setCheckInDate(reservations.get(0).getCheckInDate());
+                order.setCheckOutDate(reservations.get(0).getCheckOutDate());
+            }
+            if (reservations.get(0).getCheckInTime() != null && reservations.get(0).getCheckOutTime() != null) {
+                order.setCheckInTime(reservations.get(0).getCheckInTime());
+                order.setCheckOutTime(reservations.get(0).getCheckOutTime());
+            }
 
             Room room = reservations.get(0).getRoom();
             if (room != null) {
