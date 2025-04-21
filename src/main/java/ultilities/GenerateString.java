@@ -53,4 +53,10 @@ public class GenerateString {
         int seq = sequence.incrementAndGet() % 1000;
         return String.format("HD%s%03d", timestamp, seq);
     }
+
+    public static String generateNameFileOrder() {
+        String timestamp = dateFormat.format(new Date());
+        int seq = sequence.incrementAndGet() % 1000;
+        return String.format("%s%03d", timestamp, seq);
+    }
 }

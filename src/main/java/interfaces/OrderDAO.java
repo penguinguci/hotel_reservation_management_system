@@ -1,6 +1,7 @@
 package interfaces;
 
 import entities.Orders;
+import entities.Reservation;
 
 import java.util.Date;
 import java.util.List;
@@ -12,4 +13,5 @@ public interface OrderDAO extends GenericDAO<Orders, String> {
                               Date fromDate, Date toDate, Integer status,
                               Double priceFrom, Double priceTo);
     Orders getOrderDetails(String orderId);
+    Reservation findReservationForOrder(Orders order);
 }

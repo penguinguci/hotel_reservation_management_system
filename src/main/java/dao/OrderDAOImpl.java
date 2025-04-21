@@ -1,9 +1,11 @@
 package dao;
 
 import entities.Orders;
+import entities.Reservation;
 import interfaces.OrderDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import utils.AppUtil;
 
@@ -42,17 +44,14 @@ public class OrderDAOImpl extends GenericDAOImpl<Orders, String> implements Orde
     public List<Orders> getAllOrders() {
         EntityManager em = AppUtil.getEntityManager();
         try {
-            String jpql = "SELECT o FROM Orders o " +
-                    "LEFT JOIN FETCH o.customer c " +
-                    "LEFT JOIN FETCH o.staff s " +
+            String jpql = "SELECT DISTINCT o FROM Orders o " +
+                    "LEFT JOIN FETCH o.customer " +
+                    "LEFT JOIN FETCH o.staff " +
                     "LEFT JOIN FETCH o.room r " +
+                    "LEFT JOIN FETCH r.roomType " +
                     "LEFT JOIN FETCH o.orderDetails od " +
-                    "LEFT JOIN FETCH od.service " ;
-            TypedQuery<Orders> query = em.createQuery(jpql, Orders.class);
-            return query.getResultList();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+                    "LEFT JOIN FETCH od.service";
+            return em.createQuery(jpql, Orders.class).getResultList();
         } finally {
             em.close();
         }
@@ -68,6 +67,7 @@ public class OrderDAOImpl extends GenericDAOImpl<Orders, String> implements Orde
                     "LEFT JOIN FETCH o.customer c " +
                     "LEFT JOIN FETCH o.staff s " +
                     "LEFT JOIN FETCH o.room r " +
+                    "LEFT JOIN FETCH r.reservations res " +
                     "LEFT JOIN FETCH o.orderDetails od " +
                     "LEFT JOIN FETCH od.service " +
                     "WHERE 1=1");
@@ -137,19 +137,47 @@ public class OrderDAOImpl extends GenericDAOImpl<Orders, String> implements Orde
         EntityManager em = AppUtil.getEntityManager();
         try {
             String jpql = "SELECT o FROM Orders o " +
-                    "LEFT JOIN FETCH o.customer c " +
-                    "LEFT JOIN FETCH o.staff s " +
+                    "LEFT JOIN FETCH o.customer " +
+                    "LEFT JOIN FETCH o.staff " +
                     "LEFT JOIN FETCH o.room r " +
-                    "LEFT JOIN FETCH r.roomType rt " +
+                    "LEFT JOIN FETCH r.roomType " +
                     "LEFT JOIN FETCH o.orderDetails od " +
                     "LEFT JOIN FETCH od.service " +
                     "WHERE o.orderId = :orderId";
-            TypedQuery<Orders> query = em.createQuery(jpql, Orders.class)
-                    .setParameter("orderId", orderId);
-            return query.getSingleResult();
-        } catch (Exception e) {
-            e.printStackTrace();
+            return em.createQuery(jpql, Orders.class)
+                    .setParameter("orderId", orderId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
             return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public Reservation findReservationForOrder(Orders order) {
+        if (order.getRoom() == null || order.getCustomer() == null) return null;
+
+        EntityManager em = AppUtil.getEntityManager();
+        try {
+            String jpql = "SELECT r FROM Reservation r " +
+                    "WHERE r.room.roomId = :roomId " +
+                    "AND r.customer.customerId = :customerId " +
+                    "AND r.reservationStatus IN (1, 2) " +
+                    "AND ((r.checkInDate IS NOT NULL AND r.checkInDate <= :orderDate AND " +
+                    "(r.checkOutDate IS NULL OR r.checkOutDate >= :orderDate)) OR " +
+                    "(r.checkInTime IS NOT NULL AND r.checkInTime <= :orderDate AND " +
+                    "(r.checkOutTime IS NULL OR r.checkOutTime >= :orderDate))) " +
+                    "ORDER BY r.checkInTime DESC, r.checkInDate DESC";
+
+            List<Reservation> reservations = em.createQuery(jpql, Reservation.class)
+                    .setParameter("roomId", order.getRoom().getRoomId())
+                    .setParameter("customerId", order.getCustomer().getCustomerId())
+                    .setParameter("orderDate", order.getOrderDate())
+                    .setMaxResults(1)
+                    .getResultList();
+
+            return reservations.isEmpty() ? null : reservations.get(0);
         } finally {
             em.close();
         }
