@@ -93,10 +93,16 @@ public class Orders {
     }
 
     public double calculateTotalPrice() {
-        // Tổng tiền cuối cùng = giá phòng + phụ phí trễ + thuế + phí dịch vụ + tổng tiền dịch vụ
+        // Base room price
+        this.totalPrice = calculateRoomPrice();
+        // Service total
         double serviceTotal = orderDetails.stream()
                 .mapToDouble(OrderDetails::calculateLineTotal)
                 .sum();
+        // Calculate tax and service fee
+        calculateTaxAmount();
+        calculateServiceFee();
+        // Final total
         return totalPrice + overstayFee + taxAmount + serviceFee + serviceTotal;
     }
 

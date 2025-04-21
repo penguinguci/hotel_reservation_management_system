@@ -99,10 +99,14 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             transaction.begin();
             Reservation reservation = em.find(Reservation.class, reservationId);
             if (reservation != null && reservation.canCheckIn()) {
+
                 reservation.updateStatus(Reservation.STATUS_CHECKED_IN);
+                reservation.setCheckInTime(new Date());
                 reservation.getRoom().checkIn(reservation);
+
                 em.merge(reservation);
                 em.merge(reservation.getRoom());
+
                 transaction.commit();
                 return true;
             }
@@ -125,18 +129,13 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             transaction.begin();
             Reservation reservation = em.find(Reservation.class, reservationId);
             if (reservation != null && reservation.canCheckOut()) {
-                // Tính toán phụ phí
                 reservation.calculateOverstayDetails(actualCheckOutTime);
-
-                // Cập nhật tổng tiền
-                double newTotal = reservation.getTotalPrice() + reservation.getOverstayFee();
-                reservation.setTotalPrice(newTotal);
-
-                // Cập nhật trạng thái
+                reservation.setTotalPrice(reservation.calculateTotalPrice());
+                reservation.setRemainingAmount(reservation.calculateRemainingAmount());
                 reservation.updateStatus(Reservation.STATUS_CHECKED_OUT);
+                reservation.setActualCheckOutTime(actualCheckOutTime);
                 reservation.getRoom().checkOut(reservation);
 
-                // Lưu vào DB
                 em.merge(reservation);
                 em.merge(reservation.getRoom());
 

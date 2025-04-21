@@ -154,40 +154,28 @@ public class Tab_ListBooking extends javax.swing.JPanel {
     }
 
     private void updateBookingInfo() {
-        List<Reservation> selectedReservations = getSelectedReservations();
-        if (selectedReservations.isEmpty()) {
+        if (selectedReservation == null) {
             clearPaymentInfo();
             return;
         }
 
-        double roomTotal = selectedReservations.stream()
-                .mapToDouble(Reservation::calculateTotalPrice)
-                .sum();
-
-        double deposit = selectedReservations.stream()
-                .mapToDouble(Reservation::calculateDepositAmount)
-                .sum();
-
-        double remaining = selectedReservations.stream()
-                .mapToDouble(Reservation::calculateRemainingAmount)
-                .sum();
-
-        double overstayFee = selectedReservations.stream()
-                .mapToDouble(Reservation::getOverstayFee)
-                .sum();
-
-        double serviceTotal = selectedReservations.stream()
-                .mapToDouble(Reservation::calculateTotalServicePrice)
-                .sum();
-
+        selectedReservation.calculateTotalPrice();
+        double roomPrice = selectedReservation.getTotalPrice() - selectedReservation.calculateTotalServicePrice();
+        double serviceTotal = selectedReservation.calculateTotalServicePrice();
+        double depositAmount = selectedReservation.getDepositAmount();
+        double remainingAmount = selectedReservation.getRemainingAmount();
+        double overstayFee = selectedReservation.getOverstayFee();
+        double tax = (roomPrice + overstayFee) * 0.1;
         double serviceFee = serviceTotal * 0.05;
-        double tax = roomTotal * 0.1;
-        double finalTotal = remaining + serviceFee + tax + overstayFee;
+        double finalTotal = remainingAmount + overstayFee + tax + serviceFee;
 
-        lbl_LastTotalPrice_Value.setText(MoneyUtil.formatCurrency(roomTotal));
-        lbl_BookingMethod_Value.setText(selectedReservations.get(0).getBookingMethod() == BookingMethod.AT_THE_COUNTER ? "Tại quầy" : "Trực tuyến");
-        lbl_Deposit_Value.setText(MoneyUtil.formatCurrency(deposit));
-        lbl_RemainingAmount_Value.setText(MoneyUtil.formatCurrency(remaining));
+        // Update UI
+        lbl_LastTotalPrice_Value.setText(MoneyUtil.formatCurrency(roomPrice + serviceTotal));
+        lbl_BookingMethod_Value.setText(selectedReservation.getBookingMethod() == BookingMethod.AT_THE_COUNTER ? "Tại quầy" : "Trực tuyến");
+        lbl_Deposit_Value.setText(MoneyUtil.formatCurrency(depositAmount));
+        lbl_RemainingAmount_Value.setText(MoneyUtil.formatCurrency(remainingAmount));
+
+
         lbl_FloatingFee_Value.setText(MoneyUtil.formatCurrency(overstayFee));
         lbl_ServiceFee_Value.setText(MoneyUtil.formatCurrency(serviceFee));
         lbl_Tax_Value.setText(MoneyUtil.formatCurrency(tax));
@@ -222,15 +210,33 @@ public class Tab_ListBooking extends javax.swing.JPanel {
     }
 
     private void updateButtonStates() {
-        List<Reservation> selectedReservations = getSelectedReservations();
-        btn_ChooseAll.setEnabled(!currentReservations.isEmpty() &&
-                currentReservations.stream().anyMatch(r -> r.getReservationStatus() != Reservation.STATUS_CANCELLED));
-        btn_Checkin.setEnabled(selectedReservation != null && selectedReservation.canCheckIn());
-        btn_Checkout.setEnabled(selectedReservation != null && selectedReservation.canCheckOut());
-        btn_CacelBooking.setEnabled(!selectedReservations.isEmpty() &&
-                selectedReservations.stream().allMatch(r -> r.canCancel()));
-        btn_Pay.setEnabled(!selectedReservations.isEmpty() &&
-                selectedReservations.stream().allMatch(r -> r.getReservationStatus() == Reservation.STATUS_CHECKED_OUT));
+        int selectedCount = table_ListReservation.getTable().getSelectedRowCount();
+
+        if (selectedCount == 1) {
+            int selectedRow = table_ListReservation.getTable().getSelectedRow();
+            int modelRow = table_ListReservation.getTable().convertRowIndexToModel(selectedRow);
+            Object[] rowData = table_ListReservation.getTableModel().getRowData(modelRow);
+            String reservationId = (String) rowData[0];
+
+            selectedReservation = currentReservations.stream()
+                    .filter(r -> r.getReservationId().equals(reservationId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (selectedReservation != null) {
+                btn_Checkin.setEnabled(selectedReservation.canCheckIn());
+                btn_Checkout.setEnabled(selectedReservation.canCheckOut());
+                btn_CacelBooking.setEnabled(selectedReservation.canCancel());
+                btn_Pay.setEnabled(selectedReservation.getReservationStatus() == Reservation.STATUS_CHECKED_OUT);
+                return;
+            }
+        }
+
+        // Nếu không chọn hoặc chọn nhiều hơn 1
+        btn_Checkin.setEnabled(false);
+        btn_Checkout.setEnabled(false);
+        btn_CacelBooking.setEnabled(false);
+        btn_Pay.setEnabled(false);
     }
 
     private void searchReservations() {
@@ -313,57 +319,31 @@ public class Tab_ListBooking extends javax.swing.JPanel {
             lbl_TotalPrice_Value.setText("");
         });
 
-        btn_ChooseAll.addActionListener(e -> {
-            if (!currentReservations.isEmpty() && btn_ChooseAll.isEnabled()) {
-                table_ListReservation.getTable().selectAll();
-                updateBookingInfo();
-                updateButtonStates();
-            }
-        });
 
         btn_Checkin.addActionListener(e -> {
-            List<Reservation> selectedReservations = getSelectedReservations();
-            if (selectedReservations.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn ít nhất một đơn đặt phòng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            if (selectedReservation == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn một đơn đặt phòng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            // Kiểm tra cùng khách hàng
-            String customerId = selectedReservations.get(0).getCustomer().getCustomerId();
-            boolean sameCustomer = selectedReservations.stream()
-                    .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
-
-            if (!sameCustomer) {
-                JOptionPane.showMessageDialog(this, "Chỉ có thể check-in các đơn đặt phòng của cùng một khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            if (!selectedReservation.canCheckIn()) {
+                JOptionPane.showMessageDialog(this, "Đơn đặt phòng không thể check-in!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Kiểm tra có thể check-in
-            boolean allCanCheckIn = selectedReservations.stream()
-                    .allMatch(Reservation::canCheckIn);
-
-            if (!allCanCheckIn) {
-                JOptionPane.showMessageDialog(this, "Một số đơn đặt phòng không thể check-in!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // Xác nhận check-in
             int confirm = JOptionPane.showConfirmDialog(this,
-                    "Bạn có chắc chắn muốn check-in " + selectedReservations.size() + " phòng?",
+                    "Bạn có chắc chắn muốn check-in đơn đặt phòng này?",
                     "Xác nhận check-in", JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-                    List<String> reservationIds = selectedReservations.stream()
-                            .map(Reservation::getReservationId)
-                            .collect(Collectors.toList());
-
-                    if (reservationDAO.batchCheckIn(reservationIds)) {
+                    if (reservationDAO.checkIn(selectedReservation.getReservationId())) {
                         JOptionPane.showMessageDialog(this,
-                                "Check-in thành công " + selectedReservations.size() + " phòng!",
+                                "Check-in thành công!",
                                 "Thành công", JOptionPane.INFORMATION_MESSAGE);
                         loadReservations();
                         updateButtonStates();
+                        updateBookingInfo();
                     } else {
                         JOptionPane.showMessageDialog(this,
                                 "Check-in thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -377,55 +357,29 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         });
 
         btn_Checkout.addActionListener(e -> {
-            List<Reservation> selectedReservations = getSelectedReservations();
-            if (selectedReservations.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng chọn ít nhất một đơn đặt phòng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            if (selectedReservation == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn một đơn đặt phòng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            // Kiểm tra cùng khách hàng
-            String customerId = selectedReservations.get(0).getCustomer().getCustomerId();
-            boolean sameCustomer = selectedReservations.stream()
-                    .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
-
-            if (!sameCustomer) {
-                JOptionPane.showMessageDialog(this, "Chỉ có thể check-out các đơn đặt phòng của cùng một khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            if (!selectedReservation.canCheckOut()) {
+                JOptionPane.showMessageDialog(this, "Đơn đặt phòng không thể check-out!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Kiểm tra có thể check-out
-            boolean allCanCheckOut = selectedReservations.stream()
-                    .allMatch(Reservation::canCheckOut);
-
-            if (!allCanCheckOut) {
-                JOptionPane.showMessageDialog(this, "Một số đơn đặt phòng không thể check-out!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // Xác nhận check-out
             int confirm = JOptionPane.showConfirmDialog(this,
-                    "Bạn có chắc chắn muốn check-out " + selectedReservations.size() + " phòng?",
+                    "Bạn có chắc chắn muốn check-out đơn đặt phòng này?",
                     "Xác nhận check-out", JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
-                    List<String> reservationIds = selectedReservations.stream()
-                            .map(Reservation::getReservationId)
-                            .collect(Collectors.toList());
-
-                    Date actualCheckOutTime = new Date(); // Thời gian check-out thực tế
-
-                    if (reservationDAO.batchCheckOut(reservationIds, actualCheckOutTime)) {
-                        // Tính tổng phụ phí
-                        double totalOverstayFee = selectedReservations.stream()
-                                .mapToDouble(Reservation::getOverstayFee)
-                                .sum();
-
-                        String message = "Check-out thành công " + selectedReservations.size() + " phòng!";
-                        if (totalOverstayFee > 0) {
-                            message += "\nTổng phụ phí: " + String.format("%,.0f VND", totalOverstayFee);
+                    Date actualCheckOutTime = new Date();
+                    if (reservationDAO.checkOut(selectedReservation.getReservationId(), actualCheckOutTime)) {
+                        double overstayFee = selectedReservation.getOverstayFee();
+                        String message = "Check-out thành công!";
+                        if (overstayFee > 0) {
+                            message += "\nPhí phụ trội: " + MoneyUtil.formatCurrency(overstayFee);
                         }
-
                         JOptionPane.showMessageDialog(this, message,
                                 "Thành công", JOptionPane.INFORMATION_MESSAGE);
                         loadReservations();
@@ -498,26 +452,28 @@ public class Tab_ListBooking extends javax.swing.JPanel {
     }
 
     private void showPaymentDialog() {
-        List<Reservation> selectedReservations = getSelectedReservations();
-        if (selectedReservations.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn ít nhất một đơn đặt phòng!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+        if (table_ListReservation.getTable().getSelectedRowCount() != 1) {
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn 1 đơn đặt phòng để thanh toán",
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Kiểm tra cùng khách hàng
-        String customerId = selectedReservations.get(0).getCustomer().getCustomerId();
-        boolean sameCustomer = selectedReservations.stream()
-                .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
-        if (!sameCustomer) {
-            JOptionPane.showMessageDialog(this, "Chỉ có thể thanh toán các đơn đặt phòng của cùng một khách hàng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        int selectedRow = table_ListReservation.getTable().getSelectedRow();
+        int modelRow = table_ListReservation.getTable().convertRowIndexToModel(selectedRow);
+        Object[] rowData = table_ListReservation.getTableModel().getRowData(modelRow);
+        String reservationId = (String) rowData[0];
 
-        // Kiểm tra trạng thái CHECKED_OUT
-        boolean allCheckedOut = selectedReservations.stream()
-                .allMatch(r -> r.getReservationStatus() == Reservation.STATUS_CHECKED_OUT);
-        if (!allCheckedOut) {
-            JOptionPane.showMessageDialog(this, "Tất cả đơn đặt phòng phải ở trạng thái CHECKED_OUT để thanh toán!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        Reservation selectedReservation = currentReservations.stream()
+                .filter(r -> r.getReservationId().equals(reservationId))
+                .findFirst()
+                .orElse(null);
+
+        if (selectedReservation == null ||
+                selectedReservation.getReservationStatus() != Reservation.STATUS_CHECKED_OUT) {
+            JOptionPane.showMessageDialog(this,
+                    "Đơn đặt phòng phải ở trạng thái CHECKED_OUT để thanh toán",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -527,14 +483,13 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         dialog.setModal(true);
         dialog.setLayout(new BorderLayout());
 
-        Dialog_PaymentInfo paymentInfo = new Dialog_PaymentInfo(selectedReservations);
+        Dialog_PaymentInfo paymentInfo = new Dialog_PaymentInfo(List.of(selectedReservation));
         dialog.add(paymentInfo, BorderLayout.CENTER);
 
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
 
-        // Sau khi dialog đóng, làm mới dữ liệu
         if (paymentInfo.isPaymentSuccessful()) {
             loadReservations();
             updateBookingInfo();
@@ -557,7 +512,6 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         cbx_CustomerID = new ui.components.combobox.StyledComboBox();
         jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        btn_ChooseAll = new ui.components.button.ButtonCustom();
         btn_Clear = new ui.components.button.ButtonCancelCustom();
         jPanel1 = new javax.swing.JPanel();
         table_ListReservation = new ui.components.table.CustomTableButton();
@@ -664,13 +618,6 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         jLabel1.setForeground(new java.awt.Color(153, 153, 255));
         jLabel1.setText("Danh sách đặt phòng:");
 
-        btn_ChooseAll.setText("Chọn tất cả");
-        btn_ChooseAll.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_ChooseAllActionPerformed(evt);
-            }
-        });
-
         btn_Clear.setText("Làm mới");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -680,10 +627,8 @@ public class Tab_ListBooking extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 391, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 526, Short.MAX_VALUE)
                 .addComponent(btn_Clear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btn_ChooseAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -693,9 +638,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_ChooseAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_Clear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(btn_Clear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -1084,16 +1027,11 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         add(jPanel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 270, 490, 50));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_ChooseAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ChooseAllActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_ChooseAllActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private ui.components.button.ButtonCancelCustom btn_CacelBooking;
     private ui.components.button.ButtonCustom btn_Checkin;
     private ui.components.button.ButtonCustom btn_Checkout;
-    private ui.components.button.ButtonCustom btn_ChooseAll;
     private ui.components.button.ButtonCancelCustom btn_Clear;
     private ui.components.button.ButtonCustom btn_Pay;
     private ui.components.combobox.StyledComboBox cbx_CustomerID;

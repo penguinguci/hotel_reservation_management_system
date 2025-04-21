@@ -95,10 +95,8 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="391" max="32767" attributes="0"/>
+                  <EmptySpace pref="526" max="32767" attributes="0"/>
                   <Component id="btn_Clear" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Component id="btn_ChooseAll" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -111,10 +109,7 @@
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
               <Group type="102" alignment="0" attributes="0">
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="btn_ChooseAll" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btn_Clear" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="btn_Clear" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -131,14 +126,6 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Danh s&#xe1;ch &#x111;&#x1eb7;t ph&#xf2;ng:"/>
           </Properties>
-        </Component>
-        <Component class="ui.components.button.ButtonCustom" name="btn_ChooseAll">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Ch&#x1ecd;n t&#x1ea5;t c&#x1ea3;"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_ChooseAllActionPerformed"/>
-          </Events>
         </Component>
         <Component class="ui.components.button.ButtonCancelCustom" name="btn_Clear">
           <Properties>

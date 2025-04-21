@@ -30,14 +30,15 @@ import java.util.Set;
  */
 public class Dialog_PaymentInfo extends javax.swing.JPanel {
     private List<Reservation> reservations;
-    private double totalPrice;
-    private double depositAmount;
-    private double remainingAmount;
-    private double overstayFee;
-    private double taxPrice;
-    private double serviceFee;
-    private double finalPrice;
-    private double customerPayment;
+    private double totalPrice;       // Tổng tiền ban đầu (phòng + dịch vụ)
+    private double serviceTotal;     // Tổng tiền dịch vụ
+    private double depositAmount;   // Tiền cọc
+    private double remainingAmount; // Tiền còn lại
+    private double overstayFee;     // Phí phụ trội
+    private double taxPrice;        // Thuế
+    private double serviceFee;      // Phí dịch vụ
+    private double finalPrice;      // Tổng tiền cuối cùng
+    private double customerPayment; // Tiền khách đưa
     private boolean paymentSuccessful;
     private ReservationDAO reservationDAO;
     private OrderDAO orderDAO;
@@ -55,7 +56,6 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
         setupPaymentMethodComboBox();
         updatePaymentLabels();
         setupListeners();
-        // Ban đầu vô hiệu hóa txt_CustomerPayment
         txt_CustomerPayment.setEnabled(false);
     }
 
@@ -64,13 +64,22 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
     }
 
     private void calculatePaymentDetails() {
-        totalPrice = reservations.stream().mapToDouble(Reservation::calculateTotalPrice).sum();
-        depositAmount = reservations.stream().mapToDouble(Reservation::getDepositAmount).sum();
-        remainingAmount = reservations.stream().mapToDouble(Reservation::getRemainingAmount).sum();
-        overstayFee = reservations.stream().mapToDouble(Reservation::getOverstayFee).sum();
-        taxPrice = totalPrice * 0.1;
-        serviceFee = reservations.stream().mapToDouble(Reservation::calculateTotalServicePrice).sum() * 0.05;
-        finalPrice = remainingAmount + overstayFee + taxPrice + serviceFee;
+        Reservation reservation = reservations.get(0);
+
+        // Room price + services
+        totalPrice = reservation.calculateTotalPrice() - reservation.calculateTotalServicePrice();
+        serviceTotal = reservation.calculateTotalServicePrice();
+        depositAmount = reservation.getDepositAmount();
+        remainingAmount = reservation.getRemainingAmount();
+        overstayFee = reservation.getOverstayFee();
+
+        serviceFee = serviceTotal * 0.05;
+
+        taxPrice = (totalPrice + overstayFee) * 0.1;
+
+        // Final total
+        finalPrice = remainingAmount + overstayFee + serviceFee + taxPrice;
+
         customerPayment = 0;
     }
 
@@ -85,7 +94,7 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
     }
 
     private void updatePaymentLabels() {
-        lbl_TotalPrice_Value.setText(MoneyUtil.formatCurrency(remainingAmount));
+        lbl_TotalPrice_Value.setText(MoneyUtil.formatCurrency(totalPrice));
         lbl_TaxPrice_Value.setText(MoneyUtil.formatCurrency(taxPrice));
         lbl_FeeService_Value.setText(MoneyUtil.formatCurrency(serviceFee));
         lbl_overstayFee_Value.setText(MoneyUtil.formatCurrency(overstayFee));
@@ -93,6 +102,7 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
         lbl_NeedToPay_Value.setText(MoneyUtil.formatCurrency(finalPrice));
         lbl_RemainingMoney_Value.setText(MoneyUtil.formatCurrency(customerPayment - finalPrice));
     }
+
 
     private void updateCustomerPayment(double amount) {
         customerPayment = amount;
@@ -103,6 +113,15 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
     }
 
     private void processPayment() {
+        if (reservations.size() != 1) {
+            JOptionPane.showMessageDialog(this,
+                    "Chỉ có thể thanh toán 1 đơn đặt phòng mỗi lần",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Reservation reservation = reservations.get(0);
+
         String selectedPaymentMethod = (String) cbx_PaymentMethod.getSelectedItem();
         if (selectedPaymentMethod == null || selectedPaymentMethod.equals("Chọn phương thức thanh toán")) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn phương thức thanh toán!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -114,73 +133,68 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
             return;
         }
 
-        PaymentMethod paymentMethod = switch (selectedPaymentMethod) {
-            case "Tiền mặt" -> PaymentMethod.CASH;
-            case "Thẻ ngân hàng" -> PaymentMethod.CREDIT_CARD;
-            case "Chuyển khoản" -> PaymentMethod.BANK_TRANSFER;
-            case "Ví điện tử" -> PaymentMethod.E_WALLET;
-            default -> null;
-        };
-
         try {
+            // Tạo đơn hàng
             Orders order = new Orders();
             order.setOrderId(GenerateString.generateOrderID());
-            order.setCustomer(reservations.get(0).getCustomer());
+            order.setCustomer(reservation.getCustomer());
             order.setOrderDate(new Date());
             order.setStatus(1); // Đã thanh toán
-            order.setPaymentMethod(paymentMethod);
-            order.setTotalPrice(finalPrice);
-            order.setTaxAmount(taxPrice);
-            order.setServiceFee(serviceFee);
+            order.setPaymentMethod(PaymentMethod.CASH);
+            order.setDepositAmount(depositAmount);
+            order.setRemainingAmount(0);
             order.setOverstayFee(overstayFee);
-            if (reservations.get(0).getCheckInDate() != null && reservations.get(0).getCheckOutDate() != null) {
-                order.setCheckInDate(reservations.get(0).getCheckInDate());
-                order.setCheckOutDate(reservations.get(0).getCheckOutDate());
-            }
-            if (reservations.get(0).getCheckInTime() != null && reservations.get(0).getCheckOutTime() != null) {
-                order.setCheckInTime(reservations.get(0).getCheckInTime());
-                order.setCheckOutTime(reservations.get(0).getCheckOutTime());
-            }
+            order.setServiceFee(serviceFee);
+            order.setTaxAmount(taxPrice);
+            order.setTotalPrice(finalPrice);
+            order.setRoom(reservation.getRoom());
 
-            Room room = reservations.get(0).getRoom();
-            if (room != null) {
-                order.setRoom(room);
+            if (reservation.getBookingType() == Reservation.BookingType.HOUR) {
+                order.setCheckInTime(reservation.getCheckInTime());
+                order.setCheckOutTime(reservation.getCheckOutTime());
+            } else {
+                order.setCheckInTime(reservation.getCheckInDate());
+                order.setCheckOutTime(reservation.getCheckOutDate());
             }
+            order.setNumberOfNights(reservation.getNumberOfNights());
 
+            // Lưu thông tin nhân viên
             Account account = CurrentAccount.getCurrentAccount();
             Staff staff = staffDAO.findById(account.getStaff().getStaffId());
             order.setStaff(staff);
 
+            // Lưu chi tiết dịch vụ
             Set<OrderDetails> orderDetails = new HashSet<>();
-            for (Reservation reservation : reservations) {
+            if (reservation.getReservationDetails() != null) {
                 for (ReservationDetails rd : reservation.getReservationDetails()) {
                     OrderDetails od = new OrderDetails();
                     od.setOrders(order);
                     od.setService(rd.getService());
                     od.setQuantity(rd.getQuantity());
-                    od.setLineTotalAmount(rd.getLineTotalAmount());
+                    od.setLineTotalAmount(rd.calculateLineTotal());
                     orderDetails.add(od);
                 }
             }
             order.setOrderDetails(orderDetails);
 
-            if (orderDAO.createOrder(order)) {
-                for (Reservation reservation : reservations) {
-                    reservation.setRemainingAmount(0);
-                    reservationDAO.update(reservation);
-                }
-
-                paymentSuccessful = true;
-                String message = "Thanh toán thành công!";
-                if (selectedPaymentMethod.equals("Tiền mặt")) {
-                    message += "\nTiền trả lại: " + MoneyUtil.formatCurrency(customerPayment - finalPrice);
-                }
-                JOptionPane.showMessageDialog(this, message, "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                Window dialog = SwingUtilities.getWindowAncestor(this);
-                dialog.dispose();
-            } else {
-                JOptionPane.showMessageDialog(this, "Thanh toán thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            // Lưu đơn hàng vào cơ sở dữ liệu
+            if (!orderDAO.createOrder(order)) {
+                throw new RuntimeException("Không thể tạo đơn hàng!");
             }
+
+            // Cập nhật trạng thái đặt phòng
+            reservation.setRemainingAmount(0);
+            reservation.setReservationStatus(1); // Đã thanh toán
+            reservationDAO.update(reservation);
+
+            paymentSuccessful = true;
+            String message = "Thanh toán thành công!";
+            if (selectedPaymentMethod.equals("Tiền mặt") && customerPayment > finalPrice) {
+                message += "\nTiền trả lại: " + MoneyUtil.formatCurrency(customerPayment - finalPrice);
+            }
+            JOptionPane.showMessageDialog(this, message, "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            Window dialog = SwingUtilities.getWindowAncestor(this);
+            dialog.dispose();
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Lỗi khi thanh toán: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
