@@ -25,6 +25,7 @@ import ui.dialogs.Dialog_AddService;
 import ui.dialogs.Dialog_ViewRoomDetails;
 import ultilities.GenerateString;
 import utils.AppUtil;
+import utils.CurrentAccount;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -58,6 +59,7 @@ public class Tab_Booking extends javax.swing.JPanel {
         customerDAO = new CustomerDAOImpl();
         roomDAO = new RoomDAOImpl();
         initComponents();
+        initTableData();
         initializeSearchCustomer();
         initializePriceRangeComboBox();
         initializeRoomTypeComboBox();
@@ -93,6 +95,12 @@ public class Tab_Booking extends javax.swing.JPanel {
             }
         });
         setFocusCycleRoot(true);
+    }
+
+    private void initTableData() {
+        RoomDAO roomDAO = new RoomDAOImpl();
+        List<Room> allRooms = roomDAO.findAll();
+        displayRoomsInTable(allRooms);
     }
 
     private void initializeCartTable() {
@@ -235,8 +243,6 @@ public class Tab_Booking extends javax.swing.JPanel {
         }
 
         cbx_RangePrice.setModel(model);
-
-        displayRoomsInTable(allRooms);
     }
 
     private void initializeSearchCustomer() {
@@ -464,7 +470,6 @@ public class Tab_Booking extends javax.swing.JPanel {
         pnl_ButtonActions = new javax.swing.JPanel();
         btn_Booking = new ui.components.button.ButtonCustom();
         btn_Cancel = new ui.components.button.ButtonCancelCustom();
-        btn_KeyboardNumber = new ui.components.button.ButtonCustom();
         pnl_Cart = new javax.swing.JPanel();
         table_Cart = new ui.components.table.CustomTableButton();
         pnl_BottomService = new javax.swing.JPanel();
@@ -749,12 +754,9 @@ public class Tab_Booking extends javax.swing.JPanel {
 
         btn_Booking.setText("Đặt phòng");
         btn_Booking.addActionListener(new java.awt.event.ActionListener() {
+            @SneakyThrows
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try {
-                    btn_BookingActionPerformed(evt);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+                btn_BookingActionPerformed(evt);
             }
         });
 
@@ -765,8 +767,6 @@ public class Tab_Booking extends javax.swing.JPanel {
             }
         });
 
-        btn_KeyboardNumber.setText("Bàn phím số");
-
         javax.swing.GroupLayout pnl_ButtonActionsLayout = new javax.swing.GroupLayout(pnl_ButtonActions);
         pnl_ButtonActions.setLayout(pnl_ButtonActionsLayout);
         pnl_ButtonActionsLayout.setHorizontalGroup(
@@ -774,11 +774,8 @@ public class Tab_Booking extends javax.swing.JPanel {
             .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btn_Booking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
-                        .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 227, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btn_KeyboardNumber, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addComponent(btn_Booking, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
+                    .addComponent(btn_Cancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         pnl_ButtonActionsLayout.setVerticalGroup(
             pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -786,10 +783,8 @@ public class Tab_Booking extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(btn_Booking, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_KeyboardNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 13, Short.MAX_VALUE))
         );
 
         add(pnl_ButtonActions, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 570, 480, 130));
@@ -1049,7 +1044,6 @@ public class Tab_Booking extends javax.swing.JPanel {
     private ui.components.button.ButtonCancelCustom btn_Clear;
     private ui.components.button.ButtonCancelCustom btn_DeleteAll;
     private ui.components.button.ButtonCancelCustom btn_DeleteOne;
-    private ui.components.button.ButtonCustom btn_KeyboardNumber;
     private ui.components.button.ButtonCustom btn_SearchRoom;
     private ui.components.button.ButtonCustom btn_SeeDetails;
     private ui.components.button.ButtonCustom btn_UpdateService;
@@ -1174,6 +1168,10 @@ public class Tab_Booking extends javax.swing.JPanel {
             if (availableRooms == null || availableRooms.isEmpty()) {
                 table_EntityRoom.getTableModel().clearData();
                 JOptionPane.showMessageDialog(this, "Không tìm thấy phòng phù hợp", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+
+                List<Room> rooms = roomDAO.getAllRooms();
+                displayRoomsInTable(rooms);
+                clear();
             } else {
                 displayRoomsInTable(availableRooms);
             }
@@ -1404,6 +1402,21 @@ public class Tab_Booking extends javax.swing.JPanel {
             int selectedRow = table_EntityRoom.getTable().getSelectedRow();
             if (selectedRow == -1) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn phòng cần thêm",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Date checkinDate = calendar_Checkin.getSelectedDate();
+            Date checkoutDate = calendar_Checout.getSelectedDate();
+
+            if (checkinDate == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-in",
+                        "Thông báo", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (checkoutDate == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-out",
                         "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -1744,6 +1757,14 @@ public class Tab_Booking extends javax.swing.JPanel {
                 reservation.setBookingDate(new Date());
                 reservation.setCheckInDate(checkInDate);
                 reservation.setCheckOutDate(checkOutDate);
+
+                Account account = CurrentAccount.getCurrentAccount();
+                Staff staff = em.find(Staff.class, account.getStaff().getStaffId());
+                if (staff == null) {
+                    throw new IllegalStateException("Không tìm thấy nhân viên với ID: " + account.getStaff().getStaffId());
+                }
+
+                reservation.setStaff(staff);
 
                 reservation.setBookingMethod(bookingMethod.equals("Tại quầy") ?
                         BookingMethod.AT_THE_COUNTER : BookingMethod.CONTACT);

@@ -57,7 +57,7 @@ public class CustomTableButton extends JPanel implements Serializable {
             }
         };
         table.setRowHeight(40);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setAutoCreateRowSorter(true);
         table.setShowGrid(true);
         table.setGridColor(new Color(220, 220, 220));

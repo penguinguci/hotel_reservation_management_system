@@ -1,30 +1,23 @@
 package ui.components.button;
 
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.RenderingHints;
+import ui.components.effect.RippleEffect;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Area;
 import java.awt.geom.RoundRectangle2D;
-import javax.swing.JButton;
-import ui.components.effect.RippleEffect;
 
-public class ButtonCustom extends JButton {
-
-    private Color startColor = new Color(149, 145, 239);
-    private Color endColor = new Color(127, 122, 239);
-    private Color disabledColor = new Color(167, 161, 250); // Màu khi nút bị vô hiệu hóa
+public class ButtonCompleteCustom extends JButton {
+    private Color startColor = new Color(7, 171, 234);
+    private Color endColor = new Color(6, 157, 213);
+    private Color disabledColor = new Color(78, 182, 230);
     private boolean isHovered = false;
     private int round = 10;
     private final RippleEffect rippleEffect;
 
-    public ButtonCustom() {
+    public ButtonCompleteCustom() {
         setContentAreaFilled(false); // Tắt nền mặc định
         setFocusPainted(false); // Bỏ khung focus
         setBorderPainted(false); // Bỏ viền
@@ -35,7 +28,7 @@ public class ButtonCustom extends JButton {
         // Khởi tạo hiệu ứng Ripple
         rippleEffect = new RippleEffect(this);
 
-        // Add event hover
+        // add event hover
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -115,5 +108,19 @@ public class ButtonCustom extends JButton {
     public void setDisabledColor(Color disabledColor) {
         this.disabledColor = disabledColor;
         repaint();
+    }
+
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("ButtonCompleteCustom Test");
+        ButtonCompleteCustom button = new ButtonCompleteCustom();
+        button.setText("Test Button");
+        button.setPreferredSize(new Dimension(200, 50));
+        button.addActionListener(e -> System.out.println("Button clicked!"));
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new FlowLayout());
+        frame.add(button);
+        frame.pack();
+        frame.setVisible(true);
     }
 }
