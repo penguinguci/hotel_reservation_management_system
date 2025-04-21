@@ -1757,6 +1757,7 @@ public class Tab_Booking extends javax.swing.JPanel {
                 reservation.setBookingDate(new Date());
                 reservation.setCheckInDate(checkInDate);
                 reservation.setCheckOutDate(checkOutDate);
+                reservation.setDurationHours(0);
 
                 Account account = CurrentAccount.getCurrentAccount();
                 Staff staff = em.find(Staff.class, account.getStaff().getStaffId());

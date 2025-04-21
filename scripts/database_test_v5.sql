@@ -70,12 +70,13 @@ INSERT INTO phones (staff_id, phones) VALUES
                                           ('ST005', '0956789012');
 
 -- 9. Thêm dữ liệu vào accounts
-INSERT INTO accounts (username, password, role, staff_id) VALUES
-                                                              ('tranb', 'hashed_password_1', 'STAFF', 'ST001'),
-                                                              ('nguyenc', 'hashed_password_2', 'MANAGER', 'ST002'),
-                                                              ('lethid', 'hashed_password_3', 'STAFF', 'ST003'),
-                                                              ('phame', 'hashed_password_4', 'STAFF', 'ST004'),
-                                                              ('hoangf', 'hashed_password_5', 'MANAGER', 'ST005');
+INSERT INTO accounts (username, password, role, staff_id)
+VALUES
+    ('manager', '$2a$10$xJwL5v5Jz5U5Z5e5v5e5ve5v5e5v5e5v5e5v5e5v5e5v5e5v5e5v', 'MANAGER', 'ST001'),
+    ('staff1', '$2a$10$xJwL5v5Jz5U5Z5e5v5e5ve5v5e5v5e5v5e5v5e5v5e5v5e5v5e5v', 'STAFF', 'ST002'),
+    ('staff2', '$2a$10$xJwL5v5Jz5U5Z5e5v5e5ve5v5e5v5e5v5e5v5e5v5e5v5e5v5e5v', 'STAFF', 'ST003'),
+    ('staff3', '$2a$10$xJwL5v5Jz5U5Z5e5v5e5ve5v5e5v5e5v5e5v5e5v5e5v5e5v5e5v', 'STAFF', 'ST004'),
+    ('staff4', '$2a$10$xJwL5v5Jz5U5Z5e5v5e5ve5v5e5v5e5v5e5v5e5v5e5v5e5v5e5v', 'STAFF', 'ST005');
 
 -- 10. Thêm dữ liệu vào reservations
 INSERT INTO reservations (reservation_id, actual_checkout_time, booking_date, bookingMethod, booking_type, check_in_date, check_in_time, check_out_date, check_out_time, deposit_amount, duration_hours, hourly_rate, number_of_nights, overstay_fee, overstay_units, remaining_amount, reservation_status, status, total_price, customer_id, room_id, staff_id) VALUES
@@ -85,7 +86,7 @@ INSERT INTO reservations (reservation_id, actual_checkout_time, booking_date, bo
                                                                                                                                                                                                                                                                                                                                                                      ('RES004', '2023-10-07 15:00:00', '2023-10-03 11:00:00', 'CONTACT', 'NIGHT', '2023-10-05 14:00:00', NULL, '2023-10-07 12:00:00', NULL, 1000000, NULL, NULL, 2, 200000, 1, 1200000, 2, 1, 2200000, 'C004', 'R004', 'ST004'),
                                                                                                                                                                                                                                                                                                                                                                      ('RES005', '2023-10-02 12:00:00', '2023-10-01 07:00:00', 'AT_THE_COUNTER', 'NIGHT', '2023-10-01 14:00:00', NULL, '2023-10-02 12:00:00', NULL, 120000, NULL, NULL, 1, 0, 0, 280000, 2, 1, 400000, 'C005', 'R005', 'ST005');
 
-UPDATE reservations SET duration_hours = 1 WHERE duration_hours IS NULL;
+UPDATE reservations SET duration_hours = 0 WHERE duration_hours IS NULL;
 UPDATE reservations SET hourly_rate = 0 WHERE hourly_rate IS NULL;
 UPDATE reservations SET number_of_nights = 0 WHERE hourly_rate IS NULL;
 UPDATE reservations SET overstay_fee = 0 WHERE overstay_fee IS NULL;
@@ -105,12 +106,12 @@ INSERT INTO reservation_details (reservation_id, service_id, line_total_amount, 
 
 
 -- 12. Thêm dữ liệu vào orders
-INSERT INTO orders (order_id, check_in_date, check_in_time, check_out_date, check_out_time, deposit_amount, number_of_nights, order_date, overstay_fee, paymentMethod, remaining_amount, service_fee, status, tax_amount, total_price, customer_id, room_id, staff_id) VALUES
-                                                                                                                                                                                                                                                                           ('O001', '2023-10-01 14:00:00', NULL, '2023-10-03 12:00:00', NULL, 300000, 2, '2023-10-03 14:00:00', 100000, 'CASH', 883500, 3500, 1, 110000, 1000000, 'C001', 'R001', 'ST001'),
-                                                                                                                                                                                                                                                                           ('O002', '2023-10-03 14:00:00', NULL, '2023-10-05 12:00:00', NULL, 650000, 2, '2023-10-05 14:00:00', 0, 'CREDIT_CARD', 750000, 5000, 1, 120000, 1200000, 'C002', 'R002', 'ST002'),
-                                                                                                                                                                                                                                                                           ('O003', NULL, '2023-10-02 14:00:00', NULL, '2023-10-02 18:00:00', 90000, NULL, '2023-10-02 20:00:00', 24000, 'CASH', 201400, 1000, 1, 22400, 200000, 'C003', 'R001', 'ST003'),
-                                                                                                                                                                                                                                                                           ('O004', '2023-10-05 14:00:00', NULL, '2023-10-07 12:00:00', NULL, 1000000, 2, '2023-10-07 15:00:00', 200000, 'BANK_TRANSFER', 1355000, 15000, 1, 220000, 2000000, 'C004', 'R004', 'ST004'),
-                                                                                                                                                                                                                                                                           ('O005', '2023-10-01 14:00:00', NULL, '2023-10-02 12:00:00', NULL, 120000, 1, '2023-10-02 12:00:00', 0, 'E_WALLET', 445000, 7500, 1, 40000, 400000, 'C005', 'R005', 'ST005');
+INSERT INTO orders (order_id, check_in_date, check_in_time, check_out_date, check_out_time, deposit_amount, number_of_nights, order_date, overstay_fee, paymentMethod, remaining_amount, service_fee, status, tax_amount, total_price, customer_id, room_id, staff_id, duration_hours) VALUES
+                                                                                                                                                                                                                                                                           ('O001', '2023-10-01 14:00:00', NULL, '2023-10-03 12:00:00', NULL, 300000, 2, '2023-10-03 14:00:00', 100000, 'CASH', 883500, 3500, 1, 110000, 1000000, 'C001', 'R001', 'ST001', 0),
+                                                                                                                                                                                                                                                                           ('O002', '2023-10-03 14:00:00', NULL, '2023-10-05 12:00:00', NULL, 650000, 2, '2023-10-05 14:00:00', 0, 'CREDIT_CARD', 750000, 5000, 1, 120000, 1200000, 'C002', 'R002', 'ST002', 0),
+                                                                                                                                                                                                                                                                           ('O003', NULL, '2023-10-02 14:00:00', NULL, '2023-10-02 18:00:00', 90000, NULL, '2023-10-02 20:00:00', 24000, 'CASH', 201400, 1000, 1, 22400, 200000, 'C003', 'R001', 'ST003', 1),
+                                                                                                                                                                                                                                                                           ('O004', '2023-10-05 14:00:00', NULL, '2023-10-07 12:00:00', NULL, 1000000, 2, '2023-10-07 15:00:00', 200000, 'BANK_TRANSFER', 1355000, 15000, 1, 220000, 2000000, 'C004', 'R004', 'ST004', 0),
+                                                                                                                                                                                                                                                                           ('O005', '2023-10-01 14:00:00', NULL, '2023-10-02 12:00:00', NULL, 120000, 1, '2023-10-02 12:00:00', 0, 'E_WALLET', 445000, 7500, 1, 40000, 400000, 'C005', 'R005', 'ST005', 0);
 
 -- 13. Thêm dữ liệu vào order_details
 INSERT INTO order_details (order_id, service_id, line_total_amount, quantity) VALUES

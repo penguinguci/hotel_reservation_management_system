@@ -331,7 +331,7 @@ public class Tab_ListOrder extends javax.swing.JPanel {
 
             PdfPTable companyTable = new PdfPTable(1);
             companyTable.setWidthPercentage(100);
-            companyTable.addCell(createCell("KHÁCH SẠN XYZ\nĐịa chỉ: 123 Đường ABC, Quận 1, TP.HCM\nHotline: 0123 456 789\nMã số thuế: 1234567890",
+            companyTable.addCell(createCell("KHÁCH SẠN MELODY\nĐịa chỉ: 12 Nguyễn Văn Bảo, Quận Gò Vấp, TP.HCM\nHotline: 0915 020 803\nMã số thuế: 1234567890",
                     normalFont, Element.ALIGN_CENTER, 5, Rectangle.NO_BORDER));
             document.add(companyTable);
             document.add(new Paragraph("\n"));
@@ -510,7 +510,7 @@ public class Tab_ListOrder extends javax.swing.JPanel {
 
             document.add(summaryTable);
 
-            Paragraph footer = new Paragraph("\nCảm ơn quý khách đã sử dụng dịch vụ!\nVui lòng kiểm tra kỹ hóa đơn", smallFont);
+            Paragraph footer = new Paragraph("\nCảm ơn quý khách đã sử dụng dịch vụ!\nVui lòng kiểm tra kỹ hóa đơn ^_^", smallFont);
             footer.setAlignment(Element.ALIGN_CENTER);
             document.add(footer);
 

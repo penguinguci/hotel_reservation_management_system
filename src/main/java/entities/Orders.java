@@ -46,7 +46,10 @@ public class Orders {
     private Room room;
 
     @Column(name = "number_of_nights")
-    private Integer numberOfNights;
+    private Integer numberOfNights = 0;
+
+    @Column(name = "duration_hours")
+    private Integer durationHours = 0;
 
     @Column(name = "total_price")
     private double totalPrice;
@@ -114,10 +117,8 @@ public class Orders {
     public double calculateRoomPrice() {
         if (numberOfNights != null && numberOfNights > 0) {
             return room.getPrice() * numberOfNights;
-        } else if (checkInTime != null && checkOutTime != null) {
-            long diffInMillis = checkOutTime.getTime() - checkInTime.getTime();
-            int hours = (int) Math.ceil(diffInMillis / (60.0 * 60 * 1000));
-            return room.calculateHourlyRate(checkInTime) * hours;
+        } else if (durationHours != null && durationHours > 0) {
+            return room.getHourlyBaseRate() * durationHours;
         }
         return room.getPrice();
     }

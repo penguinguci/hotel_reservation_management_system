@@ -63,7 +63,7 @@ public class Reservation {
     private Room room;
 
     @Column(name = "number_of_nights")
-    private Integer numberOfNights = 1;
+    private Integer numberOfNights = 0;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "booking_type")
@@ -76,7 +76,7 @@ public class Reservation {
     private Date checkOutTime;
 
     @Column(name = "duration_hours")
-    private Integer durationHours = 1;
+    private Integer durationHours = 0;
 
     @Column(name = "hourly_rate")
     private double hourlyRate;
@@ -218,25 +218,15 @@ public class Reservation {
         double roomPrice = 0;
 
         if (bookingType == BookingType.NIGHT) {
-            // Tính theo số đêm, tối thiểu 1 đêm
-            int nights = (numberOfNights != null && numberOfNights > 0) ? numberOfNights : 1;
-            roomPrice = room.getPrice() * nights;
+            roomPrice = room.getPrice() * numberOfNights;
         } else if (bookingType == BookingType.HOUR) {
-            // Tính theo giờ
-            if (checkInTime != null && checkOutTime != null) {
-                long diffInMillis = checkOutTime.getTime() - checkInTime.getTime();
-                int hours = (int) Math.ceil(diffInMillis / (60.0 * 60 * 1000));
-                hours = Math.max(hours, 1); // Tối thiểu 1 giờ
-                roomPrice = room.calculateHourlyRate(checkInTime) * hours;
-            } else {
-                roomPrice = room.getSafeHourlyBaseRate() * durationHours;
-            }
+            roomPrice = hourlyRate * durationHours;
         }
 
         double servicePrice = (reservationDetails == null || reservationDetails.isEmpty()) ? 0 :
                 reservationDetails.stream().mapToDouble(ReservationDetails::calculateLineTotal).sum();
 
-        this.totalPrice = roomPrice + servicePrice + overstayFee;
+        this.totalPrice = roomPrice + servicePrice;
         return this.totalPrice;
     }
 

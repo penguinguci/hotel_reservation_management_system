@@ -1948,6 +1948,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
                 reservation.setCheckInTime(checkInTime);
                 reservation.setCheckOutTime(checkOutTime);
                 reservation.setDurationHours(hours);
+                reservation.setNumberOfNights(0);
 
                 Room room = em.find(Room.class, roomID);
                 if (room == null) {
