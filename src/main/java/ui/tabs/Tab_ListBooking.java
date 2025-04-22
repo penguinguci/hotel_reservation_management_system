@@ -524,9 +524,29 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         dialog.setVisible(true);
 
         if (paymentInfo.isPaymentSuccessful()) {
-            loadReservations();
+            txt_Search.setText("");
+            cbx_CustomerID.setSelectedIndex(0);
+            try {
+                loadReservations();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+            clearReservationDetails();
             updateBookingInfo();
             updateButtonStates();
+            try {
+                initComboboxCustomerID();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            table_ListService.getTableModel().clearData();
+            table_ListReservation.getTable().clearSelection();
+            lbl_FloatingFee_Value.setText("");
+            lbl_ServiceFee_Value.setText("");
+            lbl_Tax_Value.setText("");
+            lbl_TotalPrice_Value.setText("");
+
         }
     }
 

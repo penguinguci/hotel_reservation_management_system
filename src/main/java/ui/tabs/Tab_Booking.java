@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  *
  * @author TRAN LONG VU
  */
-public class Tab_Booking extends javax.swing.JPanel {
+public class Tab_Booking extends JPanel {
     private Timer debounceTimer;
     private static final int DEBOUNCE_DELAY = 300;
     private CustomerDAO customerDAO;
@@ -55,7 +55,8 @@ public class Tab_Booking extends javax.swing.JPanel {
     /**
      * Creates new form Tab_Booking
      */
-    public Tab_Booking() throws RemoteException {
+    @SneakyThrows
+    public Tab_Booking() {
         customerDAO = new CustomerDAOImpl();
         roomDAO = new RoomDAOImpl();
         initComponents();
@@ -97,7 +98,8 @@ public class Tab_Booking extends javax.swing.JPanel {
         setFocusCycleRoot(true);
     }
 
-    private void initTableData() throws RemoteException {
+    @SneakyThrows
+    private void initTableData() {
         RoomDAO roomDAO = new RoomDAOImpl();
         List<Room> allRooms = roomDAO.findAll();
         displayRoomsInTable(allRooms);
@@ -208,7 +210,8 @@ public class Tab_Booking extends javax.swing.JPanel {
         });
     }
 
-    private void initializeRoomTypeComboBox() throws RemoteException {
+    @SneakyThrows
+    private void initializeRoomTypeComboBox() {
         RoomTypesDAO roomTypesDAO = new RoomTypeDAOImpl();
         List<RoomType> roomTypes = roomTypesDAO.getAllRoomTypes();
 
@@ -226,17 +229,14 @@ public class Tab_Booking extends javax.swing.JPanel {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     String selectedType = (String) cbx_TypeRoom.getSelectedItem();
-                    try {
-                        filterRoomsByType(selectedType);
-                    } catch (RemoteException ex) {
-                        throw new RuntimeException(ex);
-                    }
+                    filterRoomsByType(selectedType);
                 }
             }
         });
     }
 
-    private void initializePriceRangeComboBox() throws RemoteException {
+    @SneakyThrows
+    private void initializePriceRangeComboBox() {
         RoomDAO roomDAO = new RoomDAOImpl();
         List<Room> allRooms = roomDAO.findAll();
         List<String> priceRanges = generateSmartPriceRanges(allRooms);
@@ -321,6 +321,7 @@ public class Tab_Booking extends javax.swing.JPanel {
         txt_SearchCustomer.getTextField().addKeyListener(new KeyAdapter() {
             private int selectedIndex = -1;
 
+            @SneakyThrows
             @Override
             public void keyPressed(KeyEvent e) {
                 List<String> suggestions = popupSearchCustomer.getSuggestions();
@@ -349,11 +350,7 @@ public class Tab_Booking extends javax.swing.JPanel {
                         break;
                     case KeyEvent.VK_ENTER:
                         if (selectedIndex >= 0 && selectedIndex < suggestions.size()) {
-                            try {
-                                popupSearchCustomer.selectSuggestion(suggestions.get(selectedIndex));
-                            } catch (RemoteException ex) {
-                                throw new RuntimeException(ex);
-                            }
+                            popupSearchCustomer.selectSuggestion(suggestions.get(selectedIndex));
                         }
                         e.consume();
                         break;
@@ -439,326 +436,318 @@ public class Tab_Booking extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnl_EmptyRoom = new javax.swing.JPanel();
-        pnl_InforBookingRoom = new javax.swing.JPanel();
+        pnl_EmptyRoom = new JPanel();
+        pnl_InforBookingRoom = new JPanel();
         btn_SearchRoom = new ui.components.button.ButtonCustom();
-        pnl_Left_InforBookRoom = new javax.swing.JPanel();
-        pnl_Label_Left_InforBookRoom = new javax.swing.JPanel();
-        lbl_Checkin = new javax.swing.JLabel();
-        lbl_Checkout = new javax.swing.JLabel();
-        lbl_RangePrice = new javax.swing.JLabel();
-        pnl_Input_Left_InforBookRoom = new javax.swing.JPanel();
+        pnl_Left_InforBookRoom = new JPanel();
+        pnl_Label_Left_InforBookRoom = new JPanel();
+        lbl_Checkin = new JLabel();
+        lbl_Checkout = new JLabel();
+        lbl_RangePrice = new JLabel();
+        pnl_Input_Left_InforBookRoom = new JPanel();
         calendar_Checkin = new ui.components.calendar.CustomCalendar();
         calendar_Checout = new ui.components.calendar.CustomCalendar();
         cbx_RangePrice = new ui.components.combobox.StyledComboBox();
-        pnl_Right_InforBookRoom = new javax.swing.JPanel();
-        pnl_Label_Right_InforBookRoom = new javax.swing.JPanel();
-        lbl_Capacity = new javax.swing.JLabel();
-        lbl_TypeRoom = new javax.swing.JLabel();
-        pnl_Input_Right_InforBookRoom = new javax.swing.JPanel();
-        spinner_Capacity = new javax.swing.JSpinner();
+        pnl_Right_InforBookRoom = new JPanel();
+        pnl_Label_Right_InforBookRoom = new JPanel();
+        lbl_Capacity = new JLabel();
+        lbl_TypeRoom = new JLabel();
+        pnl_Input_Right_InforBookRoom = new JPanel();
+        spinner_Capacity = new JSpinner();
         cbx_TypeRoom = new ui.components.combobox.StyledComboBox();
         btn_Clear = new ui.components.button.ButtonCancelCustom();
-        table_EntityRoom = new ui.components.table.CustomTableButton();
+        table_EntityRoom = new CustomTableButton();
         btn_AddRoom = new ui.components.button.ButtonCustom();
         btn_SeeDetails = new ui.components.button.ButtonCustom();
-        pnl_InforCustomer = new javax.swing.JPanel();
+        pnl_InforCustomer = new JPanel();
         txt_SearchCustomer = new ui.components.textfield.SearchTextField();
-        pnl_CustomerLeft = new javax.swing.JPanel();
-        lbl_CustomerName = new javax.swing.JLabel();
-        lbl_CustomerGender = new javax.swing.JLabel();
-        lbl_CustomerPhone = new javax.swing.JLabel();
-        lbl_CustomerCCCD = new javax.swing.JLabel();
-        pnl_CustomerRight = new javax.swing.JPanel();
-        lbl_CustomerName_Value = new javax.swing.JLabel();
-        lbl_CustomerGender_Value = new javax.swing.JLabel();
-        lbl_CustomerPhone_Value = new javax.swing.JLabel();
-        lbl_CustomerCCCD_Value = new javax.swing.JLabel();
+        pnl_CustomerLeft = new JPanel();
+        lbl_CustomerName = new JLabel();
+        lbl_CustomerGender = new JLabel();
+        lbl_CustomerPhone = new JLabel();
+        lbl_CustomerCCCD = new JLabel();
+        pnl_CustomerRight = new JPanel();
+        lbl_CustomerName_Value = new JLabel();
+        lbl_CustomerGender_Value = new JLabel();
+        lbl_CustomerPhone_Value = new JLabel();
+        lbl_CustomerCCCD_Value = new JLabel();
         btn_AddCustomer = new ui.components.button.ButtonCustom();
-        pnl_ButtonActions = new javax.swing.JPanel();
+        pnl_ButtonActions = new JPanel();
         btn_Booking = new ui.components.button.ButtonCustom();
         btn_Cancel = new ui.components.button.ButtonCancelCustom();
-        pnl_Cart = new javax.swing.JPanel();
-        table_Cart = new ui.components.table.CustomTableButton();
-        pnl_BottomService = new javax.swing.JPanel();
+        pnl_Cart = new JPanel();
+        table_Cart = new CustomTableButton();
+        pnl_BottomService = new JPanel();
         btn_AddService = new ui.components.button.ButtonCustom();
         btn_UpdateService = new ui.components.button.ButtonCustom();
-        pnl_TopCart = new javax.swing.JPanel();
-        lbl_CartTittle = new javax.swing.JLabel();
+        pnl_TopCart = new JPanel();
+        lbl_CartTittle = new JLabel();
         btn_DeleteOne = new ui.components.button.ButtonCancelCustom();
         btn_DeleteAll = new ui.components.button.ButtonCancelCustom();
-        pnl_InforBooking = new javax.swing.JPanel();
-        pnl_Left_InforBooking = new javax.swing.JPanel();
-        lbl_LastTotalPrice = new javax.swing.JLabel();
-        lbl_BookingMethod = new javax.swing.JLabel();
-        lbl_Deposit = new javax.swing.JLabel();
-        lbl_RemainingAmount = new javax.swing.JLabel();
-        pnl_Right_InforBooking = new javax.swing.JPanel();
-        lbl_LastTotalPrice_Value = new javax.swing.JLabel();
+        pnl_InforBooking = new JPanel();
+        pnl_Left_InforBooking = new JPanel();
+        lbl_LastTotalPrice = new JLabel();
+        lbl_BookingMethod = new JLabel();
+        lbl_Deposit = new JLabel();
+        lbl_RemainingAmount = new JLabel();
+        pnl_Right_InforBooking = new JPanel();
+        lbl_LastTotalPrice_Value = new JLabel();
         cbx_BookingMethod = new ui.components.combobox.StyledComboBox();
-        lbl_Deposit_Value = new javax.swing.JLabel();
-        lbl_RemainingAmount_Value = new javax.swing.JLabel();
+        lbl_Deposit_Value = new JLabel();
+        lbl_RemainingAmount_Value = new JLabel();
 
-        setBackground(new java.awt.Color(255, 255, 255));
+        setBackground(new Color(255, 255, 255));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        pnl_EmptyRoom.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_EmptyRoom.setBackground(new Color(255, 255, 255));
 
-        pnl_InforBookingRoom.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_InforBookingRoom.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin đặt phòng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 15), new java.awt.Color(136, 130, 246))); // NOI18N
+        pnl_InforBookingRoom.setBackground(new Color(255, 255, 255));
+        pnl_InforBookingRoom.setBorder(BorderFactory.createTitledBorder(null, "Thông tin đặt phòng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new Font("Segoe UI", 1, 15), new Color(136, 130, 246))); // NOI18N
 
         btn_SearchRoom.setText("Tìm kiếm");
-        btn_SearchRoom.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btn_SearchRoom.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 btn_SearchRoomActionPerformed(evt);
             }
         });
 
-        pnl_Left_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_Left_InforBookRoom.setBackground(new Color(255, 255, 255));
 
-        pnl_Label_Left_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Label_Left_InforBookRoom.setLayout(new java.awt.GridLayout(3, 1));
+        pnl_Label_Left_InforBookRoom.setBackground(new Color(255, 255, 255));
+        pnl_Label_Left_InforBookRoom.setLayout(new GridLayout(3, 1));
 
-        lbl_Checkin.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Checkin.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
         lbl_Checkin.setText("Ngày checkin:");
         pnl_Label_Left_InforBookRoom.add(lbl_Checkin);
 
-        lbl_Checkout.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Checkout.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
         lbl_Checkout.setText("Ngày checkout:");
         pnl_Label_Left_InforBookRoom.add(lbl_Checkout);
 
-        lbl_RangePrice.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_RangePrice.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
         lbl_RangePrice.setText("Khoảng giá:");
         pnl_Label_Left_InforBookRoom.add(lbl_RangePrice);
 
-        pnl_Input_Left_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Input_Left_InforBookRoom.setLayout(new java.awt.GridLayout(3, 1, 0, 10));
+        pnl_Input_Left_InforBookRoom.setBackground(new Color(255, 255, 255));
+        pnl_Input_Left_InforBookRoom.setLayout(new GridLayout(3, 1, 0, 10));
 
-        calendar_Checkin.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        calendar_Checkin.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
         pnl_Input_Left_InforBookRoom.add(calendar_Checkin);
 
-        calendar_Checout.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        calendar_Checout.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
         pnl_Input_Left_InforBookRoom.add(calendar_Checout);
 
-        cbx_RangePrice.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        cbx_RangePrice.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
         pnl_Input_Left_InforBookRoom.add(cbx_RangePrice);
 
-        javax.swing.GroupLayout pnl_Left_InforBookRoomLayout = new javax.swing.GroupLayout(pnl_Left_InforBookRoom);
+        GroupLayout pnl_Left_InforBookRoomLayout = new GroupLayout(pnl_Left_InforBookRoom);
         pnl_Left_InforBookRoom.setLayout(pnl_Left_InforBookRoomLayout);
         pnl_Left_InforBookRoomLayout.setHorizontalGroup(
-            pnl_Left_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_Left_InforBookRoomLayout.createSequentialGroup()
-                .addComponent(pnl_Label_Left_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pnl_Input_Left_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
+                pnl_Left_InforBookRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_Left_InforBookRoomLayout.createSequentialGroup()
+                                .addComponent(pnl_Label_Left_InforBookRoom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(pnl_Input_Left_InforBookRoom, GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE))
         );
         pnl_Left_InforBookRoomLayout.setVerticalGroup(
-            pnl_Left_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnl_Label_Left_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(pnl_Input_Left_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+                pnl_Left_InforBookRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(pnl_Label_Left_InforBookRoom, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(pnl_Input_Left_InforBookRoom, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
         );
 
-        pnl_Right_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_Right_InforBookRoom.setBackground(new Color(255, 255, 255));
 
-        pnl_Label_Right_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Label_Right_InforBookRoom.setLayout(new java.awt.GridLayout(3, 1));
+        pnl_Label_Right_InforBookRoom.setBackground(new Color(255, 255, 255));
+        pnl_Label_Right_InforBookRoom.setLayout(new GridLayout(3, 1));
 
-        lbl_Capacity.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_Capacity.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
         lbl_Capacity.setText("Sức chứa:");
         pnl_Label_Right_InforBookRoom.add(lbl_Capacity);
 
-        lbl_TypeRoom.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_TypeRoom.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
         lbl_TypeRoom.setText("Loại phòng:");
         pnl_Label_Right_InforBookRoom.add(lbl_TypeRoom);
 
-        pnl_Input_Right_InforBookRoom.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Input_Right_InforBookRoom.setPreferredSize(new java.awt.Dimension(84, 100));
-        pnl_Input_Right_InforBookRoom.setLayout(new java.awt.GridLayout(3, 1, 0, 12));
+        pnl_Input_Right_InforBookRoom.setBackground(new Color(255, 255, 255));
+        pnl_Input_Right_InforBookRoom.setPreferredSize(new Dimension(84, 100));
+        pnl_Input_Right_InforBookRoom.setLayout(new GridLayout(3, 1, 0, 12));
 
-        spinner_Capacity.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        spinner_Capacity.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
         spinner_Capacity.setFocusable(false);
         spinner_Capacity.setVerifyInputWhenFocusTarget(false);
         pnl_Input_Right_InforBookRoom.add(spinner_Capacity);
 
-        cbx_TypeRoom.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        cbx_TypeRoom.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
         pnl_Input_Right_InforBookRoom.add(cbx_TypeRoom);
 
-        javax.swing.GroupLayout pnl_Right_InforBookRoomLayout = new javax.swing.GroupLayout(pnl_Right_InforBookRoom);
+        GroupLayout pnl_Right_InforBookRoomLayout = new GroupLayout(pnl_Right_InforBookRoom);
         pnl_Right_InforBookRoom.setLayout(pnl_Right_InforBookRoomLayout);
         pnl_Right_InforBookRoomLayout.setHorizontalGroup(
-            pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 312, Short.MAX_VALUE)
-            .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pnl_Right_InforBookRoomLayout.createSequentialGroup()
-                    .addComponent(pnl_Label_Right_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 233, Short.MAX_VALUE)))
-            .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_Right_InforBookRoomLayout.createSequentialGroup()
-                    .addContainerGap(103, Short.MAX_VALUE)
-                    .addComponent(pnl_Input_Right_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap()))
+                pnl_Right_InforBookRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGap(0, 312, Short.MAX_VALUE)
+                        .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addGroup(pnl_Right_InforBookRoomLayout.createSequentialGroup()
+                                        .addComponent(pnl_Label_Right_InforBookRoom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 233, Short.MAX_VALUE)))
+                        .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addGroup(GroupLayout.Alignment.TRAILING, pnl_Right_InforBookRoomLayout.createSequentialGroup()
+                                        .addContainerGap(103, Short.MAX_VALUE)
+                                        .addComponent(pnl_Input_Right_InforBookRoom, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
+                                        .addContainerGap()))
         );
         pnl_Right_InforBookRoomLayout.setVerticalGroup(
-            pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 142, Short.MAX_VALUE)
-            .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(pnl_Label_Right_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE))
-            .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pnl_Right_InforBookRoomLayout.createSequentialGroup()
-                    .addComponent(pnl_Input_Right_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
-                    .addContainerGap()))
+                pnl_Right_InforBookRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGap(0, 142, Short.MAX_VALUE)
+                        .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addComponent(pnl_Label_Right_InforBookRoom, GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE))
+                        .addGroup(pnl_Right_InforBookRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addGroup(pnl_Right_InforBookRoomLayout.createSequentialGroup()
+                                        .addComponent(pnl_Input_Right_InforBookRoom, GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
+                                        .addContainerGap()))
         );
 
         btn_Clear.setText("Xóa trắng");
-        btn_Clear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try {
-                    btn_ClearActionPerformed(evt);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+        btn_Clear.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btn_ClearActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout pnl_InforBookingRoomLayout = new javax.swing.GroupLayout(pnl_InforBookingRoom);
+        GroupLayout pnl_InforBookingRoomLayout = new GroupLayout(pnl_InforBookingRoom);
         pnl_InforBookingRoom.setLayout(pnl_InforBookingRoomLayout);
         pnl_InforBookingRoomLayout.setHorizontalGroup(
-            pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_InforBookingRoomLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnl_Left_InforBookRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pnl_Right_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btn_SearchRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
-                    .addComponent(btn_Clear, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                pnl_InforBookingRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(GroupLayout.Alignment.TRAILING, pnl_InforBookingRoomLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(pnl_Left_InforBookRoom, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(pnl_Right_InforBookRoom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(pnl_InforBookingRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(btn_SearchRoom, GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE)
+                                        .addComponent(btn_Clear, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         pnl_InforBookingRoomLayout.setVerticalGroup(
-            pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnl_Right_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGroup(pnl_InforBookingRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                .addGroup(pnl_InforBookingRoomLayout.createSequentialGroup()
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btn_SearchRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(btn_Clear, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(pnl_InforBookingRoomLayout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(pnl_Left_InforBookRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                pnl_InforBookingRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(pnl_Right_InforBookRoom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGroup(pnl_InforBookingRoomLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                .addGroup(pnl_InforBookingRoomLayout.createSequentialGroup()
+                                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(btn_SearchRoom, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btn_Clear, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
+                                .addGroup(pnl_InforBookingRoomLayout.createSequentialGroup()
+                                        .addGap(0, 0, Short.MAX_VALUE)
+                                        .addComponent(pnl_Left_InforBookRoom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
         );
 
         table_EntityRoom.setColumnNames(new String[] {"STT", "Số phòng", "Loại phòng", "Giá/đêm", "Tiện nghi", "Trạng thái"});
-        table_EntityRoom.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
+        table_EntityRoom.setHeaderBackgroundColor(new Color(153, 153, 255));
 
         btn_AddRoom.setText("Thêm");
-        btn_AddRoom.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btn_AddRoom.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 btn_AddRoomActionPerformed(evt);
             }
         });
 
         btn_SeeDetails.setText("Xem chi tiết");
-        btn_SeeDetails.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try {
-                    btn_SeeDetailsActionPerformed(evt);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+        btn_SeeDetails.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btn_SeeDetailsActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout pnl_EmptyRoomLayout = new javax.swing.GroupLayout(pnl_EmptyRoom);
+        GroupLayout pnl_EmptyRoomLayout = new GroupLayout(pnl_EmptyRoom);
         pnl_EmptyRoom.setLayout(pnl_EmptyRoomLayout);
         pnl_EmptyRoomLayout.setHorizontalGroup(
-            pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(pnl_InforBookingRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(table_EntityRoom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnl_EmptyRoomLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btn_AddRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btn_SeeDetails, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                pnl_EmptyRoomLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addComponent(pnl_InforBookingRoom, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(table_EntityRoom, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(GroupLayout.Alignment.LEADING, pnl_EmptyRoomLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(btn_AddRoom, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btn_SeeDetails, GroupLayout.PREFERRED_SIZE, 130, GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
         );
         pnl_EmptyRoomLayout.setVerticalGroup(
-            pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_EmptyRoomLayout.createSequentialGroup()
-                .addComponent(pnl_InforBookingRoom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(table_EntityRoom, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnl_EmptyRoomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btn_AddRoom, javax.swing.GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
-                    .addComponent(btn_SeeDetails, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(22, Short.MAX_VALUE))
+                pnl_EmptyRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(GroupLayout.Alignment.TRAILING, pnl_EmptyRoomLayout.createSequentialGroup()
+                                .addComponent(pnl_InforBookingRoom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(table_EntityRoom, GroupLayout.PREFERRED_SIZE, 197, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(pnl_EmptyRoomLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(btn_AddRoom, GroupLayout.DEFAULT_SIZE, 39, Short.MAX_VALUE)
+                                        .addComponent(btn_SeeDetails, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         add(pnl_EmptyRoom, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 820, 440));
 
-        pnl_InforCustomer.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_InforCustomer.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin khách hàng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 15), new java.awt.Color(136, 130, 246))); // NOI18N
+        pnl_InforCustomer.setBackground(new Color(255, 255, 255));
+        pnl_InforCustomer.setBorder(BorderFactory.createTitledBorder(null, "Thông tin khách hàng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new Font("Segoe UI", 1, 15), new Color(136, 130, 246))); // NOI18N
         pnl_InforCustomer.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        txt_SearchCustomer.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txt_SearchCustomer.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
         txt_SearchCustomer.setPlaceholder("Nhập SĐT hoặc CCCD tìm kiếm...");
-        txt_SearchCustomer.setPlaceholderColor(new java.awt.Color(102, 102, 102));
-        txt_SearchCustomer.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+        txt_SearchCustomer.setPlaceholderColor(new Color(102, 102, 102));
+        txt_SearchCustomer.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent evt) {
                 txt_SearchCustomerMouseClicked(evt);
             }
         });
         pnl_InforCustomer.add(txt_SearchCustomer, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 25, 460, -1));
 
-        pnl_CustomerLeft.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_CustomerLeft.setLayout(new java.awt.GridLayout(4, 0, 0, 5));
+        pnl_CustomerLeft.setBackground(new Color(255, 255, 255));
+        pnl_CustomerLeft.setLayout(new GridLayout(4, 0, 0, 5));
 
-        lbl_CustomerName.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_CustomerName.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
         lbl_CustomerName.setText("Tên khách hàng:");
         pnl_CustomerLeft.add(lbl_CustomerName);
 
-        lbl_CustomerGender.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_CustomerGender.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
         lbl_CustomerGender.setText("Giới tính:");
-        lbl_CustomerGender.setPreferredSize(new java.awt.Dimension(50, 16));
+        lbl_CustomerGender.setPreferredSize(new Dimension(50, 16));
         pnl_CustomerLeft.add(lbl_CustomerGender);
 
-        lbl_CustomerPhone.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_CustomerPhone.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
         lbl_CustomerPhone.setText("Số điện thoại:");
         pnl_CustomerLeft.add(lbl_CustomerPhone);
 
-        lbl_CustomerCCCD.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_CustomerCCCD.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
         lbl_CustomerCCCD.setText("CCCD:");
         pnl_CustomerLeft.add(lbl_CustomerCCCD);
 
         pnl_InforCustomer.add(pnl_CustomerLeft, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 110, 170));
 
-        pnl_CustomerRight.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_CustomerRight.setLayout(new java.awt.GridLayout(4, 0, 0, 5));
+        pnl_CustomerRight.setBackground(new Color(255, 255, 255));
+        pnl_CustomerRight.setLayout(new GridLayout(4, 0, 0, 5));
 
-        lbl_CustomerName_Value.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_CustomerName_Value.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        lbl_CustomerName_Value.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_CustomerName_Value.setBorder(BorderFactory.createLineBorder(new Color(204, 204, 204)));
         pnl_CustomerRight.add(lbl_CustomerName_Value);
 
-        lbl_CustomerGender_Value.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_CustomerGender_Value.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        lbl_CustomerGender_Value.setPreferredSize(new java.awt.Dimension(50, 16));
+        lbl_CustomerGender_Value.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_CustomerGender_Value.setBorder(BorderFactory.createLineBorder(new Color(204, 204, 204)));
+        lbl_CustomerGender_Value.setPreferredSize(new Dimension(50, 16));
         pnl_CustomerRight.add(lbl_CustomerGender_Value);
 
-        lbl_CustomerPhone_Value.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_CustomerPhone_Value.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        lbl_CustomerPhone_Value.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_CustomerPhone_Value.setBorder(BorderFactory.createLineBorder(new Color(204, 204, 204)));
         pnl_CustomerRight.add(lbl_CustomerPhone_Value);
 
-        lbl_CustomerCCCD_Value.setFont(new java.awt.Font("Segoe UI", 0, 15)); // NOI18N
-        lbl_CustomerCCCD_Value.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        lbl_CustomerCCCD_Value.setFont(new Font("Segoe UI", 0, 15)); // NOI18N
+        lbl_CustomerCCCD_Value.setBorder(BorderFactory.createLineBorder(new Color(204, 204, 204)));
         pnl_CustomerRight.add(lbl_CustomerCCCD_Value);
 
         pnl_InforCustomer.add(pnl_CustomerRight, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 70, 320, 170));
 
         btn_AddCustomer.setText("Thêm khách hàng");
-        btn_AddCustomer.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btn_AddCustomer.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 btn_AddCustomerActionPerformed(evt);
             }
         });
@@ -766,248 +755,236 @@ public class Tab_Booking extends javax.swing.JPanel {
 
         add(pnl_InforCustomer, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 0, 480, 300));
 
-        pnl_ButtonActions.setBackground(new java.awt.Color(255, 255, 255));
+        pnl_ButtonActions.setBackground(new Color(255, 255, 255));
 
         btn_Booking.setText("Đặt phòng");
-        btn_Booking.addActionListener(new java.awt.event.ActionListener() {
+        btn_Booking.addActionListener(new ActionListener() {
             @SneakyThrows
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 btn_BookingActionPerformed(evt);
             }
         });
 
         btn_Cancel.setText("Hủy");
-        btn_Cancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try {
-                    btn_CancelActionPerformed(evt);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+        btn_Cancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btn_CancelActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout pnl_ButtonActionsLayout = new javax.swing.GroupLayout(pnl_ButtonActions);
+        GroupLayout pnl_ButtonActionsLayout = new GroupLayout(pnl_ButtonActions);
         pnl_ButtonActions.setLayout(pnl_ButtonActionsLayout);
         pnl_ButtonActionsLayout.setHorizontalGroup(
-            pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btn_Booking, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-                    .addComponent(btn_Cancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                pnl_ButtonActionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnl_ButtonActionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(btn_Booking, GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
+                                        .addComponent(btn_Cancel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         pnl_ButtonActionsLayout.setVerticalGroup(
-            pnl_ButtonActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btn_Booking, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btn_Cancel, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 13, Short.MAX_VALUE))
+                pnl_ButtonActionsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_ButtonActionsLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(btn_Booking, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btn_Cancel, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 13, Short.MAX_VALUE))
         );
 
         add(pnl_ButtonActions, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 570, 480, 130));
 
-        pnl_Cart.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Cart.setLayout(new java.awt.BorderLayout());
+        pnl_Cart.setBackground(new Color(255, 255, 255));
+        pnl_Cart.setLayout(new BorderLayout());
 
         table_Cart.setColumnNames(new String[] {"STT", "Số phòng", "Giá/đêm", "Số đêm", "Dịch vụ", "Thành tiền"});
-        table_Cart.setHeaderBackgroundColor(new java.awt.Color(153, 153, 255));
-        pnl_Cart.add(table_Cart, java.awt.BorderLayout.CENTER);
+        table_Cart.setHeaderBackgroundColor(new Color(153, 153, 255));
+        pnl_Cart.add(table_Cart, BorderLayout.CENTER);
 
-        pnl_BottomService.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_BottomService.setPreferredSize(new java.awt.Dimension(818, 50));
+        pnl_BottomService.setBackground(new Color(255, 255, 255));
+        pnl_BottomService.setPreferredSize(new Dimension(818, 50));
 
         btn_AddService.setText("Thêm dịch vụ");
-        btn_AddService.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try {
-                    btn_AddServiceActionPerformed(evt);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+        btn_AddService.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btn_AddServiceActionPerformed(evt);
             }
         });
 
         btn_UpdateService.setText("Sửa dịch vụ");
-        btn_UpdateService.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try {
-                    btn_UpdateServiceActionPerformed(evt);
-                } catch (RemoteException e) {
-                    throw new RuntimeException(e);
-                }
+        btn_UpdateService.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                btn_UpdateServiceActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout pnl_BottomServiceLayout = new javax.swing.GroupLayout(pnl_BottomService);
+        GroupLayout pnl_BottomServiceLayout = new GroupLayout(pnl_BottomService);
         pnl_BottomService.setLayout(pnl_BottomServiceLayout);
         pnl_BottomServiceLayout.setHorizontalGroup(
-            pnl_BottomServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_BottomServiceLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btn_AddService, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btn_UpdateService, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(534, Short.MAX_VALUE))
+                pnl_BottomServiceLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_BottomServiceLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(btn_AddService, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btn_UpdateService, GroupLayout.PREFERRED_SIZE, 130, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(534, Short.MAX_VALUE))
         );
         pnl_BottomServiceLayout.setVerticalGroup(
-            pnl_BottomServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_BottomServiceLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_BottomServiceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btn_AddService, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
-                    .addComponent(btn_UpdateService, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                pnl_BottomServiceLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(GroupLayout.Alignment.TRAILING, pnl_BottomServiceLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnl_BottomServiceLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(btn_AddService, GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                                        .addComponent(btn_UpdateService, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
 
-        pnl_Cart.add(pnl_BottomService, java.awt.BorderLayout.PAGE_END);
+        pnl_Cart.add(pnl_BottomService, BorderLayout.PAGE_END);
 
-        pnl_TopCart.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_TopCart.setPreferredSize(new java.awt.Dimension(818, 32));
+        pnl_TopCart.setBackground(new Color(255, 255, 255));
+        pnl_TopCart.setPreferredSize(new Dimension(818, 32));
 
-        lbl_CartTittle.setBackground(new java.awt.Color(255, 255, 255));
-        lbl_CartTittle.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
-        lbl_CartTittle.setForeground(new java.awt.Color(153, 153, 255));
+        lbl_CartTittle.setBackground(new Color(255, 255, 255));
+        lbl_CartTittle.setFont(new Font("Segoe UI", 1, 16)); // NOI18N
+        lbl_CartTittle.setForeground(new Color(153, 153, 255));
         lbl_CartTittle.setText("Hàng chờ");
-        lbl_CartTittle.setPreferredSize(new java.awt.Dimension(73, 25));
+        lbl_CartTittle.setPreferredSize(new Dimension(73, 25));
 
         btn_DeleteOne.setText("Xóa");
-        btn_DeleteOne.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btn_DeleteOne.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 btn_DeleteOneActionPerformed(evt);
             }
         });
 
         btn_DeleteAll.setText("Xóa tất cả");
-        btn_DeleteAll.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btn_DeleteAll.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 btn_DeleteAllActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout pnl_TopCartLayout = new javax.swing.GroupLayout(pnl_TopCart);
+        GroupLayout pnl_TopCartLayout = new GroupLayout(pnl_TopCart);
         pnl_TopCart.setLayout(pnl_TopCartLayout);
         pnl_TopCartLayout.setHorizontalGroup(
-            pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_TopCartLayout.createSequentialGroup()
-                .addContainerGap(624, Short.MAX_VALUE)
-                .addComponent(btn_DeleteOne, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btn_DeleteAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-            .addGroup(pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pnl_TopCartLayout.createSequentialGroup()
-                    .addComponent(lbl_CartTittle, javax.swing.GroupLayout.PREFERRED_SIZE, 411, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 409, Short.MAX_VALUE)))
+                pnl_TopCartLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(GroupLayout.Alignment.TRAILING, pnl_TopCartLayout.createSequentialGroup()
+                                .addContainerGap(624, Short.MAX_VALUE)
+                                .addComponent(btn_DeleteOne, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btn_DeleteAll, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
+                        .addGroup(pnl_TopCartLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addGroup(pnl_TopCartLayout.createSequentialGroup()
+                                        .addComponent(lbl_CartTittle, GroupLayout.PREFERRED_SIZE, 411, GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 409, Short.MAX_VALUE)))
         );
         pnl_TopCartLayout.setVerticalGroup(
-            pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_TopCartLayout.createSequentialGroup()
-                .addGroup(pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_DeleteOne, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_DeleteAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 6, Short.MAX_VALUE))
-            .addGroup(pnl_TopCartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(pnl_TopCartLayout.createSequentialGroup()
-                    .addComponent(lbl_CartTittle, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+                pnl_TopCartLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_TopCartLayout.createSequentialGroup()
+                                .addGroup(pnl_TopCartLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btn_DeleteOne, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btn_DeleteAll, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 6, Short.MAX_VALUE))
+                        .addGroup(pnl_TopCartLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                .addGroup(pnl_TopCartLayout.createSequentialGroup()
+                                        .addComponent(lbl_CartTittle, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE)))
         );
 
-        pnl_Cart.add(pnl_TopCart, java.awt.BorderLayout.PAGE_START);
+        pnl_Cart.add(pnl_TopCart, BorderLayout.PAGE_START);
 
         add(pnl_Cart, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 440, 820, 260));
 
-        pnl_InforBooking.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_InforBooking.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Thông tin đặt phòng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 16), new java.awt.Color(153, 153, 255))); // NOI18N
+        pnl_InforBooking.setBackground(new Color(255, 255, 255));
+        pnl_InforBooking.setBorder(BorderFactory.createTitledBorder(null, "Thông tin đặt phòng", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new Font("Segoe UI", 1, 16), new Color(153, 153, 255))); // NOI18N
 
-        pnl_Left_InforBooking.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Left_InforBooking.setLayout(new java.awt.GridLayout(4, 1));
+        pnl_Left_InforBooking.setBackground(new Color(255, 255, 255));
+        pnl_Left_InforBooking.setLayout(new GridLayout(4, 1));
 
-        lbl_LastTotalPrice.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_LastTotalPrice.setFont(new Font("Segoe UI", 0, 16)); // NOI18N
         lbl_LastTotalPrice.setText("Tổng tiền:");
         pnl_Left_InforBooking.add(lbl_LastTotalPrice);
 
-        lbl_BookingMethod.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_BookingMethod.setFont(new Font("Segoe UI", 0, 16)); // NOI18N
         lbl_BookingMethod.setText("Hình thức đặt phòng:");
         pnl_Left_InforBooking.add(lbl_BookingMethod);
 
-        lbl_Deposit.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_Deposit.setFont(new Font("Segoe UI", 0, 16)); // NOI18N
         lbl_Deposit.setText("Số tiền cọc:");
         pnl_Left_InforBooking.add(lbl_Deposit);
 
-        lbl_RemainingAmount.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_RemainingAmount.setFont(new Font("Segoe UI", 0, 16)); // NOI18N
         lbl_RemainingAmount.setText("Số tiền còn lại:");
         pnl_Left_InforBooking.add(lbl_RemainingAmount);
 
-        pnl_Right_InforBooking.setBackground(new java.awt.Color(255, 255, 255));
-        pnl_Right_InforBooking.setLayout(new java.awt.GridLayout(4, 1, 0, 10));
+        pnl_Right_InforBooking.setBackground(new Color(255, 255, 255));
+        pnl_Right_InforBooking.setLayout(new GridLayout(4, 1, 0, 10));
 
-        lbl_LastTotalPrice_Value.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lbl_LastTotalPrice_Value.setForeground(new java.awt.Color(255, 0, 51));
-        lbl_LastTotalPrice_Value.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        lbl_LastTotalPrice_Value.setFont(new Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_LastTotalPrice_Value.setForeground(new Color(255, 0, 51));
+        lbl_LastTotalPrice_Value.setBorder(BorderFactory.createLineBorder(new Color(204, 204, 204)));
         pnl_Right_InforBooking.add(lbl_LastTotalPrice_Value);
 
-        cbx_BookingMethod.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        cbx_BookingMethod.setFont(new Font("Segoe UI", 0, 16)); // NOI18N
         pnl_Right_InforBooking.add(cbx_BookingMethod);
 
-        lbl_Deposit_Value.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lbl_Deposit_Value.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        lbl_Deposit_Value.setFont(new Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_Deposit_Value.setBorder(BorderFactory.createLineBorder(new Color(204, 204, 204)));
         pnl_Right_InforBooking.add(lbl_Deposit_Value);
 
-        lbl_RemainingAmount_Value.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        lbl_RemainingAmount_Value.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        lbl_RemainingAmount_Value.setFont(new Font("Segoe UI", 0, 16)); // NOI18N
+        lbl_RemainingAmount_Value.setBorder(BorderFactory.createLineBorder(new Color(204, 204, 204)));
         pnl_Right_InforBooking.add(lbl_RemainingAmount_Value);
 
-        javax.swing.GroupLayout pnl_InforBookingLayout = new javax.swing.GroupLayout(pnl_InforBooking);
+        GroupLayout pnl_InforBookingLayout = new GroupLayout(pnl_InforBooking);
         pnl_InforBooking.setLayout(pnl_InforBookingLayout);
         pnl_InforBookingLayout.setHorizontalGroup(
-            pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_InforBookingLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnl_Left_InforBooking, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnl_Right_InforBooking, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                pnl_InforBookingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_InforBookingLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(pnl_Left_InforBooking, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pnl_Right_InforBooking, GroupLayout.PREFERRED_SIZE, 285, GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(14, Short.MAX_VALUE))
         );
         pnl_InforBookingLayout.setVerticalGroup(
-            pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnl_InforBookingLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_InforBookingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnl_Left_InforBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnl_Right_InforBooking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                pnl_InforBookingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(pnl_InforBookingLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(pnl_InforBookingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addComponent(pnl_Left_InforBooking, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(pnl_Right_InforBooking, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         add(pnl_InforBooking, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 310, 480, 260));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_CancelActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_CancelActionPerformed
+    private void btn_CancelActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btn_CancelActionPerformed
         cancel();
     }//GEN-LAST:event_btn_CancelActionPerformed
 
-    private void btn_SearchRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchRoomActionPerformed
+    private void btn_SearchRoomActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btn_SearchRoomActionPerformed
         searchEntityRoom();
     }//GEN-LAST:event_btn_SearchRoomActionPerformed
 
-    private void btn_AddRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddRoomActionPerformed
+    private void btn_AddRoomActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btn_AddRoomActionPerformed
         addEntityRoomToCart();
     }//GEN-LAST:event_btn_AddRoomActionPerformed
 
-    private void btn_AddCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddCustomerActionPerformed
+    private void btn_AddCustomerActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btn_AddCustomerActionPerformed
         showFormAddCustomer();
     }//GEN-LAST:event_btn_AddCustomerActionPerformed
 
-    private void txt_SearchCustomerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txt_SearchCustomerMouseClicked
+    private void txt_SearchCustomerMouseClicked(MouseEvent evt) {//GEN-FIRST:event_txt_SearchCustomerMouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_SearchCustomerMouseClicked
 
-    private void btn_ClearActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_ClearActionPerformed
+    private void btn_ClearActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btn_ClearActionPerformed
         clear();
     }//GEN-LAST:event_btn_ClearActionPerformed
 
-    private void btn_AddServiceActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_AddServiceActionPerformed
+    private void btn_AddServiceActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btn_AddServiceActionPerformed
         int selectedRow = table_Cart.getTable().getSelectedRow();
         if (selectedRow != -1) {
             showServicesDialog(selectedRow);
@@ -1016,7 +993,7 @@ public class Tab_Booking extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btn_AddServiceActionPerformed
 
-    private void btn_UpdateServiceActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_UpdateServiceActionPerformed
+    private void btn_UpdateServiceActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btn_UpdateServiceActionPerformed
         int selectedRow = table_Cart.getTable().getSelectedRow();
         if (selectedRow != -1 && reservationDetailsList.size() > 0) {
             showServicesDialogAfterClickUpdate(selectedRow, reservationDetailsList);
@@ -1027,7 +1004,7 @@ public class Tab_Booking extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btn_UpdateServiceActionPerformed
 
-    private void btn_DeleteOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DeleteOneActionPerformed
+    private void btn_DeleteOneActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btn_DeleteOneActionPerformed
         int selectedRow = table_Cart.getTable().getSelectedRow();
         if (selectedRow != -1) {
             int modelRow = table_Cart.getTable().convertRowIndexToModel(selectedRow);
@@ -1039,7 +1016,7 @@ public class Tab_Booking extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btn_DeleteOneActionPerformed
 
-    private void btn_DeleteAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DeleteAllActionPerformed
+    private void btn_DeleteAllActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btn_DeleteAllActionPerformed
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa tất cả phòng trong hàng chờ không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             CustomTableButton.CustomTableModel model = table_Cart.getTableModel();
@@ -1048,11 +1025,11 @@ public class Tab_Booking extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btn_DeleteAllActionPerformed
 
-    private void btn_BookingActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_BookingActionPerformed
+    private void btn_BookingActionPerformed(ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_BookingActionPerformed
         bookingRoom();
     }//GEN-LAST:event_btn_BookingActionPerformed
 
-    private void btn_SeeDetailsActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_SeeDetailsActionPerformed
+    private void btn_SeeDetailsActionPerformed(ActionEvent evt) {//GEN-FIRST:event_btn_SeeDetailsActionPerformed
         int seletedRow = table_EntityRoom.getTable().getSelectedRow();
         if (seletedRow != -1) {
             String roomID = table_EntityRoom.getTable().getValueAt(seletedRow, 1).toString();
@@ -1080,48 +1057,48 @@ public class Tab_Booking extends javax.swing.JPanel {
     private ui.components.combobox.StyledComboBox cbx_BookingMethod;
     private ui.components.combobox.StyledComboBox cbx_RangePrice;
     private ui.components.combobox.StyledComboBox cbx_TypeRoom;
-    private javax.swing.JLabel lbl_BookingMethod;
-    private javax.swing.JLabel lbl_Capacity;
-    private javax.swing.JLabel lbl_CartTittle;
-    private javax.swing.JLabel lbl_Checkin;
-    private javax.swing.JLabel lbl_Checkout;
-    private javax.swing.JLabel lbl_CustomerCCCD;
-    private javax.swing.JLabel lbl_CustomerCCCD_Value;
-    private javax.swing.JLabel lbl_CustomerGender;
-    private javax.swing.JLabel lbl_CustomerGender_Value;
-    private javax.swing.JLabel lbl_CustomerName;
-    private javax.swing.JLabel lbl_CustomerName_Value;
-    private javax.swing.JLabel lbl_CustomerPhone;
-    private javax.swing.JLabel lbl_CustomerPhone_Value;
-    private javax.swing.JLabel lbl_Deposit;
-    private javax.swing.JLabel lbl_Deposit_Value;
-    private javax.swing.JLabel lbl_LastTotalPrice;
-    private javax.swing.JLabel lbl_LastTotalPrice_Value;
-    private javax.swing.JLabel lbl_RangePrice;
-    private javax.swing.JLabel lbl_RemainingAmount;
-    private javax.swing.JLabel lbl_RemainingAmount_Value;
-    private javax.swing.JLabel lbl_TypeRoom;
-    private javax.swing.JPanel pnl_BottomService;
-    private javax.swing.JPanel pnl_ButtonActions;
-    private javax.swing.JPanel pnl_Cart;
-    private javax.swing.JPanel pnl_CustomerLeft;
-    private javax.swing.JPanel pnl_CustomerRight;
-    private javax.swing.JPanel pnl_EmptyRoom;
-    private javax.swing.JPanel pnl_InforBooking;
-    private javax.swing.JPanel pnl_InforBookingRoom;
-    private javax.swing.JPanel pnl_InforCustomer;
-    private javax.swing.JPanel pnl_Input_Left_InforBookRoom;
-    private javax.swing.JPanel pnl_Input_Right_InforBookRoom;
-    private javax.swing.JPanel pnl_Label_Left_InforBookRoom;
-    private javax.swing.JPanel pnl_Label_Right_InforBookRoom;
-    private javax.swing.JPanel pnl_Left_InforBookRoom;
-    private javax.swing.JPanel pnl_Left_InforBooking;
-    private javax.swing.JPanel pnl_Right_InforBookRoom;
-    private javax.swing.JPanel pnl_Right_InforBooking;
-    private javax.swing.JPanel pnl_TopCart;
-    private javax.swing.JSpinner spinner_Capacity;
-    private ui.components.table.CustomTableButton table_Cart;
-    private ui.components.table.CustomTableButton table_EntityRoom;
+    private JLabel lbl_BookingMethod;
+    private JLabel lbl_Capacity;
+    private JLabel lbl_CartTittle;
+    private JLabel lbl_Checkin;
+    private JLabel lbl_Checkout;
+    private JLabel lbl_CustomerCCCD;
+    private JLabel lbl_CustomerCCCD_Value;
+    private JLabel lbl_CustomerGender;
+    private JLabel lbl_CustomerGender_Value;
+    private JLabel lbl_CustomerName;
+    private JLabel lbl_CustomerName_Value;
+    private JLabel lbl_CustomerPhone;
+    private JLabel lbl_CustomerPhone_Value;
+    private JLabel lbl_Deposit;
+    private JLabel lbl_Deposit_Value;
+    private JLabel lbl_LastTotalPrice;
+    private JLabel lbl_LastTotalPrice_Value;
+    private JLabel lbl_RangePrice;
+    private JLabel lbl_RemainingAmount;
+    private JLabel lbl_RemainingAmount_Value;
+    private JLabel lbl_TypeRoom;
+    private JPanel pnl_BottomService;
+    private JPanel pnl_ButtonActions;
+    private JPanel pnl_Cart;
+    private JPanel pnl_CustomerLeft;
+    private JPanel pnl_CustomerRight;
+    private JPanel pnl_EmptyRoom;
+    private JPanel pnl_InforBooking;
+    private JPanel pnl_InforBookingRoom;
+    private JPanel pnl_InforCustomer;
+    private JPanel pnl_Input_Left_InforBookRoom;
+    private JPanel pnl_Input_Right_InforBookRoom;
+    private JPanel pnl_Label_Left_InforBookRoom;
+    private JPanel pnl_Label_Right_InforBookRoom;
+    private JPanel pnl_Left_InforBookRoom;
+    private JPanel pnl_Left_InforBooking;
+    private JPanel pnl_Right_InforBookRoom;
+    private JPanel pnl_Right_InforBooking;
+    private JPanel pnl_TopCart;
+    private JSpinner spinner_Capacity;
+    private CustomTableButton table_Cart;
+    private CustomTableButton table_EntityRoom;
     private ui.components.textfield.SearchTextField txt_SearchCustomer;
     // End of variables declaration//GEN-END:variables
 
@@ -1134,15 +1111,23 @@ public class Tab_Booking extends javax.swing.JPanel {
             Date checkinDate = calendar_Checkin.getSelectedDate();
             Date checkoutDate = calendar_Checout.getSelectedDate();
 
+            // Lấy ngày hiện tại và chuẩn hóa về 0h
+            Calendar calendarToday = Calendar.getInstance();
+            calendarToday.set(Calendar.HOUR_OF_DAY, 0);
+            calendarToday.set(Calendar.MINUTE, 0);
+            calendarToday.set(Calendar.SECOND, 0);
+            calendarToday.set(Calendar.MILLISECOND, 0);
+            Date today = calendarToday.getTime();
+
             // Validate ngày nếu có chọn
             if (checkinDate != null && checkoutDate != null && checkinDate.after(checkoutDate)) {
                 JOptionPane.showMessageDialog(this, "Ngày check-out phải sau ngày check-in", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // kiểm tra ngày check in phải bằng hoặc lớn hơn ngày hiện tại
-            if (checkinDate != null && checkinDate.before(new Date())) {
-                JOptionPane.showMessageDialog(this, "Ngày check-in không được nhỏ hơn ngày hiện tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            // Kiểm tra ngày check-in phải bằng hoặc lớn hơn ngày hiện tại
+            if (checkinDate != null && checkinDate.before(today)) {
+                JOptionPane.showMessageDialog(this, "Ngày check-in phải bằng hoặc lớn hơn ngày hiện tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -1156,7 +1141,6 @@ public class Tab_Booking extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-out", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
 
             // Lấy các tham số khác (cho phép null)
             Integer capacity = null;
@@ -1359,7 +1343,8 @@ public class Tab_Booking extends javax.swing.JPanel {
      * Lọc danh sách phòng theo loại phòng đã chọn.
      * @param roomType Loại phòng đã chọn.
      */
-    private void filterRoomsByType(String roomType) throws RemoteException {
+    @SneakyThrows
+    private void filterRoomsByType(String roomType) {
         Date checkIn = calendar_Checkin.getSelectedDate();
         Date checkOut = calendar_Checout.getSelectedDate();
         int capacity = (int) spinner_Capacity.getValue();
@@ -1578,7 +1563,8 @@ public class Tab_Booking extends javax.swing.JPanel {
     /**
      * Xóa tất cả thông tin trong form.
      */
-    private void clear() throws RemoteException {
+    @SneakyThrows
+    private void clear() {
         calendar_Checkin.setSelectedDate(null);
         calendar_Checout.setSelectedDate(null);
         spinner_Capacity.setValue(1);
@@ -1602,7 +1588,8 @@ public class Tab_Booking extends javax.swing.JPanel {
      * Hiển thị hộp thoại chọn dịch vụ.
      * @param row Hàng cần cập nhật dịch vụ.
      */
-    private void showServicesDialog(int row) throws RemoteException {
+    @SneakyThrows
+    private void showServicesDialog(int row) {
         JDialog dialog = new JDialog();
         dialog.setTitle("Chọn dịch vụ");
         dialog.setSize(900, 620);
@@ -1640,7 +1627,8 @@ public class Tab_Booking extends javax.swing.JPanel {
      * @param row Hàng cần cập nhật dịch vụ.
      * @param listReservationDetails Danh sách dịch vụ đã chọn.
      */
-    private void showServicesDialogAfterClickUpdate(int row, List<ReservationDetails> listReservationDetails) throws RemoteException {
+    @SneakyThrows
+    private void showServicesDialogAfterClickUpdate(int row, List<ReservationDetails> listReservationDetails) {
         JDialog dialog = new JDialog();
         dialog.setTitle("Cập nhật dịch vụ đã chọn");
         dialog.setSize(900, 620);
@@ -1887,7 +1875,8 @@ public class Tab_Booking extends javax.swing.JPanel {
         }
     }
 
-    private void showViewDetailsRoom(String roomID) throws RemoteException {
+    @SneakyThrows
+    private void showViewDetailsRoom(String roomID) {
         JDialog dialog = new JDialog();
         dialog.setTitle("Chi tiết phòng");
         dialog.setSize(800, 500);
@@ -1921,7 +1910,7 @@ public class Tab_Booking extends javax.swing.JPanel {
         dialog.setVisible(true);
     }
 
-    private void cancel() throws RemoteException {
+    private void cancel() {
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn hủy không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             table_Cart.getTableModel().clearData();

@@ -186,7 +186,7 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
 
             // Cập nhật trạng thái đặt phòng
             reservation.setRemainingAmount(0);
-            reservation.setReservationStatus(1); // Đã thanh toán
+            reservation.setStatus(true); // Đã thanh toán
             reservationDAO.update(reservation);
 
             paymentSuccessful = true;

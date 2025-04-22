@@ -330,7 +330,8 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                     "LEFT JOIN FETCH r.room rt " +
                     "LEFT JOIN FETCH rt.roomType " +
                     "LEFT JOIN FETCH r.reservationDetails rd " +
-                    "LEFT JOIN FETCH rd.service";
+                    "LEFT JOIN FETCH rd.service " +
+                    "WHERE r.status = false";
             TypedQuery<Reservation> query = em.createQuery(jpql, Reservation.class);
             return query.getResultList();
         } catch (Exception e) {
