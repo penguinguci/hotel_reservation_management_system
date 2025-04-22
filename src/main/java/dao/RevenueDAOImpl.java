@@ -3,6 +3,7 @@ package dao;
 import entities.Orders;
 import entities.OrderDetails;
 import entities.PaymentMethod;
+import interfaces.RevenueDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -12,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class RevenueDAOImpl {
+public class RevenueDAOImpl implements RevenueDAO {
 
     private EntityManager em;
 
@@ -23,6 +24,7 @@ public class RevenueDAOImpl {
         }
     }
 
+    @Override
     public List<Double> getQuarterlyRevenue(int year) {
         List<Double> quarterlyRevenue = new ArrayList<>(Collections.nCopies(4, 0.0));
         String jpql = "SELECT FUNCTION('QUARTER', o.orderDate) AS quarter, " +
@@ -44,6 +46,7 @@ public class RevenueDAOImpl {
         return quarterlyRevenue;
     }
 
+    @Override
     public List<Double> getYearlyRevenue() {
         List<Double> yearlyRevenue = new ArrayList<>(Collections.nCopies(3, 0.0));
         String jpql = "SELECT FUNCTION('YEAR', o.orderDate) AS year, " +
@@ -64,6 +67,7 @@ public class RevenueDAOImpl {
         return yearlyRevenue;
     }
 
+    @Override
     public double getRoomRevenueByDateRange1(Date startDate, Date endDate) {
         String jpql = "SELECT SUM((r.price * o.numberOfNights) + o.taxAmount + COALESCE(o.overstayFee, 0)) " +
                 "FROM Orders o JOIN o.room r " +
@@ -76,6 +80,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public double getTotalRevenueByDateRange(Date startDate, Date endDate) {
         String jpql = "SELECT SUM(o.totalPrice + o.taxAmount + o.serviceFee + COALESCE(o.overstayFee, 0)) " +
                 "FROM Orders o " +
@@ -88,6 +93,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public List<Double> getMonthlyRevenue(int year) {
         List<Double> monthlyRevenue = new ArrayList<>(Collections.nCopies(12, 0.0));
         String jpql = "SELECT FUNCTION('MONTH', o.orderDate) AS month, " +
@@ -109,6 +115,7 @@ public class RevenueDAOImpl {
         return monthlyRevenue;
     }
 
+    @Override
     public double getTotalRevenue(int year) {
         String jpql = "SELECT SUM(o.totalPrice + o.taxAmount + o.serviceFee + COALESCE(o.overstayFee, 0)) " +
                 "FROM Orders o " +
@@ -120,6 +127,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public double getServiceRevenue(int year) {
         String jpql = "SELECT SUM(od.lineTotalAmount) " +
                 "FROM OrderDetails od JOIN od.orders o " +
@@ -131,6 +139,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public double getRoomRevenue(int year) {
         String jpql = "SELECT SUM((r.price * o.numberOfNights) + o.taxAmount + COALESCE(o.overstayFee, 0)) " +
                 "FROM Orders o JOIN o.room r " +
@@ -142,6 +151,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public List<String> getRoomLabels(int year) {
         String jpql = "SELECT DISTINCT r.id " +
                 "FROM Room r JOIN Orders o ON r.id = o.room.id " +
@@ -152,6 +162,7 @@ public class RevenueDAOImpl {
         return labels.isEmpty() ? List.of("Không có phòng") : labels;
     }
 
+    @Override
     public double getTotalRevenueByMonth(int year, int month) {
         String jpql = "SELECT SUM(o.totalPrice + o.taxAmount + o.serviceFee + COALESCE(o.overstayFee, 0)) " +
                 "FROM Orders o " +
@@ -164,6 +175,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public double getServiceRevenueByMonth(int year, int month) {
         String jpql = "SELECT SUM(od.lineTotalAmount) " +
                 "FROM OrderDetails od JOIN od.orders o " +
@@ -176,6 +188,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public double getRoomRevenueByMonth(int year, int month) {
         String jpql = "SELECT SUM((r.price * o.numberOfNights) + o.taxAmount + COALESCE(o.overstayFee, 0)) " +
                 "FROM Orders o JOIN o.room r " +
@@ -188,6 +201,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public double getTotalRevenueByQuarter(int year, int quarter) {
         int startMonth = (quarter - 1) * 3 + 1;
         int endMonth = quarter * 3;
@@ -203,6 +217,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public double getServiceRevenueByQuarter(int year, int quarter) {
         int startMonth = (quarter - 1) * 3 + 1;
         int endMonth = quarter * 3;
@@ -218,6 +233,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public double getRoomRevenueByQuarter(int year, int quarter) {
         int startMonth = (quarter - 1) * 3 + 1;
         int endMonth = quarter * 3;
@@ -233,6 +249,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public List<Integer> getAvailableYears() {
         String jpql = "SELECT DISTINCT FUNCTION('YEAR', o.orderDate) FROM Orders o ORDER BY FUNCTION('YEAR', o.orderDate)";
         Query query = em.createQuery(jpql);
@@ -242,6 +259,7 @@ public class RevenueDAOImpl {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public List<Double> getMonthlyTotalRevenue(int year) {
         List<Double> monthlyRevenue = new ArrayList<>(Collections.nCopies(12, 0.0));
         String jpql = "SELECT FUNCTION('MONTH', o.orderDate) AS month, " +
@@ -264,6 +282,7 @@ public class RevenueDAOImpl {
         return monthlyRevenue;
     }
 
+    @Override
     public List<Double> getMonthlyRoomRevenue(int year) {
         List<Double> monthlyRevenue = new ArrayList<>(Collections.nCopies(12, 0.0));
         String jpql = "SELECT FUNCTION('MONTH', o.orderDate) AS month, " +
@@ -286,6 +305,7 @@ public class RevenueDAOImpl {
         return monthlyRevenue;
     }
 
+    @Override
     public List<Double> getMonthlyServiceRevenue(int year) {
         List<Double> monthlyRevenue = new ArrayList<>(Collections.nCopies(12, 0.0));
         String jpql = "SELECT FUNCTION('MONTH', o.orderDate) AS month, SUM(od.lineTotalAmount) " +
@@ -307,6 +327,7 @@ public class RevenueDAOImpl {
         return monthlyRevenue;
     }
 
+    @Override
     public List<Double> getYearlyRoomRevenue() {
         List<Double> yearlyRevenue = new ArrayList<>(Collections.nCopies(3, 0.0));
         String jpql = "SELECT FUNCTION('YEAR', o.orderDate) AS year, " +
@@ -328,6 +349,7 @@ public class RevenueDAOImpl {
         return yearlyRevenue;
     }
 
+    @Override
     public List<Double> getYearlyServiceRevenue() {
         List<Double> yearlyRevenue = new ArrayList<>(Collections.nCopies(3, 0.0));
         String jpql = "SELECT FUNCTION('YEAR', o.orderDate) AS year, SUM(od.lineTotalAmount) " +
@@ -348,6 +370,7 @@ public class RevenueDAOImpl {
         return yearlyRevenue;
     }
 
+    @Override
     public List<Double> getQuarterlyRoomRevenue(int year) {
         List<Double> quarterlyRevenue = new ArrayList<>(Collections.nCopies(4, 0.0));
         String jpql = "SELECT FUNCTION('QUARTER', o.orderDate) AS quarter, " +
@@ -370,6 +393,7 @@ public class RevenueDAOImpl {
         return quarterlyRevenue;
     }
 
+    @Override
     public List<Double> getQuarterlyServiceRevenue(int year) {
         List<Double> quarterlyRevenue = new ArrayList<>(Collections.nCopies(4, 0.0));
         String jpql = "SELECT FUNCTION('QUARTER', o.orderDate) AS quarter, SUM(od.lineTotalAmount) " +
@@ -391,6 +415,7 @@ public class RevenueDAOImpl {
         return quarterlyRevenue;
     }
 
+    @Override
     public List<Double> getRevenueByDateRange(Date startDate, Date endDate) {
         List<Double> revenueData = new ArrayList<>();
         List<String> labels = getDateRangeLabels(startDate, endDate);
@@ -492,6 +517,7 @@ public class RevenueDAOImpl {
         return revenueData;
     }
 
+    @Override
     public double getServiceRevenueByDateRange1(Date startDate, Date endDate) {
         String jpql = "SELECT SUM(od.lineTotalAmount) " +
                 "FROM OrderDetails od JOIN od.orders o " +
@@ -504,6 +530,7 @@ public class RevenueDAOImpl {
         return result != null ? result : 0.0;
     }
 
+    @Override
     public List<String> getDateRangeLabels(Date startDate, Date endDate) {
         List<String> labels = new ArrayList<>();
         SimpleDateFormat dayFormat = new SimpleDateFormat("dd/MM");
@@ -539,6 +566,7 @@ public class RevenueDAOImpl {
         return labels;
     }
 
+    @Override
     public List<Double> getRoomRevenueByDateRange(Date startDate, Date endDate) {
         List<Double> revenueData = new ArrayList<>();
         List<String> labels = getDateRangeLabels(startDate, endDate);
@@ -640,6 +668,7 @@ public class RevenueDAOImpl {
         return revenueData;
     }
 
+    @Override
     public List<Double> getServiceRevenueByDateRange(Date startDate, Date endDate) {
         List<Double> revenueData = new ArrayList<>();
         List<String> labels = getDateRangeLabels(startDate, endDate);
@@ -738,7 +767,9 @@ public class RevenueDAOImpl {
         return revenueData;
     }
 
+
     // New method: Get total revenue by order status
+    @Override
     public Map<Integer, Double> getRevenueByStatus(int year) {
         String jpql = "SELECT o.status, SUM(o.totalPrice + o.taxAmount + o.serviceFee + COALESCE(o.overstayFee, 0)) " +
                 "FROM Orders o " +
@@ -760,6 +791,7 @@ public class RevenueDAOImpl {
     }
 
     // New method: Get total revenue by payment method
+    @Override
     public Map<PaymentMethod, Double> getRevenueByPaymentMethod(int year) {
         String jpql = "SELECT o.paymentMethod, SUM(o.totalPrice + o.taxAmount + o.serviceFee + COALESCE(o.overstayFee, 0)) " +
                 "FROM Orders o " +
@@ -781,6 +813,7 @@ public class RevenueDAOImpl {
     }
 
     // New method: Get breakdown of fees (tax, service fee, overstay fee) by year
+    @Override
     public Map<String, Double> getFeeBreakdown(int year) {
         String jpql = "SELECT SUM(o.taxAmount), SUM(o.serviceFee), SUM(COALESCE(o.overstayFee, 0)) " +
                 "FROM Orders o " +
@@ -797,6 +830,7 @@ public class RevenueDAOImpl {
     }
 
     // New method: Get monthly breakdown of fees
+    @Override
     public List<Map<String, Double>> getMonthlyFeeBreakdown(int year) {
         List<Map<String, Double>> monthlyBreakdown = new ArrayList<>();
         for (int i = 0; i < 12; i++) {

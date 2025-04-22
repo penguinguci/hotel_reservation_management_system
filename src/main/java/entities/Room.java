@@ -8,6 +8,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.collection.spi.PersistentCollection;
 
+import java.io.Serializable;
 import java.util.*;
 
 @Data
@@ -15,7 +16,7 @@ import java.util.*;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "rooms")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Room {
+public class Room implements Serializable {
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "room_id")

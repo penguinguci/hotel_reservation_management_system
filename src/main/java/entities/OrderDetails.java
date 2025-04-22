@@ -5,11 +5,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @Data
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "order_details")
-public class OrderDetails {
+public class OrderDetails implements Serializable {
     @Id
     @EqualsAndHashCode.Include
     @ManyToOne

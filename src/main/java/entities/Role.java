@@ -1,6 +1,8 @@
 package entities;
 
-public enum Role {
+import java.io.Serializable;
+
+public enum Role implements Serializable {
     STAFF("Nhân viên lễ tân"), MANAGER("Nhân viên quản lý");
 
     private String roleName;
