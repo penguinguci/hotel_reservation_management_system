@@ -26,4 +26,10 @@ public class UpdatePasswords {
         em.close();
         emf.close();
     }
+
+    public static void main(String[] args) {
+        UpdatePasswords updatePasswords = new UpdatePasswords();
+        updatePasswords.HashedPassword();
+        System.out.println("Mật khẩu đã được mã hóa thành công!");
+    }
 }

@@ -72,7 +72,7 @@ INSERT INTO phones (staff_id, phones) VALUES
 -- 9. Thêm dữ liệu vào accounts
 INSERT INTO accounts (username, password, role, staff_id)
 VALUES
-    ('manager', '$2a$10$xJwL5v5Jz5U5Z5e5v5e5ve5v5e5v5e5v5e5v5e5v5e5v5e5v5e5v', 'MANAGER', 'ST001'),
+        ('manager', '$2a$10$xJwL5v5Jz5U5Z5e5v5e5ve5v5e5v5e5v5e5v5e5v5e5v5e5v5e5v', 'MANAGER', 'ST001'),
     ('staff1', '$2a$10$xJwL5v5Jz5U5Z5e5v5e5ve5v5e5v5e5v5e5v5e5v5e5v5e5v5e5v', 'STAFF', 'ST002'),
     ('staff2', '$2a$10$xJwL5v5Jz5U5Z5e5v5e5ve5v5e5v5e5v5e5v5e5v5e5v5e5v5e5v', 'STAFF', 'ST003'),
     ('staff3', '$2a$10$xJwL5v5Jz5U5Z5e5v5e5ve5v5e5v5e5v5e5v5e5v5e5v5e5v5e5v', 'STAFF', 'ST004'),
