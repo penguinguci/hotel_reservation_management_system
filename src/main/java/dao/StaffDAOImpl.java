@@ -170,4 +170,22 @@ public class StaffDAOImpl extends GenericDAOImpl<Staff, String> implements Staff
             throw new RuntimeException("Error counting by prefix", e);
         }
     }
+    @Override
+    public void updateStatus(String staffId, boolean status) throws RemoteException {
+        EntityTransaction transaction = em.getTransaction();
+        try {
+            transaction.begin();
+            Staff staff = em.find(Staff.class, staffId);
+            if (staff != null) {
+                staff.setStatus(status);
+                em.merge(staff);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            throw e;
+        }
+    }
 }
