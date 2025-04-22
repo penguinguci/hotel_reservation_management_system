@@ -8,5 +8,6 @@
     <file url="file://$PROJECT_DIR$/scripts/database_test_v4.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/scripts/database_test_v5.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/scripts/hotel_reservation_management.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/scripts/index_search.sql" dialect="GenericSQL" />
   </component>
 </project>
