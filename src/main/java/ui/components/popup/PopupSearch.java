@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +53,11 @@ public class PopupSearch implements Serializable {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 1 && suggestionList.getSelectedIndex() >= 0) {
-                    selectSuggestion(suggestionList.getSelectedValue());
+                    try {
+                        selectSuggestion(suggestionList.getSelectedValue());
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     ensureFocus();
                 }
             }
@@ -103,7 +108,7 @@ public class PopupSearch implements Serializable {
         focusTimer.start();
     }
 
-    public void selectSuggestion(String suggestion) {
+    public void selectSuggestion(String suggestion) throws RemoteException {
         popupMenu.setVisible(false);
         if (suggestionListener != null) {
             suggestionListener.onSuggestionSelected(suggestion);
@@ -180,6 +185,6 @@ public class PopupSearch implements Serializable {
     }
 
     public interface SuggestionListener {
-        void onSuggestionSelected(String suggestion);
+        void onSuggestionSelected(String suggestion) throws RemoteException;
     }
 }

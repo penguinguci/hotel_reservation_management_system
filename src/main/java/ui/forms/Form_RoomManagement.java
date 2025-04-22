@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.rmi.RemoteException;
 import java.util.*;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class Form_RoomManagement extends JPanel {
     Tab_RoomTypeManagement tabRTM = new Tab_RoomTypeManagement();
     Tab_ServicesManagement tabSM = new Tab_ServicesManagement();
 
-    public Form_RoomManagement() {
+    public Form_RoomManagement() throws RemoteException {
         initComponents();
         initializeTableModels();
         loadRoomTypes();
@@ -141,14 +142,22 @@ public class Form_RoomManagement extends JPanel {
         btnAdd.setText("Thêm");
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddActionPerformed(evt);
+                try {
+                    btnAddActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
         btnUpdate.setText("Cập nhật");
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUpdateActionPerformed(evt);
+                try {
+                    btnUpdateActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -157,7 +166,11 @@ public class Form_RoomManagement extends JPanel {
         btnReset.setText("Làm mới");
         btnReset.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetActionPerformed(evt);
+                try {
+                    btnResetActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -462,7 +475,11 @@ public class Form_RoomManagement extends JPanel {
         btnResetAmentity.setText("Làm mới");
         btnResetAmentity.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetAmentityActionPerformed(evt);
+                try {
+                    btnResetAmentityActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -572,7 +589,7 @@ public class Form_RoomManagement extends JPanel {
     private void cb_RoomTypeActionPerformed(ActionEvent evt) {
     }
 
-    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
         String newRoomId = generateRoomId();
         if (newRoomId == null) {
             JOptionPane.showMessageDialog(this, "Không thể sinh mã phòng mới! Đã đạt giới hạn mã phòng (R999).");
@@ -630,7 +647,7 @@ public class Form_RoomManagement extends JPanel {
         }
     }
 
-    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
         if (selectedRoom == null) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một phòng để cập nhật!");
             return;
@@ -676,7 +693,7 @@ public class Form_RoomManagement extends JPanel {
         }
     }
 
-    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnResetActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
         String newRoomId = generateRoomId();
         if (newRoomId == null) {
             JOptionPane.showMessageDialog(this, "Không thể sinh mã phòng mới! Đã đạt giới hạn mã phòng (R999).");
@@ -773,7 +790,7 @@ public class Form_RoomManagement extends JPanel {
         }
     }
 
-    private void btnResetAmentityActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnResetAmentityActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
         jTextArea1.setText("");
         updateAmenitiesTable(selectedRoom != null ? selectedRoom.getAmenities() : null);
         loadRoomData();
@@ -785,7 +802,7 @@ public class Form_RoomManagement extends JPanel {
         ((DefaultTableModel) customTable1.getModel()).setRowCount(0);
     }
 
-    private void loadRoomTypes() {
+    private void loadRoomTypes() throws RemoteException {
         List<RoomType> roomTypes = roomTypeDAO.getAllRoomTypes();
         cb_RoomType.removeAllItems();
         cb_RoomTypeSearch.removeAllItems();
@@ -831,7 +848,7 @@ public class Form_RoomManagement extends JPanel {
         }
     }
 
-    public void loadRoomData() {
+    public void loadRoomData() throws RemoteException {
         List<Room> rooms = roomDAO.getAllRooms();
         updateRoomTable(rooms);
         cb_Status.removeAllItems();
@@ -862,7 +879,11 @@ public class Form_RoomManagement extends JPanel {
                 int selectedRow = customTable.getSelectedRow();
                 if (selectedRow >= 0) {
                     String roomId = (String) customTable.getValueAt(selectedRow, 0);
-                    selectedRoom = roomDAO.findById(roomId);
+                    try {
+                        selectedRoom = roomDAO.findById(roomId);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     if (selectedRoom != null) {
                         txtRoomName.setText(selectedRoom.getRoomId());
                         txtPosition.setText(valueOf(selectedRoom.getFloor()));
@@ -896,10 +917,34 @@ public class Form_RoomManagement extends JPanel {
                 }
             }
         });
-        cb_Status.addActionListener(e -> searchRooms());
-        cb_RoomType.addActionListener(e -> searchRooms());
-        cb_Price.addActionListener(e -> searchRooms());
-        cb_Position.addActionListener(e -> searchRooms());
+        cb_Status.addActionListener(e -> {
+            try {
+                searchRooms();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        cb_RoomType.addActionListener(e -> {
+            try {
+                searchRooms();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        cb_Price.addActionListener(e -> {
+            try {
+                searchRooms();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        cb_Position.addActionListener(e -> {
+            try {
+                searchRooms();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     void updateAmenitiesTable(List<String> amenities) {
@@ -916,14 +961,14 @@ public class Form_RoomManagement extends JPanel {
         customTable1.revalidate();
     }
 
-    void loadAmenityData() {
+    void loadAmenityData() throws RemoteException {
         if (selectedRoom != null) {
             loadRoomData();
             setupListeners();
         }
     }
 
-    private void searchRooms() {
+    private void searchRooms() throws RemoteException {
         Map<String, Object> criteria = new HashMap<>();
 
         String priceFilter = (String) cb_Price.getSelectedItem();
@@ -976,7 +1021,7 @@ public class Form_RoomManagement extends JPanel {
         updateRoomTable(rooms);
     }
 
-    private String generateRoomId() {
+    private String generateRoomId() throws RemoteException {
         List<Room> rooms = roomDAO.getAllRooms();
         int maxNumber = 0;
 
@@ -1068,6 +1113,8 @@ public class Form_RoomManagement extends JPanel {
             JOptionPane.showMessageDialog(this, "Tầng phải là số nguyên hợp lệ!");
             txtPosition.requestFocus();
             return false;
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
         }
 
         if (!capacityText.isEmpty()) {

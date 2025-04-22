@@ -15,6 +15,7 @@ import java.util.Date;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "reservation_details")
 public class ReservationDetails implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @EqualsAndHashCode.Include
     @ManyToOne

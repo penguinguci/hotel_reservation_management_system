@@ -9,16 +9,23 @@ import jakarta.persistence.TypedQuery;
 import lombok.AllArgsConstructor;
 import utils.AppUtil;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-public class StaffDAOImpl extends GenericDAOImpl<Staff, String> implements StaffDAO {
+public class StaffDAOImpl extends GenericDAOImpl<Staff, String> implements StaffDAO, Serializable, Remote {
+    private static final long serialVersionUID = 1L;
     private EntityManager em;
 
-    public StaffDAOImpl () {
+    public StaffDAOImpl () throws RemoteException {
         super(Staff.class);
+
         em = AppUtil.getEntityManager();
     }
+
 
     // create
     public boolean create(Staff staff) {

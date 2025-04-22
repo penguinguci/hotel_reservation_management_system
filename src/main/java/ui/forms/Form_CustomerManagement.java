@@ -402,7 +402,11 @@ public class Form_CustomerManagement extends javax.swing.JPanel implements ListS
         btn_Search.setText("Tìm kiếm");
         btn_Search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_SearchActionPerformed(evt);
+                try {
+                    btn_SearchActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -462,7 +466,11 @@ public class Form_CustomerManagement extends javax.swing.JPanel implements ListS
         btn_Import.setText("Import");
         btn_Import.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_ImportActionPerformed(evt);
+                try {
+                    btn_ImportActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
         pnl_GroupButton.add(btn_Import);
@@ -528,7 +536,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel implements ListS
         update();
     }//GEN-LAST:event_btn_UpdateActionPerformed
 
-    private void btn_ImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ImportActionPerformed
+    private void btn_ImportActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_ImportActionPerformed
         importData();
     }//GEN-LAST:event_btn_ImportActionPerformed
 
@@ -536,8 +544,12 @@ public class Form_CustomerManagement extends javax.swing.JPanel implements ListS
         exportData();
     }//GEN-LAST:event_btn_ExportActionPerformed
 
-    private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
-        search();
+    private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_SearchActionPerformed
+        try {
+            search();
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
     }//GEN-LAST:event_btn_SearchActionPerformed
 
     private void btn_ClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ClearActionPerformed
@@ -793,7 +805,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel implements ListS
     }
 
     // Search customer
-    private void search() {
+    private void search() throws RemoteException {
         String id = txt_IDSearch.getText().trim();
         String name = txt_NameSearch.getText().trim();
         String phone = txt_PhoneSearch.getText().trim();
@@ -837,7 +849,7 @@ public class Form_CustomerManagement extends javax.swing.JPanel implements ListS
     }
 
     // Import
-    private void importData() {
+    private void importData() throws RemoteException {
         CustomerDAO customerDAO = new CustomerDAOImpl();
 
         boolean success =  ExcelUtil.importFromExcel(this, row -> {

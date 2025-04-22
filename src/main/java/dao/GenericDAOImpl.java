@@ -6,23 +6,30 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import utils.AppUtil;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-public class GenericDAOImpl<T, ID> implements GenericDAO<T, ID> {
+public class GenericDAOImpl<T, ID> extends UnicastRemoteObject  implements GenericDAO<T, ID>, Serializable {
+    private static final long serialVersionUID = 1L;
     private final EntityManager em;
     private final Class<T> entityClass;
 
-    public GenericDAOImpl(EntityManager em, Class<T> entityClass) {
+    public GenericDAOImpl(EntityManager em, Class<T> entityClass) throws RemoteException {
+        super();
         this.em = em;
         this.entityClass = entityClass;
     }
 
-    public GenericDAOImpl(Class<T> entityClass) {
+    public GenericDAOImpl(Class<T> entityClass) throws RemoteException {
+        super();
         this.em = AppUtil.getEntityManager();
         this.entityClass = entityClass;
     }
 
-    public GenericDAOImpl() {
+    public GenericDAOImpl() throws RemoteException {
+        super();
         this.em = AppUtil.getEntityManager();
         this.entityClass = null;
     }

@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  *
  * @author TRAN LONG VU
  */
-public class Tab_BookingByTime extends javax.swing.JPanel {
+public class Tab_BookingByTime extends javax.swing.JPanel  {
     private Timer debounceTimer;
     private static final int DEBOUNCE_DELAY = 300;
     private CustomerDAO customerDAO;
@@ -61,7 +61,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
     /**
      * Creates new form Tab_Booking
      */
-    public Tab_BookingByTime() {
+    public Tab_BookingByTime() throws RemoteException {
         customerDAO = new CustomerDAOImpl();
         roomDAO = new RoomDAOImpl();
         initComponents();
@@ -221,7 +221,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         });
     }
 
-    private void initializeRoomTypeComboBox() {
+    private void initializeRoomTypeComboBox() throws RemoteException {
         RoomTypesDAO roomTypesDAO = new RoomTypeDAOImpl();
         List<RoomType> roomTypes = roomTypesDAO.getAllRoomTypes();
 
@@ -239,13 +239,17 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     String selectedType = (String) cbx_TypeRoom.getSelectedItem();
-                    filterRoomsByType(selectedType);
+                    try {
+                        filterRoomsByType(selectedType);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         });
     }
 
-    private void initializePriceRangeComboBox() {
+    private void initializePriceRangeComboBox() throws RemoteException {
         RoomDAO roomDAO = new RoomDAOImpl();
         List<Room> allRooms = roomDAO.findAll();
         List<String> priceRanges = generateSmartPriceRanges(allRooms);
@@ -358,7 +362,11 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
                         break;
                     case KeyEvent.VK_ENTER:
                         if (selectedIndex >= 0 && selectedIndex < suggestions.size()) {
-                            popupSearchCustomer.selectSuggestion(suggestions.get(selectedIndex));
+                            try {
+                                popupSearchCustomer.selectSuggestion(suggestions.get(selectedIndex));
+                            } catch (RemoteException ex) {
+                                throw new RuntimeException(ex);
+                            }
                         }
                         e.consume();
                         break;
@@ -411,7 +419,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         });
     }
 
-    private void initDataTableEntity() {
+    private void initDataTableEntity() throws RemoteException {
         List<Room> rooms = roomDAO.findAll();
         Date checkInDate = DateUtil.combineDateAndTime(calendar_Checkin.getSelectedDate(), timePicker_Checkin.getTime());
         displayHourlyRoomsInTable(rooms, checkInDate);
@@ -697,7 +705,11 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         btn_Clear.setText("Xóa trắng");
         btn_Clear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_ClearActionPerformed(evt);
+                try {
+                    btn_ClearActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -740,7 +752,11 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         btn_SeeDetails.setText("Xem chi tiết");
         btn_SeeDetails.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_SeeDetailsActionPerformed(evt);
+                try {
+                    btn_SeeDetailsActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -856,7 +872,11 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         btn_Cancel.setText("Hủy");
         btn_Cancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_CancelActionPerformed(evt);
+                try {
+                    btn_CancelActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -895,14 +915,22 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         btn_AddService.setText("Thêm dịch vụ");
         btn_AddService.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_AddServiceActionPerformed(evt);
+                try {
+                    btn_AddServiceActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
         btn_UpdateService.setText("Sửa dịch vụ");
         btn_UpdateService.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_UpdateServiceActionPerformed(evt);
+                try {
+                    btn_UpdateServiceActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -1048,7 +1076,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         add(pnl_InforBooking, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 310, 480, 260));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_CancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_CancelActionPerformed
+    private void btn_CancelActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_CancelActionPerformed
         cancel();
     }//GEN-LAST:event_btn_CancelActionPerformed
 
@@ -1068,11 +1096,11 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_SearchCustomerMouseClicked
 
-    private void btn_ClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ClearActionPerformed
+    private void btn_ClearActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_ClearActionPerformed
         clear();
     }//GEN-LAST:event_btn_ClearActionPerformed
 
-    private void btn_AddServiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddServiceActionPerformed
+    private void btn_AddServiceActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_AddServiceActionPerformed
         int selectedRow = table_Cart.getTable().getSelectedRow();
         if (selectedRow != -1) {
             showServicesDialog(selectedRow);
@@ -1081,7 +1109,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btn_AddServiceActionPerformed
 
-    private void btn_UpdateServiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_UpdateServiceActionPerformed
+    private void btn_UpdateServiceActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_UpdateServiceActionPerformed
         int selectedRow = table_Cart.getTable().getSelectedRow();
         if (selectedRow != -1 && reservationDetailsList.size() > 0) {
             showServicesDialogAfterClickUpdate(selectedRow, reservationDetailsList);
@@ -1117,7 +1145,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         bookingRoomHourlyReservation();
     }//GEN-LAST:event_btn_BookingActionPerformed
 
-    private void btn_SeeDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SeeDetailsActionPerformed
+    private void btn_SeeDetailsActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_SeeDetailsActionPerformed
         int seletedRow = table_EntityRoom.getTable().getSelectedRow();
         if (seletedRow != -1) {
             String roomID = table_EntityRoom.getTable().getValueAt(seletedRow, 1).toString();
@@ -1268,7 +1296,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
      * Lọc danh sách phòng theo loại phòng đã chọn.
      * @param roomType Loại phòng đã chọn.
      */
-    private void filterRoomsByType(String roomType) {
+    private void filterRoomsByType(String roomType) throws RemoteException {
         Date checkIn = calendar_Checkin.getSelectedDate();
         Date checkOut = calendar_Checkout.getSelectedDate();
         int capacity = (int) spinner_Capacity.getValue();
@@ -1362,7 +1390,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
     /**
      * Xóa tất cả thông tin trong form.
      */
-    private void clear() {
+    private void clear() throws RemoteException {
         calendar_Checkin.setSelectedDate(null);
         calendar_Checkout.setSelectedDate(null);
         spinner_Capacity.setValue(1);
@@ -1387,7 +1415,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
      * Hiển thị hộp thoại chọn dịch vụ.
      * @param row Hàng cần cập nhật dịch vụ.
      */
-    private void showServicesDialog(int row) {
+    private void showServicesDialog(int row) throws RemoteException {
         JDialog dialog = new JDialog();
         dialog.setTitle("Chọn dịch vụ");
         dialog.setSize(900, 620);
@@ -1425,7 +1453,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
      * @param row Hàng cần cập nhật dịch vụ.
      * @param listReservationDetails Danh sách dịch vụ đã chọn.
      */
-    private void showServicesDialogAfterClickUpdate(int row, List<ReservationDetails> listReservationDetails) {
+    private void showServicesDialogAfterClickUpdate(int row, List<ReservationDetails> listReservationDetails) throws RemoteException {
         JDialog dialog = new JDialog();
         dialog.setTitle("Cập nhật dịch vụ đã chọn");
         dialog.setSize(900, 620);
@@ -1537,7 +1565,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         }
     }
 
-    private void showViewDetailsRoom(String roomID) {
+    private void showViewDetailsRoom(String roomID) throws RemoteException {
         JDialog dialog = new JDialog();
         dialog.setTitle("Chi tiết phòng");
         dialog.setSize(800, 500);
@@ -1562,7 +1590,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel {
         dialog.setVisible(true);
     }
 
-    private void cancel() {
+    private void cancel() throws RemoteException {
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn hủy không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             table_Cart.getTableModel().clearData();

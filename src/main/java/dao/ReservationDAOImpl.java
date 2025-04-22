@@ -8,14 +8,17 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 import utils.AppUtil;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> implements ReservationDAO {
+public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> implements ReservationDAO, Serializable {
+    private static final long serialVersionUID = 1L;
     EntityManager em;
 
-    public ReservationDAOImpl() {
+    public ReservationDAOImpl() throws RemoteException {
         super(Reservation.class);
         em = AppUtil.getEntityManager();
     }

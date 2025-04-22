@@ -9,15 +9,20 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import utils.AppUtil;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class RevenueDAOImpl implements RevenueDAO {
+public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private EntityManager em;
 
-    public RevenueDAOImpl() {
+    public RevenueDAOImpl() throws RemoteException {
+        super();
         this.em = AppUtil.getEntityManager();
         if (em == null) {
             throw new IllegalStateException("EntityManager không thể khởi tạo");

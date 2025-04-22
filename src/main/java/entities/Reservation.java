@@ -16,6 +16,7 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "reservations")
 public class Reservation implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "reservation_id")

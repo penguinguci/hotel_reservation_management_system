@@ -6,6 +6,9 @@ import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import utils.AppUtil;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,10 +17,12 @@ import java.util.List;
 /**
  * @author Lenovo
  */
-public class AmountCustomerDAOImpl implements AmountCustomerDAO {
+public class AmountCustomerDAOImpl extends UnicastRemoteObject implements AmountCustomerDAO, Serializable {
+    private static final long serialVersionUID = 1L;
     private EntityManager em;
 
-    public AmountCustomerDAOImpl() {
+    public AmountCustomerDAOImpl() throws RemoteException {
+        super();
         this.em = AppUtil.getEntityManager();
         if (em == null) {
             throw new IllegalStateException("EntityManager không thể khởi tạo");

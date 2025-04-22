@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.rmi.RemoteException;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
     private RoomType selectedRoomType;
     private DefaultTableModel tableModel;
 
-    public Tab_RoomTypeManagement() {
+    public Tab_RoomTypeManagement() throws RemoteException {
         roomTypeDAO = new RoomTypeDAOImpl();
         initComponents();
 
@@ -182,7 +183,11 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
         btnAddType.setText("Thêm");
         btnAddType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddTypeActionPerformed(evt);
+                try {
+                    btnAddTypeActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -198,7 +203,11 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
         btnResetType.setText("Làm mới");
         btnResetType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetTypeActionPerformed(evt);
+                try {
+                    btnResetTypeActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -301,7 +310,7 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_customRoundedTextField2ActionPerformed
 
-    private void btnAddTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddTypeActionPerformed
+    private void btnAddTypeActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btnAddTypeActionPerformed
         // TODO add your handling code here:
         String typeId = generateNewTypeId();
         customRoundedTextField1.setText(typeId); // Hiển thị mã loại mới trên giao diện
@@ -368,7 +377,7 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnUpdateTypeActionPerformed
 
-    private void btnResetTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetTypeActionPerformed
+    private void btnResetTypeActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btnResetTypeActionPerformed
         // TODO add your handling code here:
         clearFields();
         loadRoomTypes();
@@ -379,7 +388,7 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_btnExitActionPerformed
 
-    private void loadRoomTypes() {
+    private void loadRoomTypes() throws RemoteException {
         List<RoomType> roomTypes = roomTypeDAO.findAll();
         tableModel.setRowCount(0); // Xóa dữ liệu cũ
         for (RoomType roomType : roomTypes) {
@@ -399,7 +408,11 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
                 int selectedRow = customTableButton1.getTable().getSelectedRow();
                 if (selectedRow >= 0) {
                     String typeId = (String) customTableButton1.getTable().getValueAt(selectedRow, 0);
-                    selectedRoomType = roomTypeDAO.findById(typeId);
+                    try {
+                        selectedRoomType = roomTypeDAO.findById(typeId);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     if (selectedRoomType != null) {
                         customRoundedTextField1.setText(selectedRoomType.getTypeID());
                         customRoundedTextField2.setText(selectedRoomType.getTypeName());
@@ -418,7 +431,7 @@ public class Tab_RoomTypeManagement extends javax.swing.JFrame {
         selectedRoomType = null;
         customTableButton1.getTable().clearSelection();
     }
-    private String generateNewTypeId() {
+    private String generateNewTypeId() throws RemoteException {
         List<RoomType> roomTypes = roomTypeDAO.findAll();
         int maxNumber = 0;
 

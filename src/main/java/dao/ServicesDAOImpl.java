@@ -6,9 +6,12 @@ import jakarta.persistence.*;
 import org.hibernate.Session;
 import utils.AppUtil;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.List;
 
-public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements ServicesDAO {
+public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements ServicesDAO, Serializable {
+    private static final long serialVersionUID = 1L;
 
     @PersistenceContext
     private EntityManagerFactory entityManagerFactory;
@@ -16,7 +19,7 @@ public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public ServicesDAOImpl() {
+    public ServicesDAOImpl() throws RemoteException {
         super(Service.class);
         entityManagerFactory = Persistence.createEntityManagerFactory("mariadb");
         entityManager = entityManagerFactory.createEntityManager();

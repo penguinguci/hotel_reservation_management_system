@@ -26,6 +26,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class Tab_ListOrder extends javax.swing.JPanel {
     /**
      * Creates new form Tab_ListOrder
      */
-    public Tab_ListOrder() {
+    public Tab_ListOrder() throws RemoteException {
         orderDAO = new OrderDAOImpl();
         initComponents();
         loadOrderStatuses();
@@ -55,7 +56,7 @@ public class Tab_ListOrder extends javax.swing.JPanel {
         cbx_StatusOrder.addItem("Đã thanh toán");
     }
 
-    private void loadOrders() {
+    private void loadOrders() throws RemoteException {
         CustomTableButton.CustomTableModel model = table_ListOrder.getTableModel();
         model.clearData();
         List<Orders> orders = orderDAO.getAllOrders();
@@ -88,18 +89,40 @@ public class Tab_ListOrder extends javax.swing.JPanel {
                 int row = table_ListOrder.getTable().getSelectedRow();
                 if (row >= 0) {
                     String orderId = (String) table_ListOrder.getTableModel().getValueAt(row, 1);
-                    displayOrderDetails(orderId);
+                    try {
+                        displayOrderDetails(orderId);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         });
 
-        btn_Search.addActionListener(e -> searchOrders());
+        btn_Search.addActionListener(e -> {
+            try {
+                searchOrders();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         btn_Clear.addActionListener(e -> clearFields());
-        btn_PrintOrder.addActionListener(e -> printOrder());
-        btn_Reset.addActionListener(e -> loadOrders());
+        btn_PrintOrder.addActionListener(e -> {
+            try {
+                printOrder();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        btn_Reset.addActionListener(e -> {
+            try {
+                loadOrders();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
-    private void displayOrderDetails(String orderId) {
+    private void displayOrderDetails(String orderId) throws RemoteException {
         Orders order = orderDAO.getOrderDetails(orderId);
         if (order == null) {
             JOptionPane.showMessageDialog(this, "Không tìm thấy hóa đơn!",
@@ -146,7 +169,7 @@ public class Tab_ListOrder extends javax.swing.JPanel {
                 DateUtil.formatDate(order.getOrderDate()) : "N/A");
     }
 
-    private void displayReservationInfo(Orders order) {
+    private void displayReservationInfo(Orders order) throws RemoteException {
         Reservation reservation = orderDAO.findReservationForOrder(order);
         order.recalculateTotalPrice(reservation);
 
@@ -212,7 +235,7 @@ public class Tab_ListOrder extends javax.swing.JPanel {
         }
     }
 
-    private void searchOrders() {
+    private void searchOrders() throws RemoteException {
         String orderId = txt_OrderID.getText().trim();
         String customerId = txt_CustomerID.getText().trim();
         String staffId = txt_StaffID.getText().trim();
@@ -288,7 +311,7 @@ public class Tab_ListOrder extends javax.swing.JPanel {
         lbl_NumOfFloating_Value.setText("");
     }
 
-    private void printOrder() {
+    private void printOrder() throws RemoteException {
         int row = table_ListOrder.getTable().getSelectedRow();
         if (row < 0) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một hóa đơn để in!",

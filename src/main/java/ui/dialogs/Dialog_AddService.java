@@ -15,6 +15,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class Dialog_AddService extends javax.swing.JPanel {
     /**
      * Creates new form Dialog_AddService
      */
-    public Dialog_AddService(String roomID) {
+    public Dialog_AddService(String roomID) throws RemoteException {
         this.roomID = roomID;
         initComponents();
         initDataTableService();
@@ -73,29 +74,41 @@ public class Dialog_AddService extends javax.swing.JPanel {
         txt_SearchServices.getTextField().getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                updateSearchServices();
+                try {
+                    updateSearchServices();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                updateSearchServices();
+                try {
+                    updateSearchServices();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                updateSearchServices();
+                try {
+                    updateSearchServices();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
     }
 
-    private void updateSearchServices() {
+    private void updateSearchServices() throws RemoteException {
         String keyword = txt_SearchServices.getText().trim();
         ServicesDAO servicesDAO = new ServicesDAOImpl();
         List<Service> services = servicesDAO.searchServices(keyword, true);
         displayServicesTable(services);
     }
 
-    private void initDataTableService() {
+    private void initDataTableService() throws RemoteException {
         ServicesDAO servicesDAO = new ServicesDAOImpl();
         List<Service> services = servicesDAO.findAll();
 
@@ -274,7 +287,11 @@ public class Dialog_AddService extends javax.swing.JPanel {
         btn_Complete.setText("Hoàn tất");
         btn_Complete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_CompleteActionPerformed(evt);
+                try {
+                    btn_CompleteActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -380,7 +397,7 @@ public class Dialog_AddService extends javax.swing.JPanel {
         addServiceToCart();
     }//GEN-LAST:event_btn_AddServiceActionPerformed
 
-    private void btn_CompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_CompleteActionPerformed
+    private void btn_CompleteActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_CompleteActionPerformed
         completeSelectedServices();
     }//GEN-LAST:event_btn_CompleteActionPerformed
 
@@ -588,7 +605,7 @@ public class Dialog_AddService extends javax.swing.JPanel {
     /**
      * Completes the selected services and closes the dialog.
      */
-    private void completeSelectedServices() {
+    private void completeSelectedServices() throws RemoteException {
         CustomTableButton.CustomTableModel model = table_CartService.getTableModel();
         selectedService = new ArrayList<>();
 

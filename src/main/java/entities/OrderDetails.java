@@ -12,6 +12,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "order_details")
 public class OrderDetails implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @EqualsAndHashCode.Include
     @ManyToOne

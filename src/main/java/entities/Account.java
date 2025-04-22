@@ -11,6 +11,7 @@
     @EqualsAndHashCode(onlyExplicitlyIncluded = true)
     @Table(name = "accounts")
     public class Account implements Serializable {
+        private static final long serialVersionUID = 1L;
         @Id
         @EqualsAndHashCode.Include
         @Column(columnDefinition = "varchar(50)", nullable = false, unique = true)

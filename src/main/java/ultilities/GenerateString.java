@@ -6,13 +6,14 @@ import entities.Customer;
 import interfaces.CustomerDAO;
 import interfaces.StaffDAO;
 
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GenerateString {
-    public static String generateStaffId() {
+    public static String generateStaffId() throws RemoteException {
         String prefix = "NV" + LocalDate.now().getYear() +
                 String.format("%02d", LocalDate.now().getMonthValue());
 

@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.rmi.RemoteException;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
     private Service selectedService;
     private DefaultTableModel tableModel;
 
-    public Tab_ServicesManagement() {
+    public Tab_ServicesManagement() throws RemoteException {
         serviceDAO = new ServicesDAOImpl();
         initComponents();
         // Đặt DefaultTableModel cho customTableButton1
@@ -43,7 +44,7 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
         setupListeners();
     }
 
-    private void loadServices() {
+    private void loadServices() throws RemoteException {
         List<Service> services = serviceDAO.getAllServices();
         tableModel.setRowCount(0); // Xóa dữ liệu cũ
         for (Service service : services) {
@@ -66,7 +67,11 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
                 int selectedRow = customTableButton1.getTable().getSelectedRow();
                 if (selectedRow >= 0) {
                     int serviceId = (int) customTableButton1.getTable().getValueAt(selectedRow, 0);
-                    selectedService = serviceDAO.findServiceByID(serviceId);
+                    try {
+                        selectedService = serviceDAO.findServiceByID(serviceId);
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     if (selectedService != null) {
                         customRoundedTextField1.setText(String.valueOf(selectedService.getServiceId()));
                         customRoundedTextField2.setText(selectedService.getName());
@@ -91,7 +96,7 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
         customTableButton1.getTable().clearSelection();
     }
 
-    private int generateNewServiceId() {
+    private int generateNewServiceId() throws RemoteException {
         List<Service> services = serviceDAO.getAllServices();
         int maxId = 0;
 
@@ -106,7 +111,7 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
     }
 
     // Tìm kiếm dịch vụ theo tên
-    private void searchServices() {
+    private void searchServices() throws RemoteException {
         String keyword = customRoundedTextFieldSearch.getText().trim();
         if (keyword.isEmpty()) {
             loadServices(); // Nếu không có từ khóa, hiển thị toàn bộ dịch vụ
@@ -291,7 +296,11 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
         btnAddType.setText("Thêm");
         btnAddType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddTypeActionPerformed(evt);
+                try {
+                    btnAddTypeActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -307,7 +316,11 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
         btnResetType.setText("Làm mới");
         btnResetType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnResetTypeActionPerformed(evt);
+                try {
+                    btnResetTypeActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -393,7 +406,11 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
 
         customRoundedTextFieldSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                customRoundedTextFieldSearchActionPerformed(evt);
+                try {
+                    customRoundedTextFieldSearchActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -401,7 +418,11 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
         btnSearch.setText("Tìm kiếm");
         btnSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearchActionPerformed(evt);
+                try {
+                    btnSearchActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -475,7 +496,7 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
     private void customRoundedTextField2ActionPerformed(java.awt.event.ActionEvent evt) {
     }
 
-    private void btnAddTypeActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnAddTypeActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
         int serviceId = generateNewServiceId();
         customRoundedTextField1.setText(String.valueOf(serviceId));
 
@@ -580,7 +601,7 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
         }
     }
 
-    private void btnResetTypeActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnResetTypeActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
         clearFields();
         loadServices();
         customRoundedTextFieldSearch.setText(""); // Xóa trường tìm kiếm khi làm mới
@@ -593,11 +614,11 @@ public class Tab_ServicesManagement extends javax.swing.JFrame {
     private void customRoundedTextField3ActionPerformed(java.awt.event.ActionEvent evt) {
     }
 
-    private void customRoundedTextFieldSearchActionPerformed(java.awt.event.ActionEvent evt) {
+    private void customRoundedTextFieldSearchActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
         searchServices(); // Tìm kiếm khi nhấn Enter trong trường tìm kiếm
     }
 
-    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {
         searchServices(); // Tìm kiếm khi nhấn nút "Tìm kiếm"
     }
 

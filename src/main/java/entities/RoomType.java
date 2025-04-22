@@ -12,6 +12,7 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "room_type")
 public class RoomType implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "type_id")

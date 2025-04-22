@@ -8,6 +8,8 @@ import ui.components.tab.CustomTab;
 import ui.tabs.Tab_StatisticsCustomers;
 import ui.tabs.Tab_StatisticsRevenue;
 
+import java.rmi.RemoteException;
+
 /**
  *
  * @author Lenovo
@@ -17,7 +19,7 @@ public class Form_Statistics extends javax.swing.JPanel {
     /**
      * Creates new form Form_Statistics
      */
-    public Form_Statistics() {
+    public Form_Statistics() throws RemoteException {
         initTabs();
         initComponents();
     }
@@ -45,7 +47,7 @@ public class Form_Statistics extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void initTabs(){
+    private void initTabs() throws RemoteException {
         customTab = new ui.components.tab.CustomTab();
 
         Tab_StatisticsRevenue tabRevenue = new ui.tabs.Tab_StatisticsRevenue();
