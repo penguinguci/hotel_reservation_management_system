@@ -1140,6 +1140,12 @@ public class Tab_Booking extends javax.swing.JPanel {
                 return;
             }
 
+            // kiểm tra ngày check in phải bằng hoặc lớn hơn ngày hiện tại
+            if (checkinDate != null && checkinDate.before(new Date())) {
+                JOptionPane.showMessageDialog(this, "Ngày check-in không được nhỏ hơn ngày hiện tại", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             // bắt buộc chọn ngày
             if (checkinDate == null) {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-in", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -1150,6 +1156,7 @@ public class Tab_Booking extends javax.swing.JPanel {
                 JOptionPane.showMessageDialog(this, "Vui lòng chọn ngày check-out", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
 
             // Lấy các tham số khác (cho phép null)
             Integer capacity = null;

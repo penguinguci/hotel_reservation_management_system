@@ -5,12 +5,16 @@
              version="3.0">
     <persistence-unit name="mariadb">
         <class>entities.Account</class>
+        <class>entities.BookingMethod</class>
         <class>entities.Customer</class>
         <class>entities.OrderDetails</class>
         <class>entities.Orders</class>
+        <class>entities.PaymentMethod</class>
         <class>entities.Reservation</class>
         <class>entities.ReservationDetails</class>
+        <class>entities.Role</class>
         <class>entities.Room</class>
+        <class>entities.RoomType</class>
         <class>entities.Service</class>
         <class>entities.Staff</class>
 
@@ -29,20 +33,24 @@
     </persistence-unit>
     <persistence-unit name="mssql">
         <class>entities.Account</class>
+        <class>entities.BookingMethod</class>
         <class>entities.Customer</class>
         <class>entities.OrderDetails</class>
         <class>entities.Orders</class>
+        <class>entities.PaymentMethod</class>
         <class>entities.Reservation</class>
         <class>entities.ReservationDetails</class>
+        <class>entities.Role</class>
         <class>entities.Room</class>
+        <class>entities.RoomType</class>
         <class>entities.Service</class>
         <class>entities.Staff</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.url"
                       value="jdbc:sqlserver://localhost:1433;databaseName=manage-hoteldb;trustServerCertificate=true;encrypt=true;" />
-            <property name="jakarta.persistence.jdbc.user" value="root" />
-            <property name="jakarta.persistence.jdbc.password" value="220501" />
+            <property name="jakarta.persistence.jdbc.user" value="sa" />
+            <property name="jakarta.persistence.jdbc.password" value="sa123" />
             <property name="jakarta.persistence.jdbc.driver"
                       value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
             <property name="jakarta.persistence.jdbc.dialect"
