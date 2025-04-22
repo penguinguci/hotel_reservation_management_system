@@ -4,6 +4,8 @@
  */
 package ui.forms;
 
+import java.rmi.RemoteException;
+
 /**
  *
  * @author TRAN LONG VU
@@ -13,7 +15,7 @@ public class Form_Booking extends javax.swing.JPanel {
     /**
      * Creates new form Form_Booking
      */
-    public Form_Booking() {
+    public Form_Booking() throws RemoteException {
         initTabs();
         initComponents();
     }
@@ -40,7 +42,7 @@ public class Form_Booking extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void initTabs(){
+    private void initTabs() throws RemoteException {
         customTab = new ui.components.tab.CustomTab();
 
         tabBooking = new ui.tabs.Tab_Booking();

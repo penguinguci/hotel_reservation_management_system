@@ -15,6 +15,7 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "staffs")
 public class Staff implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "staff_id")

@@ -21,6 +21,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,7 +44,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
     /**
      * Creates new form Tab_ListBooking
      */
-    public Tab_ListBooking() {
+    public Tab_ListBooking() throws RemoteException {
         initComponents();
         initComboboxCustomerID();
         currentReservations = new ArrayList<>();
@@ -51,7 +52,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         setupListeners();
     }
 
-    private void initComboboxCustomerID() {
+    private void initComboboxCustomerID() throws RemoteException {
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
         model.addElement("Chọn mã khách hàng");
         customerDAO = new CustomerDAOImpl();
@@ -62,7 +63,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         cbx_CustomerID.setModel(model);
     }
 
-    private void loadReservations() {
+    private void loadReservations() throws RemoteException {
         reservationDAO = new ReservationDAOImpl();
         currentReservations = reservationDAO.getAllReservations();
         updateReservationTable(currentReservations);
@@ -239,7 +240,7 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         btn_Pay.setEnabled(false);
     }
 
-    private void searchReservations() {
+    private void searchReservations() throws RemoteException {
         String keyword = txt_Search.getText().trim();
         if (!keyword.isEmpty()) {
             currentReservations = reservationDAO.searchReservations(keyword);
@@ -256,28 +257,48 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         txt_Search.getTextField().getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                searchReservations();
+                try {
+                    searchReservations();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                searchReservations();
+                try {
+                    searchReservations();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                searchReservations();
+                try {
+                    searchReservations();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
         cbx_CustomerID.addActionListener(e -> {
             String selectedCustomerId = (String) cbx_CustomerID.getSelectedItem();
             if (selectedCustomerId != null && !selectedCustomerId.equals("Chọn mã khách hàng")) {
-                currentReservations = reservationDAO.getReservationsByCustomerId(selectedCustomerId);
+                try {
+                    currentReservations = reservationDAO.getReservationsByCustomerId(selectedCustomerId);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
                 updateReservationTable(currentReservations);
                 updateButtonStates();
             } else {
-                loadReservations();
+                try {
+                    loadReservations();
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
                 currentReservations.clear();
                 updateButtonStates();
             }
@@ -305,11 +326,19 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         btn_Clear.addActionListener(e -> {
             txt_Search.setText("");
             cbx_CustomerID.setSelectedIndex(0);
-            loadReservations();
+            try {
+                loadReservations();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
             clearReservationDetails();
             updateBookingInfo();
             updateButtonStates();
-            initComboboxCustomerID();
+            try {
+                initComboboxCustomerID();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
 
             table_ListService.getTableModel().clearData();
             table_ListReservation.getTable().clearSelection();
@@ -447,11 +476,15 @@ public class Tab_ListBooking extends javax.swing.JPanel {
         });
 
         btn_Pay.addActionListener(e -> {
-            showPaymentDialog();
+            try {
+                showPaymentDialog();
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
         });
     }
 
-    private void showPaymentDialog() {
+    private void showPaymentDialog() throws RemoteException {
         if (table_ListReservation.getTable().getSelectedRowCount() != 1) {
             JOptionPane.showMessageDialog(this,
                     "Vui lòng chọn 1 đơn đặt phòng để thanh toán",

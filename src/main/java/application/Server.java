@@ -15,8 +15,8 @@ public class Server {
             Context context = new InitialContext();
 
             AccountDAO accountDAO = new AccountDAOImpl();
-            AmountCustomerDAOImpl amountCustomerDAO = new AmountCustomerDAOImpl();
-            CustomerDAOImpl customerDAO = new CustomerDAOImpl();
+            AmountCustomerDAO amountCustomerDAO = new AmountCustomerDAOImpl();
+            CustomerDAO customerDAO = new CustomerDAOImpl();
             OrderDAO orderDAO = new OrderDAOImpl();
             ReservationDAO reservationDAO = new ReservationDAOImpl();
             RevenueDAO revenueDAO = new RevenueDAOImpl();
@@ -39,9 +39,9 @@ public class Server {
             context.bind("rmi://" + HOST + ":" + PORT + "/ServicesDAO", servicesDAO);
             context.bind("rmi://" + HOST + ":" + PORT + "/StaffDAO", staffDAO);
             context.bind("rmi://" + HOST + ":" + PORT + "/GenericDAO", genericDAO);
-            System.out.println("Server is running on " + HOST + ": " + PORT);
+              System.out.println("Server is running on " + HOST + ": " + PORT);
 
-        } catch (Exception e) {
+           } catch (Exception e) {
             e.printStackTrace();
         }
     }

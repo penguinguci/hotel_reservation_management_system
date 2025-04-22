@@ -6,15 +6,18 @@
     import jakarta.persistence.*;
     import utils.AppUtil;
 
+    import java.io.Serializable;
+    import java.rmi.RemoteException;
     import java.util.ArrayList;
     import java.util.Date;
     import java.util.List;
     import java.util.Map;
 
-    public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDAO {
+    public class  RoomDAOImpl extends GenericDAOImpl<Room, String> implements RoomDAO, Serializable {
+        private static final long serialVersionUID = 1L;
         private EntityManager em;
 
-        public RoomDAOImpl() {
+        public RoomDAOImpl() throws RemoteException {
             super(Room.class);
             em = AppUtil.getEntityManager();
         }

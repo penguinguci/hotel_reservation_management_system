@@ -9,14 +9,17 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import utils.AppUtil;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OrderDAOImpl extends GenericDAOImpl<Orders, String> implements OrderDAO {
+public class OrderDAOImpl extends GenericDAOImpl<Orders, String> implements OrderDAO, Serializable {
+    private static final long serialVersionUID = 1L;
     private EntityManager em;
 
-    public OrderDAOImpl() {
+    public OrderDAOImpl() throws RemoteException {
         super(Orders.class);
         em = AppUtil.getEntityManager();
     }

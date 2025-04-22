@@ -10,6 +10,7 @@ import interfaces.RoomDAO;
 
 import javax.swing.*;
 import java.awt.*;
+import java.rmi.RemoteException;
 
 /**
  *
@@ -22,7 +23,7 @@ public class Dialog_ViewRoomDetails extends javax.swing.JPanel {
     /**
      * Creates new form Dialog_ViewRoomDetails
      */
-    public Dialog_ViewRoomDetails(String roomID) {
+    public Dialog_ViewRoomDetails(String roomID) throws RemoteException {
         this.roomID = roomID;
         initComponents();
         initRoomDetailByID();
@@ -36,7 +37,7 @@ public class Dialog_ViewRoomDetails extends javax.swing.JPanel {
         return room;
     }
 
-    private void initRoomDetailByID() {
+    private void initRoomDetailByID() throws RemoteException {
         Room roomInfor = roomDAO.findById(roomID);
         if (room != null) {
             lbl_RoomID_Value.setText(roomInfor.getRoomId());
@@ -172,7 +173,11 @@ public class Dialog_ViewRoomDetails extends javax.swing.JPanel {
         btn_AddEntityRoom.setText("Thêm");
         btn_AddEntityRoom.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_AddEntityRoomActionPerformed(evt);
+                try {
+                    btn_AddEntityRoomActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -225,7 +230,7 @@ public class Dialog_ViewRoomDetails extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_AddEntityRoomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_AddEntityRoomActionPerformed
+    private void btn_AddEntityRoomActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_AddEntityRoomActionPerformed
         addToCart();
     }//GEN-LAST:event_btn_AddEntityRoomActionPerformed
 
@@ -259,7 +264,7 @@ public class Dialog_ViewRoomDetails extends javax.swing.JPanel {
     private javax.swing.JPanel pnl_Right;
     // End of variables declaration//GEN-END:variables
 
-    private void addToCart() {
+    private void addToCart() throws RemoteException {
         Room roomInfor = roomDAO.findById(roomID);
         setRoom(roomInfor);
         Window window = SwingUtilities.getWindowAncestor(this);

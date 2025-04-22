@@ -17,6 +17,7 @@ import java.util.*;
 @Table(name = "rooms")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Room implements Serializable {
+    private static final long serialVersionUID = 1L;
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "room_id")

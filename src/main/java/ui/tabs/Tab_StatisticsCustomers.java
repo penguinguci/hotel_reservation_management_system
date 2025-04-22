@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.Font;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,7 +35,7 @@ public class Tab_StatisticsCustomers extends javax.swing.JPanel {
     private int currentTotalCustomers;
     private String currentChartTitle;
 
-    public Tab_StatisticsCustomers() {
+    public Tab_StatisticsCustomers() throws RemoteException {
         customerDAO = new AmountCustomerDAOImpl();
         initComponents();
 

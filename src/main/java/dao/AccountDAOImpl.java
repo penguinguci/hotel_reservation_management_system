@@ -5,12 +5,15 @@ import interfaces.AccountDAO;
 import jakarta.persistence.*;
 import utils.AppUtil;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements AccountDAO {
+public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements AccountDAO, Serializable {
+    private static final long serialVersionUID = 1L;
     private EntityManager em;
 
-    public AccountDAOImpl() {
+    public AccountDAOImpl() throws RemoteException {
         super(Account.class);
         em = AppUtil.getEntityManager();
     }
@@ -80,7 +83,7 @@ public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements A
     }
 
     @Override
-    public boolean isUsernameExists(String username) {
+    public boolean isUsernameExists(String username) throws RemoteException {
         if (username == null || username.isEmpty()) return false;
 
         Long count = em.createQuery("SELECT COUNT(a) FROM Account a WHERE a.username = :username", Long.class)
@@ -89,7 +92,7 @@ public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements A
         return count > 0;
     }
     @Override
-    public Account getAccountByEmail(String email) {
+    public Account getAccountByEmail(String email) throws RemoteException {
         TypedQuery<Account> query = em.createQuery(
                 "SELECT a FROM Account a JOIN a.staff s WHERE s.email = :email",
                 Account.class

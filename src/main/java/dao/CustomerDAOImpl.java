@@ -6,13 +6,15 @@ import interfaces.CustomerDAO;
 import jakarta.persistence.*;
 import utils.AppUtil;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements CustomerDAO {
+public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements CustomerDAO, Serializable {
+    private static final long serialVersionUID = 1L;
     private EntityManager em;
 
-    public CustomerDAOImpl() {
+    public CustomerDAOImpl() throws RemoteException {
         super(Customer.class);
         em = AppUtil.getEntityManager();
     }

@@ -430,7 +430,11 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ListSele
         btn_Search.setText("Tìm kiếm");
         btn_Search.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_SearchActionPerformed(evt);
+                try {
+                    btn_SearchActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -490,7 +494,11 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ListSele
         btn_Import.setText("Import");
         btn_Import.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_ImportActionPerformed(evt);
+                try {
+                    btn_ImportActionPerformed(evt);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
         pnl_GroupButton.add(btn_Import);
@@ -560,7 +568,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ListSele
         update();
     }//GEN-LAST:event_btn_UpdateActionPerformed
 
-    private void btn_ImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ImportActionPerformed
+    private void btn_ImportActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_ImportActionPerformed
         importData();
     }//GEN-LAST:event_btn_ImportActionPerformed
 
@@ -568,7 +576,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ListSele
         exportData();
     }//GEN-LAST:event_btn_ExportActionPerformed
 
-    private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SearchActionPerformed
+    private void btn_SearchActionPerformed(java.awt.event.ActionEvent evt) throws RemoteException {//GEN-FIRST:event_btn_SearchActionPerformed
         search();
     }//GEN-LAST:event_btn_SearchActionPerformed
 
@@ -917,7 +925,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ListSele
     }
 
     // Search staff
-    private void search() {
+    private void search() throws RemoteException {
         String id = txt_IDSearch.getText().trim();
         String name = txt_NameSearch.getText().trim();
         String phone = txt_PhoneSearch.getText().trim();
@@ -961,7 +969,7 @@ public class Form_StaffManagement extends javax.swing.JPanel implements ListSele
     }
 
     // Import
-    private void importData() {
+    private void importData() throws RemoteException {
         StaffDAO staffDAO = new StaffDAOImpl();
         GenericDAO<Staff, String> staffGenericDAO = new GenericDAOImpl<>(Staff.class);
         GenericDAO<Account, String> accountGenericDAO = new GenericDAOImpl<>(Account.class);

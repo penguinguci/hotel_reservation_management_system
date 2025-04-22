@@ -6,12 +6,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import utils.AppUtil;
 
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.List;
 
-public class RoomTypeDAOImpl extends GenericDAOImpl<RoomType, String> implements RoomTypesDAO {
+public class RoomTypeDAOImpl extends GenericDAOImpl<RoomType, String> implements RoomTypesDAO, Serializable {
+    private static final long serialVersionUID = 1L;
     private EntityManager em;
 
-    public RoomTypeDAOImpl() {
+    public RoomTypeDAOImpl() throws RemoteException {
         super(RoomType.class);
         em = AppUtil.getEntityManager();
     }

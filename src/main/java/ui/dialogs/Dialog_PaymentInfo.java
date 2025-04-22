@@ -19,6 +19,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +46,7 @@ public class Dialog_PaymentInfo extends javax.swing.JPanel {
     private StaffDAO staffDAO;
     private boolean isUpdating = false;
 
-    public Dialog_PaymentInfo(List<Reservation> reservations) {
+    public Dialog_PaymentInfo(List<Reservation> reservations) throws RemoteException {
         this.reservations = reservations;
         this.reservationDAO = new ReservationDAOImpl();
         this.orderDAO = new OrderDAOImpl();

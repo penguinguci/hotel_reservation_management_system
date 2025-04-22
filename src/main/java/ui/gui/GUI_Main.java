@@ -22,7 +22,7 @@ public class GUI_Main extends javax.swing.JFrame {
     private javax.swing.JPanel pnlConstrain;
     private ui.components.scroll.win11.ScrollPaneWin11 scrollPaneWin111;
     private Form_CustomerManagement formCustomerManagement;
-    public GUI_Main() {
+    public GUI_Main() throws RemoteException {
         initComponents();
         setExtendedState(MAXIMIZED_BOTH);
         Form_HomePage homePageForm = new Form_HomePage();
@@ -175,7 +175,11 @@ public class GUI_Main extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GUI_Main().setVisible(true);
+                try {
+                    new GUI_Main().setVisible(true);
+                } catch (RemoteException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
