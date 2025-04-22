@@ -22,6 +22,11 @@ public class GenericDAOImpl<T, ID> implements GenericDAO<T, ID> {
         this.entityClass = entityClass;
     }
 
+    public GenericDAOImpl() {
+        this.em = AppUtil.getEntityManager();
+        this.entityClass = null;
+    }
+
     // Create
     @Override
     public boolean create(T entity) {

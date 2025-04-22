@@ -1,6 +1,8 @@
 package entities;
 
-public enum BookingMethod {
+import java.io.Serializable;
+
+public enum BookingMethod  implements Serializable {
     AT_THE_COUNTER("Tại quầy"), CONTACT("Trực tuyến");
 
     private String name;

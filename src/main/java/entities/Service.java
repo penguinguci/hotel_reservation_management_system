@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Data
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "services")
-public class Service {
+public class Service implements Serializable {
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "service_id")

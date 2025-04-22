@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
@@ -14,7 +15,7 @@ import java.util.List;
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "reservations")
-public class Reservation {
+public class Reservation implements Serializable {
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "reservation_id")

@@ -1,6 +1,7 @@
 package ui.tabs;
 
 import dao.AmountCustomerDAOImpl;
+import interfaces.AmountCustomerDAO;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -25,7 +26,7 @@ import java.util.List;
  * @author Lenovo
  */
 public class Tab_StatisticsCustomers extends javax.swing.JPanel {
-    private AmountCustomerDAOImpl customerDAO;
+    private AmountCustomerDAO customerDAO;
     private StyledComboBox yearComboBox;
     private JLabel yearLabel;
     private List<String> currentLabels;

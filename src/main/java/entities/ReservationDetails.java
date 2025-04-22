@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
@@ -13,7 +14,7 @@ import java.util.Date;
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "reservation_details")
-public class ReservationDetails {
+public class ReservationDetails implements Serializable {
     @Id
     @EqualsAndHashCode.Include
     @ManyToOne

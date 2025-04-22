@@ -1,5 +1,6 @@
 package dao;
 
+import interfaces.AmountCustomerDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * @author Lenovo
  */
-public class AmountCustomerDAOImpl {
+public class AmountCustomerDAOImpl implements AmountCustomerDAO {
     private EntityManager em;
 
     public AmountCustomerDAOImpl() {
@@ -23,6 +24,7 @@ public class AmountCustomerDAOImpl {
         }
     }
 
+    @Override
     public List<Integer> getAvailableYears() {
         List<Integer> years = new ArrayList<>();
         String jpql = "SELECT DISTINCT FUNCTION('YEAR', o.checkInDate) FROM Orders o WHERE o.checkInDate IS NOT NULL ORDER BY FUNCTION('YEAR', o.checkInDate)";
@@ -36,6 +38,7 @@ public class AmountCustomerDAOImpl {
         return years;
     }
 
+    @Override
     public List<String> getDateRangeLabels(Date startDate, Date endDate) {
         List<String> labels = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -77,6 +80,7 @@ public class AmountCustomerDAOImpl {
         return labels;
     }
 
+    @Override
     public List<Integer> getCustomerCountByDateRange(Date startDate, Date endDate) {
         List<Integer> customerCounts = new ArrayList<>();
 
@@ -156,6 +160,7 @@ public class AmountCustomerDAOImpl {
         return customerCounts;
     }
 
+    @Override
     public int getTotalCustomerCountByDateRange(Date startDate, Date endDate) {
         try {
             String jpql = "SELECT COUNT(DISTINCT o.customer.customerId) " +
@@ -172,6 +177,7 @@ public class AmountCustomerDAOImpl {
         return 0;
     }
 
+    @Override
     public List<Integer> getMonthlyCustomerCount(int year) {
         List<Integer> monthlyCounts = new ArrayList<>();
         try {
@@ -195,6 +201,7 @@ public class AmountCustomerDAOImpl {
         return monthlyCounts;
     }
 
+    @Override
     public List<Integer> getQuarterlyCustomerCount(int year) {
         List<Integer> quarterlyCounts = new ArrayList<>();
         try {
@@ -220,6 +227,7 @@ public class AmountCustomerDAOImpl {
         return quarterlyCounts;
     }
 
+    @Override
     public List<Integer> getYearlyCustomerCount() {
         List<Integer> yearlyCounts = new ArrayList<>();
         try {
@@ -243,6 +251,7 @@ public class AmountCustomerDAOImpl {
         return yearlyCounts;
     }
 
+    @Override
     public int getTotalCustomerCountByQuarter(int year, int quarter) {
         try {
             Date quarterStart = new Date(year - 1900, (quarter - 1) * 3, 1);
@@ -265,6 +274,7 @@ public class AmountCustomerDAOImpl {
         return 0;
     }
 
+    @Override
     public int getTotalCustomerCount(int year) {
         try {
             Date yearStart = new Date(year - 1900, 0, 1);
