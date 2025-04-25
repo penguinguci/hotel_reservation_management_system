@@ -1,6 +1,7 @@
 package dao;
 
 import entities.Room;
+import interfaces.ClientCallback;
 import interfaces.GenericDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -9,12 +10,14 @@ import utils.AppUtil;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GenericDAOImpl<T, ID> extends UnicastRemoteObject  implements GenericDAO<T, ID>, Serializable {
     private static final long serialVersionUID = 1L;
     private final EntityManager em;
     private final Class<T> entityClass;
+    private List<ClientCallback> clients = new ArrayList<>();
 
     public GenericDAOImpl(EntityManager em, Class<T> entityClass) throws RemoteException {
         super();
@@ -111,4 +114,38 @@ public class GenericDAOImpl<T, ID> extends UnicastRemoteObject  implements Gener
         return em.createQuery(queryStr, Long.class).getSingleResult();
     }
 
+
+    @Override
+    public void registerClient(ClientCallback client) throws RemoteException {
+        synchronized (clients) {
+            if (!clients.contains(client)) {
+                clients.add(client);
+                System.out.println("Client registered. Total clients: " + clients.size());
+            }
+        }
+    }
+
+    @Override
+    public void unregisterClient(ClientCallback client) throws RemoteException {
+        synchronized (clients) {
+            clients.remove(client);
+            System.out.println("Client unregistered. Total clients: " + clients.size());
+        }
+    }
+
+    @Override
+    public void notifyClients(String message) throws RemoteException {
+        synchronized (clients) {
+            List<ClientCallback> toRemove = new ArrayList<>();
+            for (ClientCallback client : clients) {
+                try {
+                    client.onDataChange(message);
+                } catch (RemoteException e) {
+                    // Nếu client không thể truy cập được, loại bỏ khỏi danh sách
+                    toRemove.add(client);
+                }
+            }
+            clients.removeAll(toRemove);
+        }
+    }
 }

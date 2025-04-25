@@ -2,6 +2,7 @@ package dao;
 
 import entities.Account;
 import interfaces.AccountDAO;
+import interfaces.GenericDAO;
 import jakarta.persistence.*;
 import utils.AppUtil;
 
@@ -9,13 +10,19 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+
 public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements AccountDAO, Serializable {
     private static final long serialVersionUID = 1L;
     private EntityManager em;
+    private GenericDAO genericDAO;
 
     public AccountDAOImpl() throws RemoteException {
         super(Account.class);
         em = AppUtil.getEntityManager();
+    }
+
+    public void setGenericDAO(GenericDAO genericDAO) {
+        this.genericDAO = genericDAO;
     }
 
     public void createAccount(Account account) {
@@ -24,11 +31,14 @@ public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements A
             transaction.begin();
             em.persist(account);
             transaction.commit();
+            if (genericDAO != null) {
+                genericDAO.notifyClients("Account created: " + account.getUsername());
+            }
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 
@@ -48,11 +58,14 @@ public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements A
             transaction.begin();
             em.merge(account);
             transaction.commit();
+            if (genericDAO != null) {
+                genericDAO.notifyClients("Account updated: " + account.getUsername());
+            }
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 
@@ -63,13 +76,18 @@ public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements A
             Account account = em.find(Account.class, username);
             if (account != null) {
                 em.remove(account);
+                transaction.commit();
+                if (genericDAO != null) {
+                    genericDAO.notifyClients("Account deleted: " + username);
+                }
+            } else {
+                transaction.commit();
             }
-            transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 
@@ -91,6 +109,7 @@ public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements A
                 .getSingleResult();
         return count > 0;
     }
+
     @Override
     public Account getAccountByEmail(String email) throws RemoteException {
         TypedQuery<Account> query = em.createQuery(
@@ -104,5 +123,4 @@ public class AccountDAOImpl extends GenericDAOImpl<Account, String> implements A
             return null;
         }
     }
-
 }

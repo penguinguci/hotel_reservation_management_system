@@ -22,8 +22,6 @@ CREATE INDEX idx_services_price ON services (price);
 
 # orders
 CREATE INDEX idx_orders_date ON orders (order_date);
-
--- Index cho trạng thái đơn hàng
 CREATE INDEX idx_orders_status ON orders (status);
 CREATE INDEX idx_orders_customer_date ON orders (customer_id, order_date);
 CREATE INDEX idx_orders_room_date ON orders (room_id, order_date);

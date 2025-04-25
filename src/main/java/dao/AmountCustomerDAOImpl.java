@@ -1,6 +1,7 @@
 package dao;
 
 import interfaces.AmountCustomerDAO;
+import interfaces.GenericDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -14,12 +15,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author Lenovo
- */
 public class AmountCustomerDAOImpl extends UnicastRemoteObject implements AmountCustomerDAO, Serializable {
     private static final long serialVersionUID = 1L;
     private EntityManager em;
+    private GenericDAO genericDAO;
 
     public AmountCustomerDAOImpl() throws RemoteException {
         super();
@@ -27,6 +26,10 @@ public class AmountCustomerDAOImpl extends UnicastRemoteObject implements Amount
         if (em == null) {
             throw new IllegalStateException("EntityManager không thể khởi tạo");
         }
+    }
+
+    public void setGenericDAO(GenericDAO genericDAO) {
+        this.genericDAO = genericDAO;
     }
 
     @Override

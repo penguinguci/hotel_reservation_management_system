@@ -1989,7 +1989,7 @@ public class Tab_BookingByTime extends javax.swing.JPanel  {
                 reservation.setBookingDate(new Date());
                 reservation.setBookingMethod(bookingMethodStr.equals("Tại quầy") ?
                         BookingMethod.AT_THE_COUNTER : BookingMethod.CONTACT);
-                reservation.setStatus(true); // Đặt thành true để biểu thị đặt phòng đang hoạt động
+                reservation.setStatus(false);
 
                 Account account = CurrentAccount.getCurrentAccount();
                 Staff staff = em.find(Staff.class, account.getStaff().getStaffId());

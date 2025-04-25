@@ -1,8 +1,8 @@
 package dao;
 
 import entities.Customer;
-import entities.Staff;
 import interfaces.CustomerDAO;
+import interfaces.GenericDAO;
 import jakarta.persistence.*;
 import utils.AppUtil;
 
@@ -13,14 +13,17 @@ import java.util.List;
 public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements CustomerDAO, Serializable {
     private static final long serialVersionUID = 1L;
     private EntityManager em;
+    private GenericDAO genericDAO;
 
     public CustomerDAOImpl() throws RemoteException {
         super(Customer.class);
         em = AppUtil.getEntityManager();
     }
 
+    public void setGenericDAO(GenericDAO genericDAO) {
+        this.genericDAO = genericDAO;
+    }
 
-    // Lấy khách hàng theo ID
     @Override
     public List<Customer> searchCustomerById(String id) {
         String queryString = "SELECT c FROM Customer c WHERE c.customerId = :id";
@@ -29,7 +32,6 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements
         return query.getResultList();
     }
 
-    // Tìm kiếm khách hàng theo số điện thoại
     @Override
     public List<Customer> searchCustomersByPhone(String phone) {
         String queryString = "SELECT c FROM Customer c WHERE c.phoneNumber = :phone";
@@ -38,7 +40,6 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements
         return query.getResultList();
     }
 
-    // Tìm kiếm khách hàng theo tên
     @Override
     public List<Customer> searchCustomersByName(String name) {
         String queryString = "SELECT c FROM Customer c WHERE LOWER(c.firstName) LIKE :name OR LOWER(c.lastName) LIKE :name";
@@ -47,7 +48,6 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements
         return query.getResultList();
     }
 
-    // Tìm kiếm khách hàng theo số điện thoại hoặc CCCD (dùng cho PopupSearch)
     @Override
     public List<Customer> searchCustomersByPhoneOrCCCD(String keyword) {
         String queryString = "SELECT c FROM Customer c WHERE LOWER(c.phoneNumber) LIKE :keyword OR LOWER(c.CCCD) LIKE :keyword";
@@ -56,7 +56,6 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements
         return query.getResultList();
     }
 
-    // Lấy tất cả khách hàng
     @Override
     public List<Customer> getAllCustomers() {
         TypedQuery<Customer> query = em.createQuery("SELECT c FROM Customer c", Customer.class);
@@ -71,7 +70,6 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer, String> implements
         List<Customer> customers = query.getResultList();
         return customers.isEmpty() ? null : customers.get(0);
     }
-
 
     @Override
     public boolean isEmailExists(String email) {

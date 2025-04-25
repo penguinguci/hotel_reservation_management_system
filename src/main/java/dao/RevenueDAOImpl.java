@@ -4,6 +4,7 @@ import entities.Orders;
 import entities.OrderDetails;
 import entities.PaymentMethod;
 import interfaces.RevenueDAO;
+import interfaces.GenericDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -18,8 +19,8 @@ import java.util.stream.Collectors;
 
 public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, Serializable {
     private static final long serialVersionUID = 1L;
-
     private EntityManager em;
+    private GenericDAO genericDAO;
 
     public RevenueDAOImpl() throws RemoteException {
         super();
@@ -27,6 +28,10 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
         if (em == null) {
             throw new IllegalStateException("EntityManager không thể khởi tạo");
         }
+    }
+
+    public void setGenericDAO(GenericDAO genericDAO) {
+        this.genericDAO = genericDAO;
     }
 
     @Override
@@ -169,7 +174,7 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
 
     @Override
     public double getTotalRevenueByMonth(int year, int month) {
-        String jpql = "SELECT SUM(o.totalPrice + o.depositAmount)  " +
+        String jpql = "SELECT SUM(o.totalPrice + o.depositAmount) " +
                 "FROM Orders o " +
                 "WHERE FUNCTION('YEAR', o.orderDate) = :year AND FUNCTION('MONTH', o.orderDate) = :month";
         Query query = em.createQuery(jpql);
@@ -210,7 +215,7 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
     public double getTotalRevenueByQuarter(int year, int quarter) {
         int startMonth = (quarter - 1) * 3 + 1;
         int endMonth = quarter * 3;
-        String jpql = "SELECT SUM(o.totalPrice + o.depositAmount)  " +
+        String jpql = "SELECT SUM(o.totalPrice + o.depositAmount) " +
                 "FROM Orders o " +
                 "WHERE FUNCTION('YEAR', o.orderDate) = :year AND FUNCTION('MONTH', o.orderDate) BETWEEN :startMonth AND :endMonth";
         Query query = em.createQuery(jpql);
@@ -268,7 +273,7 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
     public List<Double> getMonthlyTotalRevenue(int year) {
         List<Double> monthlyRevenue = new ArrayList<>(Collections.nCopies(12, 0.0));
         String jpql = "SELECT FUNCTION('MONTH', o.orderDate) AS month, " +
-                "SUM(o.totalPrice + o.depositAmount)  " +
+                "SUM(o.totalPrice + o.depositAmount) " +
                 "FROM Orders o " +
                 "WHERE FUNCTION('YEAR', o.orderDate) = :year " +
                 "GROUP BY FUNCTION('MONTH', o.orderDate)";
@@ -428,9 +433,9 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
         long diffInMillies = Math.abs(endDate.getTime() - startDate.getTime());
         long diffInDays = diffInMillies / (1000 * 60 * 60 * 24);
 
-        if (diffInDays <= 60) { // Chia theo ngày
+        if (diffInDays <= 60) {
             String jpql = "SELECT FUNCTION('DATE', o.orderDate) AS date, " +
-                    "SUM(o.totalPrice + o.depositAmount)  " +
+                    "SUM(o.totalPrice + o.depositAmount) " +
                     "FROM Orders o " +
                     "WHERE o.orderDate BETWEEN :startDate AND :endDate " +
                     "GROUP BY FUNCTION('DATE', o.orderDate)";
@@ -457,9 +462,9 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
                 revenueData.add(revenue);
                 cal.add(Calendar.DAY_OF_MONTH, 1);
             }
-        } else if (diffInDays <= 365) { // Chia theo tháng
+        } else if (diffInDays <= 365) {
             String jpql = "SELECT FUNCTION('MONTH', o.orderDate), FUNCTION('YEAR', o.orderDate), " +
-                    "SUM(o.totalPrice + o.depositAmount)  " +
+                    "SUM(o.totalPrice + o.depositAmount) " +
                     "FROM Orders o " +
                     "WHERE o.orderDate BETWEEN :startDate AND :endDate " +
                     "GROUP BY FUNCTION('MONTH', o.orderDate), FUNCTION('YEAR', o.orderDate)";
@@ -488,9 +493,9 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
                 revenueData.add(revenue);
                 cal.add(Calendar.MONTH, 1);
             }
-        } else { // Chia theo năm
+        } else {
             String jpql = "SELECT FUNCTION('YEAR', o.orderDate), " +
-                    "SUM(o.totalPrice + o.depositAmount)  " +
+                    "SUM(o.totalPrice + o.depositAmount) " +
                     "FROM Orders o " +
                     "WHERE o.orderDate BETWEEN :startDate AND :endDate " +
                     "GROUP BY FUNCTION('YEAR', o.orderDate)";
@@ -772,11 +777,9 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
         return revenueData;
     }
 
-
-    // New method: Get total revenue by order status
     @Override
     public Map<Integer, Double> getRevenueByStatus(int year) {
-        String jpql = "SELECT o.status, SUM(o.totalPrice + o.depositAmount)  " +
+        String jpql = "SELECT o.status, SUM(o.totalPrice + o.depositAmount) " +
                 "FROM Orders o " +
                 "WHERE FUNCTION('YEAR', o.orderDate) = :year " +
                 "GROUP BY o.status";
@@ -795,10 +798,9 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
         return revenueByStatus;
     }
 
-    // New method: Get total revenue by payment method
     @Override
     public Map<PaymentMethod, Double> getRevenueByPaymentMethod(int year) {
-        String jpql = "SELECT o.paymentMethod, SUM(o.totalPrice + o.depositAmount)  " +
+        String jpql = "SELECT o.paymentMethod, SUM(o.totalPrice + o.depositAmount) " +
                 "FROM Orders o " +
                 "WHERE FUNCTION('YEAR', o.orderDate) = :year " +
                 "GROUP BY o.paymentMethod";
@@ -817,7 +819,6 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
         return revenueByPaymentMethod;
     }
 
-    // New method: Get breakdown of fees (tax, service fee, overstay fee) by year
     @Override
     public Map<String, Double> getFeeBreakdown(int year) {
         String jpql = "SELECT SUM(o.taxAmount), SUM(o.serviceFee), SUM(COALESCE(o.overstayFee, 0)) " +
@@ -834,7 +835,6 @@ public class RevenueDAOImpl extends UnicastRemoteObject implements RevenueDAO, S
         return feeBreakdown;
     }
 
-    // New method: Get monthly breakdown of fees
     @Override
     public List<Map<String, Double>> getMonthlyFeeBreakdown(int year) {
         List<Map<String, Double>> monthlyBreakdown = new ArrayList<>();

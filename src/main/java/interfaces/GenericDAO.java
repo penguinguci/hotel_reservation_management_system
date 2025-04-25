@@ -10,4 +10,8 @@ public interface GenericDAO<T, ID> extends Remote {
     boolean delete(ID id) throws RemoteException;
     T findById(ID id) throws RemoteException;
     List<T> findAll() throws RemoteException;
+
+    void registerClient(ClientCallback client) throws RemoteException;
+    void unregisterClient(ClientCallback client) throws RemoteException;
+    void notifyClients(String message) throws RemoteException;
 }

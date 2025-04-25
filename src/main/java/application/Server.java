@@ -8,8 +8,9 @@ import javax.naming.InitialContext;
 import java.rmi.registry.LocateRegistry;
 
 public class Server {
-    private static final String HOST = "localhost";
+    private static final String HOST = "localhost"; // Thay bằng IP của máy server
     private static final int PORT = 2004;
+
     public static void main(String[] args) {
         try {
             Context context = new InitialContext();
@@ -26,6 +27,18 @@ public class Server {
             StaffDAO staffDAO = new StaffDAOImpl();
             GenericDAO genericDAO = new GenericDAOImpl();
 
+            // Inject GenericDAO vào các DAO cần thông báo
+            ((AccountDAOImpl) accountDAO).setGenericDAO(genericDAO);
+            ((AmountCustomerDAOImpl) amountCustomerDAO).setGenericDAO(genericDAO);
+            ((OrderDAOImpl) orderDAO).setGenericDAO(genericDAO);
+            ((ReservationDAOImpl) reservationDAO).setGenericDAO(genericDAO);
+            ((RevenueDAOImpl) revenueDAO).setGenericDAO(genericDAO);
+            ((RoomDAOImpl) roomDAO).setGenericDAO(genericDAO);
+            ((RoomTypeDAOImpl) roomTypesDAO).setGenericDAO(genericDAO);
+            ((ServicesDAOImpl) servicesDAO).setGenericDAO(genericDAO);
+            ((StaffDAOImpl) staffDAO).setGenericDAO(genericDAO);
+            ((CustomerDAOImpl) customerDAO).setGenericDAO(genericDAO);
+
             LocateRegistry.createRegistry(PORT);
 
             context.bind("rmi://" + HOST + ":" + PORT + "/AccountDAO", accountDAO);
@@ -39,9 +52,9 @@ public class Server {
             context.bind("rmi://" + HOST + ":" + PORT + "/ServicesDAO", servicesDAO);
             context.bind("rmi://" + HOST + ":" + PORT + "/StaffDAO", staffDAO);
             context.bind("rmi://" + HOST + ":" + PORT + "/GenericDAO", genericDAO);
-              System.out.println("Server is running on " + HOST + ": " + PORT);
+            System.out.println("Server is running on " + HOST + ": " + PORT);
 
-           } catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
