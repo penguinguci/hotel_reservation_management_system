@@ -3,6 +3,7 @@ package dao;
 import entities.Reservation;
 import entities.Room;
 import interfaces.ReservationDAO;
+import interfaces.GenericDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
@@ -16,11 +17,16 @@ import java.util.List;
 
 public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> implements ReservationDAO, Serializable {
     private static final long serialVersionUID = 1L;
-    EntityManager em;
+    private EntityManager em;
+    private GenericDAO genericDAO;
 
     public ReservationDAOImpl() throws RemoteException {
         super(Reservation.class);
         em = AppUtil.getEntityManager();
+    }
+
+    public void setGenericDAO(GenericDAO genericDAO) {
+        this.genericDAO = genericDAO;
     }
 
     @Override
@@ -49,12 +55,15 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             em.merge(room);
 
             transaction.commit();
+            if (genericDAO != null) {
+                genericDAO.notifyClients("Hourly reservation created: " + reservation.getReservationId());
+            }
             return true;
         } catch (Exception e) {
             if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Error checking in reservation: " + e.getMessage(), e);
         } finally {
             em.close();
         }
@@ -68,7 +77,7 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                     "WHERE c.phoneNumber LIKE :keyword " +
                     "OR c.CCCD LIKE :keyword " +
                     "OR c.firstName LIKE :keyword " +
-                    "OR c.lastName LIKE :keyword ";
+                    "OR c.lastName LIKE :keyword";
             TypedQuery<Reservation> query = em.createQuery(jpql, Reservation.class)
                     .setParameter("keyword", "%" + keyword + "%");
             return query.getResultList();
@@ -102,7 +111,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             transaction.begin();
             Reservation reservation = em.find(Reservation.class, reservationId);
             if (reservation != null && reservation.canCheckIn()) {
-
                 reservation.updateStatus(Reservation.STATUS_CHECKED_IN);
                 reservation.setCheckInTime(new Date());
                 reservation.getRoom().checkIn(reservation);
@@ -111,6 +119,9 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                 em.merge(reservation.getRoom());
 
                 transaction.commit();
+                if (genericDAO != null) {
+                    genericDAO.notifyClients("Reservation checked in: " + reservationId);
+                }
                 return true;
             }
             return false;
@@ -118,7 +129,7 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Error checking in reservation: " + e.getMessage(), e);
         } finally {
             em.close();
         }
@@ -143,6 +154,9 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                 em.merge(reservation.getRoom());
 
                 transaction.commit();
+                if (genericDAO != null) {
+                    genericDAO.notifyClients("Reservation checked out: " + reservationId);
+                }
                 return true;
             }
             return false;
@@ -150,7 +164,7 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Error checking in reservation: " + e.getMessage(), e);
         } finally {
             em.close();
         }
@@ -163,7 +177,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
         try {
             transaction.begin();
 
-            // Lấy danh sách reservation và kiểm tra
             List<Reservation> reservations = em.createQuery(
                             "SELECT r FROM Reservation r WHERE r.reservationId IN :ids", Reservation.class)
                     .setParameter("ids", reservationIds)
@@ -173,7 +186,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                 return false;
             }
 
-            // Kiểm tra tất cả reservation có cùng customer không
             String customerId = reservations.get(0).getCustomer().getCustomerId();
             boolean sameCustomer = reservations.stream()
                     .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
@@ -182,7 +194,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                 throw new IllegalArgumentException("Các đơn đặt phòng không thuộc cùng một khách hàng");
             }
 
-            // Kiểm tra tất cả có thể check-in không
             boolean allCanCheckIn = reservations.stream()
                     .allMatch(Reservation::canCheckIn);
 
@@ -190,7 +201,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                 throw new IllegalStateException("Một số đơn đặt phòng không thể check-in");
             }
 
-            // Thực hiện check-in
             for (Reservation reservation : reservations) {
                 reservation.updateStatus(Reservation.STATUS_CHECKED_IN);
                 reservation.getRoom().checkIn(reservation);
@@ -199,12 +209,15 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             }
 
             transaction.commit();
+            if (genericDAO != null) {
+                genericDAO.notifyClients("Batch check-in completed for reservations: " + reservationIds);
+            }
             return true;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Error checking in reservation: " + e.getMessage(), e);
         } finally {
             em.close();
         }
@@ -217,7 +230,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
         try {
             transaction.begin();
 
-            // Lấy danh sách reservation và kiểm tra
             List<Reservation> reservations = em.createQuery(
                             "SELECT r FROM Reservation r WHERE r.reservationId IN :ids", Reservation.class)
                     .setParameter("ids", reservationIds)
@@ -227,7 +239,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                 return false;
             }
 
-            // Kiểm tra tất cả reservation có cùng customer không
             String customerId = reservations.get(0).getCustomer().getCustomerId();
             boolean sameCustomer = reservations.stream()
                     .allMatch(r -> r.getCustomer().getCustomerId().equals(customerId));
@@ -236,7 +247,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                 throw new IllegalArgumentException("Các đơn đặt phòng không thuộc cùng một khách hàng");
             }
 
-            // Kiểm tra tất cả có thể check-out không
             boolean allCanCheckOut = reservations.stream()
                     .allMatch(Reservation::canCheckOut);
 
@@ -244,7 +254,6 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                 throw new IllegalStateException("Một số đơn đặt phòng không thể check-out");
             }
 
-            // Thực hiện check-out và tính phụ phí
             for (Reservation reservation : reservations) {
                 reservation.calculateOverstayDetails(actualCheckOutTime);
                 reservation.setTotalPrice(reservation.getTotalPrice() + reservation.getOverstayFee());
@@ -255,12 +264,15 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             }
 
             transaction.commit();
+            if (genericDAO != null) {
+                genericDAO.notifyClients("Batch check-out completed for reservations: " + reservationIds);
+            }
             return true;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Error checking in reservation: " + e.getMessage(), e);
         } finally {
             em.close();
         }
@@ -279,6 +291,9 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
                 em.merge(reservation);
                 em.merge(reservation.getRoom());
                 transaction.commit();
+                if (genericDAO != null) {
+                    genericDAO.notifyClients("Reservation cancelled: " + reservationId);
+                }
                 return true;
             }
             return false;
@@ -286,7 +301,7 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Error cancelling reservation: " + e.getMessage(), e);
         } finally {
             em.close();
         }
@@ -299,23 +314,28 @@ public class ReservationDAOImpl extends GenericDAOImpl<Reservation, String> impl
         try {
             transaction.begin();
             boolean allSuccess = true;
+            List<String> cancelledReservationIds = new ArrayList<>();
             for (Reservation reservation : reservations) {
                 if (reservation.canCancel()) {
                     reservation.updateStatus(Reservation.STATUS_CANCELLED);
                     reservation.getRoom().cancelReservation();
                     em.merge(reservation);
                     em.merge(reservation.getRoom());
+                    cancelledReservationIds.add(reservation.getReservationId());
                 } else {
                     allSuccess = false;
                 }
             }
             transaction.commit();
+            if (genericDAO != null && !cancelledReservationIds.isEmpty()) {
+                genericDAO.notifyClients("Multiple reservations cancelled: " + cancelledReservationIds);
+            }
             return allSuccess;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Error checking in reservation: " + e.getMessage(), e);
         } finally {
             em.close();
         }

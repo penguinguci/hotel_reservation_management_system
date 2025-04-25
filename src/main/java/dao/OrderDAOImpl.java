@@ -3,6 +3,7 @@ package dao;
 import entities.Orders;
 import entities.Reservation;
 import interfaces.OrderDAO;
+import interfaces.GenericDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
@@ -18,10 +19,15 @@ import java.util.List;
 public class OrderDAOImpl extends GenericDAOImpl<Orders, String> implements OrderDAO, Serializable {
     private static final long serialVersionUID = 1L;
     private EntityManager em;
+    private GenericDAO genericDAO;
 
     public OrderDAOImpl() throws RemoteException {
         super(Orders.class);
         em = AppUtil.getEntityManager();
+    }
+
+    public void setGenericDAO(GenericDAO genericDAO) {
+        this.genericDAO = genericDAO;
     }
 
     @Override
@@ -32,12 +38,15 @@ public class OrderDAOImpl extends GenericDAOImpl<Orders, String> implements Orde
             transaction.begin();
             em.persist(order);
             transaction.commit();
+            if (genericDAO != null) {
+                genericDAO.notifyClients("Order created: " + order.getOrderId());
+            }
             return true;
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Error creating order: " + e.getMessage(), e);
         } finally {
             em.close();
         }

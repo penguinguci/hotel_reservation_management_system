@@ -2,11 +2,11 @@ package dao;
 
 import entities.Staff;
 import interfaces.StaffDAO;
+import interfaces.GenericDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Id;
 import jakarta.persistence.TypedQuery;
-import lombok.AllArgsConstructor;
 import utils.AppUtil;
 
 import java.io.Serializable;
@@ -19,27 +19,33 @@ import java.util.List;
 public class StaffDAOImpl extends GenericDAOImpl<Staff, String> implements StaffDAO, Serializable, Remote {
     private static final long serialVersionUID = 1L;
     private EntityManager em;
+    private GenericDAO genericDAO;
 
-    public StaffDAOImpl () throws RemoteException {
+    public StaffDAOImpl() throws RemoteException {
         super(Staff.class);
-
         em = AppUtil.getEntityManager();
     }
 
+    public void setGenericDAO(GenericDAO genericDAO) {
+        this.genericDAO = genericDAO;
+    }
 
     // create
     public boolean create(Staff staff) {
         EntityTransaction tr = em.getTransaction();
         try {
             tr.begin();
-                em.persist(staff);
+            em.persist(staff);
             tr.commit();
+            if (genericDAO != null) {
+                genericDAO.notifyClients("Staff created: " + staff.getStaffId());
+            }
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
             tr.rollback();
+            return false;
         }
-        return false;
     }
 
     // update
@@ -49,12 +55,15 @@ public class StaffDAOImpl extends GenericDAOImpl<Staff, String> implements Staff
             tr.begin();
             em.merge(staff);
             tr.commit();
+            if (genericDAO != null) {
+                genericDAO.notifyClients("Staff updated: " + staff.getStaffId());
+            }
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
             tr.rollback();
+            return false;
         }
-        return false;
     }
 
     // delete
@@ -63,26 +72,32 @@ public class StaffDAOImpl extends GenericDAOImpl<Staff, String> implements Staff
         try {
             tr.begin();
             Staff staff = em.find(Staff.class, id);
-            em.remove(staff);
+            if (staff != null) {
+                em.remove(staff);
+                tr.commit();
+                if (genericDAO != null) {
+                    genericDAO.notifyClients("Staff deleted: " + id);
+                }
+                return true;
+            }
             tr.commit();
-            return true;
+            return false;
         } catch (Exception ex) {
             ex.printStackTrace();
             tr.rollback();
+            return false;
         }
-        return false;
     }
 
     // tìm kiếm nhân viên theo tên
     public List<Staff> listStaffByName(String name) {
         String query = "select s from Staff s where lower(s.firstName) like lower(:name)" +
-                "or lower(s.lastName) like lower(:name) ";
+                " or lower(s.lastName) like lower(:name) ";
 
         return em.createQuery(query, Staff.class)
                 .setParameter("name", "%" + name + "%")
                 .getResultList();
     }
-
 
     // Hàm hỗ trợ lấy tên trường ID
     private String getIdFieldName() {
@@ -170,6 +185,7 @@ public class StaffDAOImpl extends GenericDAOImpl<Staff, String> implements Staff
             throw new RuntimeException("Error counting by prefix", e);
         }
     }
+
     @Override
     public void updateStatus(String staffId, boolean status) throws RemoteException {
         EntityTransaction transaction = em.getTransaction();
@@ -179,8 +195,13 @@ public class StaffDAOImpl extends GenericDAOImpl<Staff, String> implements Staff
             if (staff != null) {
                 staff.setStatus(status);
                 em.merge(staff);
+                transaction.commit();
+                if (genericDAO != null) {
+                    genericDAO.notifyClients("Staff status updated: " + staffId + ", new status: " + status);
+                }
+            } else {
+                transaction.commit();
             }
-            transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();

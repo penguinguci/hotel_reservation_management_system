@@ -2,8 +2,8 @@ package dao;
 
 import entities.Service;
 import interfaces.ServicesDAO;
+import interfaces.GenericDAO;
 import jakarta.persistence.*;
-import org.hibernate.Session;
 import utils.AppUtil;
 
 import java.io.Serializable;
@@ -19,10 +19,16 @@ public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements 
     @PersistenceContext
     private EntityManager entityManager;
 
+    private GenericDAO genericDAO;
+
     public ServicesDAOImpl() throws RemoteException {
         super(Service.class);
         entityManagerFactory = Persistence.createEntityManagerFactory("mariadb");
         entityManager = entityManagerFactory.createEntityManager();
+    }
+
+    public void setGenericDAO(GenericDAO genericDAO) {
+        this.genericDAO = genericDAO;
     }
 
     // Tạo dịch vụ
@@ -32,11 +38,14 @@ public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements 
             transaction.begin();
             entityManager.persist(service);
             transaction.commit();
+            if (genericDAO != null) {
+                genericDAO.notifyClients("Service created: " + service.getServiceId());
+            }
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException( e);
         }
     }
 
@@ -58,11 +67,14 @@ public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements 
             transaction.begin();
             entityManager.merge(service);
             transaction.commit();
+            if (genericDAO != null) {
+                genericDAO.notifyClients("Service updated: " + service.getServiceId());
+            }
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 
@@ -74,13 +86,18 @@ public class ServicesDAOImpl extends GenericDAOImpl<Service, String> implements 
             Service service = entityManager.find(Service.class, id);
             if (service != null) {
                 entityManager.remove(service);
+                transaction.commit();
+                if (genericDAO != null) {
+                    genericDAO.notifyClients("Service deleted: " + id);
+                }
+            } else {
+                transaction.commit();
             }
-            transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) {
                 transaction.rollback();
             }
-            throw e;
+            throw new RuntimeException("Error deleting service with ID: " + id, e);
         }
     }
 
